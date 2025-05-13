@@ -20,13 +20,13 @@ function selectingWord(param) {
     selectWords.value = words.value.filter(item => chapters.value.includes(item.chapter));
     toggleChapter.value = "";
   } else {
-    console.log("chapter : ", param);
+    //console.log("chapter : ", param);
     selectWords.value = words.value.filter(item => item.chapter === param);
   }
 
   totalCount.value = selectWords.value.length;
 
-  console.log("totalCount : ", totalCount.value);
+  //console.log("totalCount : ", totalCount.value);
 }
 
 function changeMode() {
@@ -198,7 +198,7 @@ onMounted(() => {
     </v-main>
     <v-progress-linear :model-value="progress" color="green"></v-progress-linear>
 
-    <v-snackbar v-model="isMeaningView" :timeout="2000" color="primary" variant="tonal">
+    <v-snackbar v-model="isMeaningView" :timeout="2000" location="center center" color="primary" variant="tonal">
       {{ currentWord.meaning }}
     </v-snackbar>
   </v-app>
@@ -220,9 +220,10 @@ onMounted(() => {
 
 #buttonRow {
   position: absolute;
-  top: 300px;
+  top: 340px;
   justify-content: center;
   display: flex;
   width: 100%;
 }
+
 </style>
