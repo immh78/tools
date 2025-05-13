@@ -7,13 +7,17 @@ const toggleMode = ref("quiz");
 const toggleChapter = ref("");
 const words = ref([]);
 const selectWords = ref([]);
+const wrongWords = ref([]);
+const meaningWrongWord = ref("");
 const wordFontSize = ref(70);
 const isMeaningView = ref(false);
+const isMeaningWrongWordView = ref(false);
 const currentWord = ref({});
 const correctCount = ref(0);
 const wrongCount = ref(0);
 const progress = ref(0);
 const totalCount = ref(0);
+
 
 function selectingWord(param) {
   if (toggleMode.value == "quiz") {
@@ -84,6 +88,10 @@ function markCorrect() {
   correctCount.value++;
   selectWords.value = selectWords.value.filter(item => item.word !== currentWord.value.word);
 
+  if (currentWord.value.wrongCount > 0) {
+    wrongWords.value = wrongWords.value.filter(item => item.word !== currentWord.value.word);
+  }
+
   //console.log("count : ", selectWords.value.length);
 
   pickRandomWord();
@@ -94,9 +102,20 @@ function markWrong() {
   if (selectWords.value.length === 0) return;
   wrongCount.value++;
 
-  const firstElement = selectWords.value.shift(); // Remove the first element
-  firstElement.wrongCount += 1;
-  selectWords.value.push(firstElement);
+  if (toggleMode.value == "memorize") {
+    const firstElement = selectWords.value.shift(); // Remove the first element
+    firstElement.wrongCount += 1;
+    //console.log("firstElement : ", firstElement);
+
+    selectWords.value.push(firstElement);
+  } else {
+    selectWords.value.find(item => item.word === currentWord.value.word).wrongCount += 1;
+  }
+
+  if (!wrongWords.value.some(item => item.word === currentWord.value.word)) {
+    wrongWords.value.push(currentWord.value);
+  }
+
 
   //console.log("count : ", selectWords.value.length);
 
@@ -124,6 +143,13 @@ function initValue() {
   currentWord.value.wrongCount = 0;
   progress.value = 0;
   isMeaningView.value = false;
+  wrongWords.value = [];
+  selectWords.value = [];
+}
+
+function showMeaningWrongWord(param) {
+  meaningWrongWord.value = param;
+  isMeaningWrongWordView.value = true;
 }
 
 
@@ -203,11 +229,20 @@ onMounted(() => {
             <v-badge color="error" :content="wrongCount"><v-btn color="red-lighten-5" @click="markWrong()"><v-icon
                   color="red">mdi-close-thick</v-icon>오답</v-btn></v-badge>
           </v-col>
-
+        </v-row>
+        <v-row id="wrongWordRow">
+          <v-col cols="auto">
+            <v-chip v-for="wrongWord in wrongWords" color="red" text-color="white" class="chip-spacing" @click="showMeaningWrongWord(wrongWord.meaning)">
+              {{ wrongWord.word }}
+            </v-chip>
+          </v-col>
         </v-row>
       </v-container>
-
+      <v-snackbar v-model="isMeaningWrongWordView" :timeout="2000" color="primary" variant="tonal">
+        {{ meaningWrongWord }}
+      </v-snackbar>
     </v-main>
+
     <v-progress-linear :model-value="progress" color="green"></v-progress-linear>
 
   </v-app>
@@ -243,6 +278,13 @@ onMounted(() => {
   width: 100%;
 }
 
+#wrongWordRow {
+  position: absolute;
+  top: 390px;
+  width: 100%;
+}
+
+
 .multi-line-btn-toggle {
   display: flex;
   flex-wrap: wrap;
@@ -251,5 +293,10 @@ onMounted(() => {
   /* 버튼을 중앙 정렬 */
   width: 100%;
   /* 버튼 토글의 너비를 100%로 설정 */
+}
+
+.chip-spacing {
+  margin: 4px;
+  /* 각 v-chip 간격 설정 */
 }
 </style>
