@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted } from "vue";
 
-const chapters = ref(["Day 6", "Day 7"]);
+const chapters = ref(["UNIT5-3", "UNIT5-4"]);
 
 const toggleMode = ref("quiz");
 const toggleChapter = ref("");
@@ -44,6 +44,7 @@ function changeChapter(param) {
 
 function pickRandomWord() {
   if (selectWords.value.length === 0) {
+    currentWord.value.wrongCount = 0;
     currentWord.value.word = "완료!";
     return;
   }
@@ -131,7 +132,7 @@ onMounted(() => {
               </v-btn>
               <v-btn value="memorize" @click="changeMode()">
                 <span>암기</span>
-                <v-icon end>mdi-head-question</v-icon>
+                <v-icon end>mdi-chat-alert</v-icon>
               </v-btn>
             </v-btn-toggle>
           </v-col>
