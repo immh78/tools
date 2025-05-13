@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted } from "vue";
 
-const chapters = ref(["UNIT5-3", "UNIT5-4"]);
+const chapters = ref(["Day 10", "Day 11", "Day 12"]);
 
 const toggleMode = ref("quiz");
 const toggleChapter = ref("");
@@ -85,6 +85,7 @@ function markCorrect() {
   selectWords.value = selectWords.value.filter(item => item.word !== currentWord.value.word);
 
   //console.log("count : ", selectWords.value.length);
+  
   pickRandomWord();
   updateProgress();
 }
@@ -158,10 +159,10 @@ onMounted(() => {
             </v-btn-toggle>
           </v-col>
         </v-row>
-        <v-row justify="center" v-if="toggleMode === 'memorize'">
+        <v-row justify="center">
           <v-col cols="auto">
-            <v-btn-toggle v-model="toggleChapter" color="deep-purple-accent-3" rounded="0" group>
-              <v-btn v-for="chapter in chapters" :key="chapter" :value="chapter" @click="changeChapter(chapter)">
+            <v-btn-toggle v-model="toggleChapter" color="deep-purple-accent-3" rounded="0" group class="multi-line-btn-toggle">
+              <v-btn v-for="chapter in chapters" :key="chapter" :value="chapter" :readonly="toggleMode == 'quiz'? true : false" :style="chapter == currentWord.chapter && toggleMode == 'quiz' ? 'text-decoration: underline': ''"  @click="changeChapter(chapter)">
                 {{ chapter }}
               </v-btn>
 
@@ -225,5 +226,13 @@ onMounted(() => {
   display: flex;
   width: 100%;
 }
+
+.multi-line-btn-toggle {
+  display: flex;
+  flex-wrap: wrap; /* 버튼이 여러 줄로 배치되도록 설정 */
+  justify-content: center; /* 버튼을 중앙 정렬 */
+  width: 100%; /* 버튼 토글의 너비를 100%로 설정 */
+}
+
 
 </style>
