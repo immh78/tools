@@ -20,15 +20,18 @@ function selectingWord(param) {
     selectWords.value = words.value.filter(item => chapters.value.includes(item.chapter));
     toggleChapter.value = "";
   } else {
+    console.log("chapter : ", param);
     selectWords.value = words.value.filter(item => item.chapter === param);
   }
 
-  totalCount.value = selectWords.value.length;  
+  totalCount.value = selectWords.value.length;
+
+  console.log("totalCount : ", totalCount.value);
 }
 
 function changeMode() {
   initValue();
-  
+
   if (toggleMode.value == "quiz") {
     toggleChapter.value = "";
     selectingWord('');
@@ -46,6 +49,7 @@ function pickRandomWord() {
   if (selectWords.value.length === 0) {
     currentWord.value.wrongCount = 0;
     currentWord.value.word = "완료!";
+    currentWord.value.meaning = "모든 단어를 외웠습니다.";
     return;
   }
 
@@ -53,15 +57,31 @@ function pickRandomWord() {
 
   let index = 0;
   if (toggleMode.value == "quiz") {
-      index = Math.floor(Math.random() * selectWords.value.length);
+    index = Math.floor(Math.random() * selectWords.value.length);
   } else {
-      index = 0;
+    index = 0;
   }
-  currentWord.value = selectWords.value[index];  
+  //console.log("selectWords : ", selectWords.value);
+  currentWord.value = { ...selectWords.value[index] };
+  //console.log("currentWord : ", currentWord.value.word);  
+  let tempFontSize = 70;
+
+  if (currentWord.value.word.length > 8) {
+    tempFontSize -= (currentWord.value.word.length - 7) * 10;
+  }
+
+  if (tempFontSize < 40) {
+    wordFontSize.value = 40;
+  } else {
+    wordFontSize.value = tempFontSize;
+  }
+
 }
 
 function markCorrect() {
-  correctCount.value ++;
+  if (selectWords.value.length === 0) return;
+
+  correctCount.value++;
   selectWords.value = selectWords.value.filter(item => item.word !== currentWord.value.word);
 
   //console.log("count : ", selectWords.value.length);
@@ -70,7 +90,8 @@ function markCorrect() {
 }
 
 function markWrong() {
-  wrongCount.value ++;
+  if (selectWords.value.length === 0) return;
+  wrongCount.value++;
 
   const firstElement = selectWords.value.shift(); // Remove the first element
   firstElement.wrongCount += 1;
@@ -83,7 +104,7 @@ function markWrong() {
 }
 
 function updateProgress() {
-  progress.value = Math.round(((totalCount.value - selectWords.value.length) / totalCount.value) * 100);      
+  progress.value = Math.round(((totalCount.value - selectWords.value.length) / totalCount.value) * 100);
 }
 
 
@@ -100,7 +121,7 @@ function initValue() {
   currentWord.value.word = "";
   currentWord.value.meaning = "";
   currentWord.value.wrongCount = 0;
-  progress.value = 0;  
+  progress.value = 0;
 }
 
 
@@ -147,45 +168,61 @@ onMounted(() => {
             </v-btn-toggle>
           </v-col>
         </v-row>
-        <v-row justify="center">
+        <v-row id="wordRow">
           <v-col cols="auto">
-            <span id="word" :style="{fontSize: wordFontSize + 'px'}" @click="speechWord()">{{ currentWord.word }}</span>
+            <span id="word" :style="{ fontSize: wordFontSize + 'px' }" @click="speechWord()">{{ currentWord.word
+              }}</span>
             <span id="wrong">
               <v-icon color="red-darken-4" v-for="n in currentWord.wrongCount">mdi-close-thick</v-icon>
             </span>
           </v-col>
         </v-row>
-        <v-row justify="center" v-if="isMeaningView">
+
+        <v-row id="buttonRow">
           <v-col cols="auto">
-            <span id="meaning">{{ currentWord.meaning }}</span>
-          </v-col>
-        </v-row>
-        <v-row justify="center">
-          <v-col cols="auto">
-            <v-btn color="light-green-lighten-5" @click="isMeaningView = !isMeaningView"><v-icon>mdi-magnify</v-icon>뜯보기</v-btn>
+            <v-btn color="light-green-lighten-5"
+              @click="isMeaningView = !isMeaningView"><v-icon color="green">mdi-magnify</v-icon>뜯보기</v-btn>
           </v-col>
           <v-col cols="auto">
-            <v-badge color="blue" :content="correctCount"><v-btn color="blue-lighten-5" @click="markCorrect()"><v-icon>mdi-check-bold</v-icon>정답</v-btn></v-badge>
+            <v-badge color="blue" :content="correctCount"><v-btn color="blue-lighten-5"
+                @click="markCorrect()"><v-icon color="blue">mdi-check-bold</v-icon>정답</v-btn></v-badge>
           </v-col>
           <v-col cols="auto">
-            <v-badge color="error" :content="wrongCount"><v-btn color="red-lighten-5" @click="markWrong()"><v-icon>mdi-close-thick</v-icon>오답</v-btn></v-badge>
+            <v-badge color="error" :content="wrongCount"><v-btn color="red-lighten-5"
+                @click="markWrong()"><v-icon color="red">mdi-close-thick</v-icon>오답</v-btn></v-badge>
           </v-col>
 
         </v-row>
       </v-container>
 
     </v-main>
-    <v-progress-linear :model-value="progress" ></v-progress-linear>    
+    <v-progress-linear :model-value="progress" color="green"></v-progress-linear>
+
+    <v-snackbar v-model="isMeaningView" :timeout="2000" color="primary" variant="tonal">
+      {{ currentWord.meaning }}
+    </v-snackbar>
   </v-app>
 
 </template>
 
 <style scoped>
-  #wrong {
-    font-size: 8px;
-  }
+#wrong {
+  font-size: 8px;
+}
 
-  #meaning {
-    color: #00695C;
-  }
+#wordRow {
+  position: absolute;
+  top: 180px;
+  justify-content: center;
+  display: flex;
+  width: 100%;
+}
+
+#buttonRow {
+  position: absolute;
+  top: 300px;
+  justify-content: center;
+  display: flex;
+  width: 100%;
+}
 </style>
