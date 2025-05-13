@@ -85,7 +85,7 @@ function markCorrect() {
   selectWords.value = selectWords.value.filter(item => item.word !== currentWord.value.word);
 
   //console.log("count : ", selectWords.value.length);
-  
+
   pickRandomWord();
   updateProgress();
 }
@@ -123,6 +123,7 @@ function initValue() {
   currentWord.value.meaning = "";
   currentWord.value.wrongCount = 0;
   progress.value = 0;
+  isMeaningView.value = false;
 }
 
 
@@ -161,8 +162,12 @@ onMounted(() => {
         </v-row>
         <v-row justify="center">
           <v-col cols="auto">
-            <v-btn-toggle v-model="toggleChapter" color="deep-purple-accent-3" rounded="0" group class="multi-line-btn-toggle">
-              <v-btn v-for="chapter in chapters" :key="chapter" :value="chapter" :readonly="toggleMode == 'quiz'? true : false" :style="chapter == currentWord.chapter && toggleMode == 'quiz' ? 'text-decoration: underline': ''"  @click="changeChapter(chapter)">
+            <v-btn-toggle v-model="toggleChapter" color="deep-purple-accent-3" rounded="0" group
+              class="multi-line-btn-toggle">
+              <v-btn v-for="chapter in chapters" :key="chapter" :value="chapter"
+                :readonly="toggleMode == 'quiz' ? true : false"
+                :style="chapter == currentWord.chapter && toggleMode == 'quiz' ? 'text-decoration: underline' : ''"
+                @click="changeChapter(chapter)">
                 {{ chapter }}
               </v-btn>
 
@@ -172,25 +177,31 @@ onMounted(() => {
         <v-row id="wordRow">
           <v-col cols="auto">
             <span id="word" :style="{ fontSize: wordFontSize + 'px' }" @click="speechWord()">{{ currentWord.word
-              }}</span>
+            }}</span>
             <span id="wrong">
               <v-icon color="red-darken-4" v-for="n in currentWord.wrongCount">mdi-close-thick</v-icon>
             </span>
           </v-col>
         </v-row>
-
+        <v-row id="meaningRow">
+          <v-col cols="auto">
+            <v-alert v-model="isMeaningView" color="success" height="40px">
+              {{ currentWord.meaning }}
+            </v-alert>
+          </v-col>
+        </v-row>
         <v-row id="buttonRow">
           <v-col cols="auto">
-            <v-btn color="light-green-lighten-5"
-              @click="isMeaningView = !isMeaningView"><v-icon color="green">mdi-magnify</v-icon>뜯보기</v-btn>
+            <v-btn color="light-green-lighten-5" @click="isMeaningView = !isMeaningView"><v-icon
+                color="green">mdi-magnify</v-icon>뜯보기</v-btn>
           </v-col>
           <v-col cols="auto">
-            <v-badge color="blue" :content="correctCount"><v-btn color="blue-lighten-5"
-                @click="markCorrect()"><v-icon color="blue">mdi-check-bold</v-icon>정답</v-btn></v-badge>
+            <v-badge color="blue" :content="correctCount"><v-btn color="blue-lighten-5" @click="markCorrect()"><v-icon
+                  color="blue">mdi-check-bold</v-icon>정답</v-btn></v-badge>
           </v-col>
           <v-col cols="auto">
-            <v-badge color="error" :content="wrongCount"><v-btn color="red-lighten-5"
-                @click="markWrong()"><v-icon color="red">mdi-close-thick</v-icon>오답</v-btn></v-badge>
+            <v-badge color="error" :content="wrongCount"><v-btn color="red-lighten-5" @click="markWrong()"><v-icon
+                  color="red">mdi-close-thick</v-icon>오답</v-btn></v-badge>
           </v-col>
 
         </v-row>
@@ -199,9 +210,6 @@ onMounted(() => {
     </v-main>
     <v-progress-linear :model-value="progress" color="green"></v-progress-linear>
 
-    <v-snackbar v-model="isMeaningView" :timeout="2000" location="center center" color="primary" variant="tonal">
-      {{ currentWord.meaning }}
-    </v-snackbar>
   </v-app>
 
 </template>
@@ -227,12 +235,21 @@ onMounted(() => {
   width: 100%;
 }
 
-.multi-line-btn-toggle {
+#meaningRow {
+  position: absolute;
+  top: 280px;
+  justify-content: center;
   display: flex;
-  flex-wrap: wrap; /* 버튼이 여러 줄로 배치되도록 설정 */
-  justify-content: center; /* 버튼을 중앙 정렬 */
-  width: 100%; /* 버튼 토글의 너비를 100%로 설정 */
+  width: 100%;
 }
 
-
+.multi-line-btn-toggle {
+  display: flex;
+  flex-wrap: wrap;
+  /* 버튼이 여러 줄로 배치되도록 설정 */
+  justify-content: center;
+  /* 버튼을 중앙 정렬 */
+  width: 100%;
+  /* 버튼 토글의 너비를 100%로 설정 */
+}
 </style>
