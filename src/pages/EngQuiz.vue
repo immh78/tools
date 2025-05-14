@@ -268,7 +268,7 @@ onMounted(async () => {
                     <v-btn icon="mdi-cog" @click="isSetPopup = true"></v-btn>
                 </template>
 
-                <v-app-bar-title>채원이 영어 단어장</v-app-bar-title>
+                <v-app-bar-title><v-icon>mdi-book</v-icon> 채원이 영어 단어장</v-app-bar-title>
             </v-app-bar>
             <v-container>
                 <v-row justify="center">
@@ -330,14 +330,20 @@ onMounted(async () => {
                                 @click="markWrong()"><v-icon color="red">mdi-close-thick</v-icon>오답</v-btn></v-badge>
                     </v-col>
                 </v-row>
-                <v-row id="wrongWordRow">
-                    <v-col cols="auto">
-                        <v-chip v-for="wrongWord in wrongWords" color="red" text-color="white" class="chip-spacing"
-                            @click="showMeaningWrongWord(wrongWord.meaning)">
-                            {{ wrongWord.word }}
-                        </v-chip>
-                    </v-col>
-                </v-row>
+                <v-sheet v-if="wrongWords.length > 0" id="wrongWordRow" class="pa-4 mx-auto" max-width="380" rounded="lg"
+                    width="92%" color="#fff2f4">
+                    <v-row>
+                        <v-col cols="auto">
+
+                            <v-chip v-for="wrongWord in wrongWords" color="red" text-color="white" class="chip-spacing"
+                                @click="showMeaningWrongWord(wrongWord.meaning)">
+                                {{ wrongWord.word }}
+                            </v-chip>
+                        </v-col>
+                    </v-row>
+                </v-sheet>
+
+
             </v-container>
             <v-snackbar v-model="isMeaningWrongWordView" :timeout="2000" color="primary" variant="tonal">
                 {{ meaningWrongWord }}
@@ -352,9 +358,6 @@ onMounted(async () => {
                             </v-col>
                         </v-row>
                     </v-container>
-
-
-
                 </v-card>
                 <v-fab icon="mdi-close" color="blue" @click="isSetPopup = false" class="fixed-fab">
                 </v-fab>
@@ -398,8 +401,8 @@ onMounted(async () => {
 
 #wrongWordRow {
     position: absolute;
-    top: 390px;
-    width: 100%;
+    justify-content: center;
+    top: 410px;
 }
 
 
@@ -420,8 +423,11 @@ onMounted(async () => {
 
 .fixed-fab {
     position: fixed;
-    top: 16px; /* 화면 하단에서 16px 위 */
-    right: 16px; /* 화면 우측에서 16px 왼쪽 */
-    z-index: 1050; /* 다른 요소 위에 표시되도록 설정 */
+    top: 16px;
+    /* 화면 하단에서 16px 위 */
+    right: 16px;
+    /* 화면 우측에서 16px 왼쪽 */
+    z-index: 1050;
+    /* 다른 요소 위에 표시되도록 설정 */
 }
 </style>
