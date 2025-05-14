@@ -1,8 +1,8 @@
 <script setup>
-import { database, ref as firebaseRef, get } from "../config/firebase";
-import { ref, onMounted } from "vue";
+import { database, ref as firebaseRef, get, update } from "../config/firebase";
+import { ref, watch, onMounted } from "vue";
 
-const chapters = ref(["Day 10", "Day 11"]); 
+const chapters = ref([]);
 const toggleMode = ref("quiz");
 const toggleChapter = ref("");
 const words = ref([]);
@@ -12,20 +12,25 @@ const meaningWrongWord = ref("");
 const wordFontSize = ref(70);
 const isMeaningView = ref(false);
 const isMeaningWrongWordView = ref(false);
+const isSetPopup = ref(false);
 const currentWord = ref({});
 const correctCount = ref(0);
 const wrongCount = ref(0);
 const progress = ref(0);
 const totalCount = ref(0);
 
-/* DB 관련 변수 */ 
-const quizData = ref(null);
+/* DB 관련 변수 */
+const quizChapters = ref(null);
 const error = ref(null);
 
 
 function selectingWord(param) {
+
+    //console.log("select #1", chapters.value);
     if (toggleMode.value == "quiz") {
         selectWords.value = words.value.filter(item => chapters.value.includes(item.chapter));
+        //console.log("select #2", words.value.length);
+        //console.log("select #3", selectWords.value.length);
         toggleChapter.value = "";
     } else {
         //console.log("chapter : ", param);
@@ -156,13 +161,13 @@ function showMeaningWrongWord(param) {
     isMeaningWrongWordView.value = true;
 }
 
-async function fetchQuizData() {
+async function fetchquizChapters() {
     const dbRef = firebaseRef(database, "eng-quiz-chapter");
-    get(dbRef)
+    await get(dbRef)
         .then(snapshot => {
             if (snapshot.exists()) {
-                quizData.value = snapshot.val();
-                console.log("#1", quizData.value);
+                quizChapters.value = snapshot.val();
+                //console.log("#1", quizChapters.value);
             } else {
                 console.log("No data available");
             }
@@ -173,24 +178,69 @@ async function fetchQuizData() {
         });
 }
 
-async function getChapter() {
-    await fetchQuizData();
-
-    console.log("#2", quizData.value);
-
-    if (quizData.value) {
-        
-        chapters.value = Object.values(quizData.value)
-            .filter(item => item.select === true) // select가 true인 항목 필터링
-            .map(item => item.chapter); // chapter 값만 추출
-        console.log(chapters.value); // 결과 확인
+async function saveQuizChapter(data) {
+    try {
+        const dbRef = firebaseRef(database, "eng-quiz-chapter");
+        await update(dbRef, data); // 데이터를 저장
+        console.log("Data saved successfully!");
+    } catch (err) {
+        console.error("Error saving data:", err);
     }
 }
 
-onMounted(() => {
-    //getChapter();          
+async function getChapter() {
+    await fetchquizChapters();
 
-    fetch('words.json')
+    //console.log("#2", quizChapters.value[0]);
+
+    if (quizChapters.value) {
+        chapters.value = Object.values(quizChapters.value)
+            .filter(item => item.select === true) // select가 true인 항목 필터링
+            .map(item => item.chapter);
+        //console.log("#3", chapters.value); // 결과 확인
+    }
+}
+
+// Watcher 설정
+watch(chapters, (newValue, oldValue) => {
+
+    const addedValues = newValue.filter(value => !oldValue.includes(value));
+    const removedValues = oldValue.filter(value => !newValue.includes(value));
+
+    let action = null;
+    let chapter = "";
+
+    // 추가된 값과 삭제된 값에 따라 로직 실행
+    if (addedValues.length > 0) {
+        chapter = addedValues[0];
+        action = true;
+    }
+    if (removedValues.length > 0) {
+        action = false;
+        chapter = removedValues[0];
+    }
+
+    const data = { "chapter": chapter, "select": action };
+
+    if (action != null) {
+        const idx = Object.values(quizChapters.value).findIndex(item => item.chapter === data.chapter && item.select != data.select);
+        // 초기값과 비교하여 달라진것만 update
+        if(idx > -1 ) {
+            // 변경된 값에 따라 추가 로직 실행
+            //saveQuizChapter(data);
+            console.log("chapter update : ", idx, data.chapter);
+            console.log("update data : ", quizChapters.value[idx]);
+        } 
+    }
+
+
+});
+
+
+onMounted(async() => {
+    await getChapter();
+
+    await fetch('words.json')
         .then(response => response.json())
         .then(data => {
             words.value = data.map(item => ({
@@ -198,9 +248,11 @@ onMounted(() => {
                 wrongCount: 0
             }));
 
-            selectingWord('');
-            pickRandomWord();  
         });
+
+    selectingWord('');
+    pickRandomWord();
+
 })
 
 </script>
@@ -208,6 +260,16 @@ onMounted(() => {
 <template>
     <v-app>
         <v-main>
+            <v-app-bar color="teal-darken-4"> <!--image="https://picsum.photos/1920/1080?random-->
+                <template v-slot:image>
+                    <v-img gradient="to top right, rgba(19,84,122,.8), rgba(128,208,199,.8)"></v-img>
+                </template>
+                <template v-slot:append>
+                    <v-btn icon="mdi-cog" @click="isSetPopup = true"></v-btn>
+                </template>
+
+                <v-app-bar-title>채원이 영어 단어장</v-app-bar-title>
+            </v-app-bar>
             <v-container>
                 <v-row justify="center">
                     <v-col cols="auto">
@@ -241,7 +303,7 @@ onMounted(() => {
                     <v-col cols="auto">
                         <span id="word" :style="{ fontSize: wordFontSize + 'px' }" @click="speechWord()">{{
                             currentWord.word
-                            }}</span>
+                        }}</span>
                         <span id="wrong">
                             <v-icon color="red-darken-4" v-for="n in currentWord.wrongCount">mdi-close-thick</v-icon>
                         </span>
@@ -280,6 +342,21 @@ onMounted(() => {
             <v-snackbar v-model="isMeaningWrongWordView" :timeout="2000" color="primary" variant="tonal">
                 {{ meaningWrongWord }}
             </v-snackbar>
+            <v-dialog v-model="isSetPopup" max-width="500">
+                <v-card title="학습 단원 선택">
+                    <v-container>
+                        <v-row>
+                            <v-col v-for="(c, index) in quizChapters" :key="index" cols="4">
+                                <v-switch v-model="chapters" color="red" :label="c.chapter" :value="c.chapter"
+                                    hide-details></v-switch>
+                            </v-col>
+                        </v-row>
+                    </v-container>
+                    <v-card-actions>
+                        <v-btn @click="isSetPopup = false">닫기</v-btn>
+                    </v-card-actions>
+                </v-card>
+            </v-dialog>
         </v-main>
 
         <v-progress-linear :model-value="progress" color="green"></v-progress-linear>
