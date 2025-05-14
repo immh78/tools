@@ -2,8 +2,8 @@
 import { database, ref as firebaseRef, get, update } from "../config/firebase";
 import { ref, watch, onMounted } from "vue";
 
-//const chapters = ref([]);
-const chapters = ref(["Day 10", "Day 11"]);
+const chapters = ref([]);
+//const chapters = ref(["Day 10", "Day 11"]);
 const toggleMode = ref("quiz");
 const toggleChapter = ref("");
 const words = ref([]);
@@ -24,23 +24,15 @@ const totalCount = ref(0);
 const quizChapters = ref(null);
 const error = ref(null);
 
-
 function selectingWord(param) {
-
-    //console.log("select #1", chapters.value);
     if (toggleMode.value == "quiz") {
         selectWords.value = words.value.filter(item => chapters.value.includes(item.chapter));
-        //console.log("select #2", words.value.length);
-        //console.log("select #3", selectWords.value.length);
         toggleChapter.value = "";
     } else {
-        //console.log("chapter : ", param);
         selectWords.value = words.value.filter(item => item.chapter === param);
     }
 
     totalCount.value = selectWords.value.length;
-
-    //console.log("totalCount : ", totalCount.value);
 }
 
 function changeMode() {
@@ -75,9 +67,7 @@ function pickRandomWord() {
     } else {
         index = 0;
     }
-    //console.log("selectWords : ", selectWords.value);
     currentWord.value = { ...selectWords.value[index] };
-    //console.log("currentWord : ", currentWord.value.word);  
     let tempFontSize = 70;
 
     if (currentWord.value.word.length > 8) {
@@ -102,8 +92,6 @@ function markCorrect() {
         wrongWords.value = wrongWords.value.filter(item => item.word !== currentWord.value.word);
     }
 
-    //console.log("count : ", selectWords.value.length);
-
     pickRandomWord();
     updateProgress();
 }
@@ -115,8 +103,6 @@ function markWrong() {
     if (toggleMode.value == "memorize") {
         const firstElement = selectWords.value.shift(); // Remove the first element
         firstElement.wrongCount += 1;
-        //console.log("firstElement : ", firstElement);
-
         selectWords.value.push(firstElement);
     } else {
         selectWords.value.find(item => item.word === currentWord.value.word).wrongCount += 1;
@@ -126,23 +112,17 @@ function markWrong() {
         wrongWords.value.push(currentWord.value);
     }
 
-
-    //console.log("count : ", selectWords.value.length);
-
     pickRandomWord();
-
 }
 
 function updateProgress() {
     progress.value = Math.round(((totalCount.value - selectWords.value.length) / totalCount.value) * 100);
 }
 
-
 function speechWord() {
     const utterance = new SpeechSynthesisUtterance(currentWord.value.word);
     utterance.lang = 'en-US';
     speechSynthesis.speak(utterance);
-    //console.log("speech : ", currentWord.value.word);
 }
 
 function initValue() {
@@ -168,7 +148,6 @@ async function fetchquizChapters() {
         .then(snapshot => {
             if (snapshot.exists()) {
                 quizChapters.value = snapshot.val();
-                console.log("#1", quizChapters.value);
             } else {
                 console.log("No data available");
             }
@@ -192,13 +171,10 @@ async function saveQuizChapter(data) {
 async function getChapter() {
     await fetchquizChapters();
 
-    //console.log("#2", quizChapters.value[0]);
-
     if (quizChapters.value) {
         chapters.value = Object.values(quizChapters.value)
             .filter(item => item.select === true) // select가 true인 항목 필터링
             .map(item => item.chapter);
-        // console.log("#3", chapters.value); // 결과 확인
     }
 }
 
@@ -236,7 +212,6 @@ watch(chapters, (newValue, oldValue) => {
 
 
 });
-
 
 onMounted(async () => {
     await getChapter();

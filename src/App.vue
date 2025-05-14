@@ -1,5 +1,6 @@
 <script setup>
 import EngQuiz from './pages/EngQuiz.vue';
+//import EngQuiz from './pages/Login.vue';
 </script>
 
 <template>
