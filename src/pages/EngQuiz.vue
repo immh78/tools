@@ -345,7 +345,7 @@ onMounted(async () => {
 
 
             </v-container>
-            <v-snackbar v-model="isMeaningWrongWordView" :timeout="2000" color="primary" variant="tonal">
+            <v-snackbar v-model="isMeaningWrongWordView" :timeout="2000" color="success" variant="tonal">
                 {{ meaningWrongWord }}
             </v-snackbar>
             <v-dialog v-model="isSetPopup" max-width="500">
