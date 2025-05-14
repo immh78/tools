@@ -2,7 +2,8 @@
 import { database, ref as firebaseRef, get, update } from "../config/firebase";
 import { ref, watch, onMounted } from "vue";
 
-const chapters = ref([]);
+//const chapters = ref([]);
+const chapters = ref(["Day 10", "Day 11"]);
 const toggleMode = ref("quiz");
 const toggleChapter = ref("");
 const words = ref([]);
@@ -167,7 +168,7 @@ async function fetchquizChapters() {
         .then(snapshot => {
             if (snapshot.exists()) {
                 quizChapters.value = snapshot.val();
-                //console.log("#1", quizChapters.value);
+                console.log("#1", quizChapters.value);
             } else {
                 console.log("No data available");
             }
@@ -197,7 +198,7 @@ async function getChapter() {
         chapters.value = Object.values(quizChapters.value)
             .filter(item => item.select === true) // select가 true인 항목 필터링
             .map(item => item.chapter);
-        //console.log("#3", chapters.value); // 결과 확인
+        // console.log("#3", chapters.value); // 결과 확인
     }
 }
 

@@ -1,24 +1,26 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getDatabase, ref, get, set,update } from "firebase/database";
+import {getAuth} from "firebase/auth";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyAjcEIdV46fa6Kw3Hdyzf3No_3cXtScRLc",
-  authDomain: "my-firebase-9450e.firebaseapp.com",
-  databaseURL: "https://my-firebase-9450e-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "my-firebase-9450e",
-  storageBucket: "my-firebase-9450e.firebasestorage.app",
-  messagingSenderId: "1025301057295",
-  appId: "1:1025301057295:web:18d2432b1614cc70e5387a",
-  measurementId: "G-SGD1NQERQJ"
+  apiKey: process.env.VUE_APP_FIREBASE_API_KEY,
+  authDomain: process.env.VUE_APP_FIREBASE_AUTH_DOMAIN,
+  databaseURL: process.env.VUE_APP_FIREBASE_DATABASE_URL,
+  projectId: process.env.VUE_APP_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.VUE_APP_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.VUE_APP_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.VUE_APP_FIREBASE_APP_ID,
+  measurementId: process.env.VUE_APP_FIREBASE_MEASUREMENT_ID
 };
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const database = getDatabase(app);
+const auth = getAuth(app);
 
-export { database, ref, get, set, update };
+export { database, ref, auth, get, set, update };
