@@ -220,16 +220,16 @@ watch(chapters, (newValue, oldValue) => {
         chapter = removedValues[0];
     }
 
-    const data = { "chapter": chapter, "select": action };
-
+    
     if (action != null) {
-        const idx = Object.values(quizChapters.value).findIndex(item => item.chapter === data.chapter && item.select != data.select);
+        let idx = Object.values(quizChapters.value).findIndex(item => item.chapter === chapter && item.select != action);
         // 초기값과 비교하여 달라진것만 update
         if(idx > -1 ) {
             // 변경된 값에 따라 추가 로직 실행
-            //saveQuizChapter(data);
-            console.log("chapter update : ", idx, data.chapter);
-            console.log("update data : ", quizChapters.value[idx]);
+            const data = { [idx] : { "chapter": chapter, "select": action }};
+            quizChapters.value[idx].select = action;
+            saveQuizChapter(data);            
+            console.log("chapter update : ", quizChapters.value);            
         } 
     }
 
