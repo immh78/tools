@@ -220,24 +220,24 @@ watch(chapters, (newValue, oldValue) => {
         chapter = removedValues[0];
     }
 
-    
+
     if (action != null) {
         let idx = Object.values(quizChapters.value).findIndex(item => item.chapter === chapter && item.select != action);
         // 초기값과 비교하여 달라진것만 update
-        if(idx > -1 ) {
+        if (idx > -1) {
             // 변경된 값에 따라 추가 로직 실행
-            const data = { [idx] : { "chapter": chapter, "select": action }};
+            const data = { [idx]: { "chapter": chapter, "select": action } };
             quizChapters.value[idx].select = action;
-            saveQuizChapter(data);            
-            console.log("chapter update : ", quizChapters.value);            
-        } 
+            saveQuizChapter(data);
+            console.log("chapter update : ", quizChapters.value);
+        }
     }
 
 
 });
 
 
-onMounted(async() => {
+onMounted(async () => {
     await getChapter();
 
     await fetch('words.json')
@@ -303,7 +303,7 @@ onMounted(async() => {
                     <v-col cols="auto">
                         <span id="word" :style="{ fontSize: wordFontSize + 'px' }" @click="speechWord()">{{
                             currentWord.word
-                        }}</span>
+                            }}</span>
                         <span id="wrong">
                             <v-icon color="red-darken-4" v-for="n in currentWord.wrongCount">mdi-close-thick</v-icon>
                         </span>
@@ -346,16 +346,18 @@ onMounted(async() => {
                 <v-card title="학습 단원 선택">
                     <v-container>
                         <v-row>
-                            <v-col v-for="(c, index) in quizChapters" :key="index" cols="4">
+                            <v-col v-for="(c, index) in quizChapters" :key="index" cols="6">
                                 <v-switch v-model="chapters" color="red" :label="c.chapter" :value="c.chapter"
                                     hide-details></v-switch>
                             </v-col>
                         </v-row>
                     </v-container>
-                    <v-card-actions>
-                        <v-btn @click="isSetPopup = false">닫기</v-btn>
-                    </v-card-actions>
+
+
+
                 </v-card>
+                <v-fab icon="mdi-close" color="blue" @click="isSetPopup = false" class="fixed-fab">
+                </v-fab>
             </v-dialog>
         </v-main>
 
@@ -414,5 +416,12 @@ onMounted(async() => {
 .chip-spacing {
     margin: 4px;
     /* 각 v-chip 간격 설정 */
+}
+
+.fixed-fab {
+    position: fixed;
+    top: 16px; /* 화면 하단에서 16px 위 */
+    right: 16px; /* 화면 우측에서 16px 왼쪽 */
+    z-index: 1050; /* 다른 요소 위에 표시되도록 설정 */
 }
 </style>
