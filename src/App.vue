@@ -1,11 +1,11 @@
 <script setup>
-//import { RouterView } from 'vue-router';
-import EngQuiz from './pages/EngQuiz.vue';
+import { RouterView } from 'vue-router';
+//import EngQuiz from './pages/EngQuiz.vue';
 </script>
 
 <template>
-<!--  <RouterView />-->
-  <EngQuiz />
+  <RouterView />
+  <!--<EngQuiz />-->
 
 </template>
 

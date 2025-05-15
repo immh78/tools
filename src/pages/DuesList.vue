@@ -6,7 +6,7 @@ const SHEET_ID = '1-NlBFmwdIZop6pDvasfBtT7sn1jdwIfuCTq4bcHvN0s'; // 본인의 Sh
 const RANGE = '시트1'; // 원하는 범위 지정
 
 const headers = ref([
-    { title: '날짜', align: 'start', key: 'date', value: 'date' },
+    { title: '날짜', align: 'start', key: 'date', value: 'date', width: 110 },
     { title: '여행지', align: 'start', key: 'destination', value: 'destination' },
     { title: '금액', align: 'end', sortable: false, key: 'amount', value: 'amount' },
 ]);
@@ -57,14 +57,17 @@ onMounted(async () => {
                           no-data-text="조회중입니다."
                           items-per-page="14" 
                           :show-items-per-page="false" 
+                          
                 >
                 <template v-slot:item.destination="{ item }">
                     {{ item.destination }}<br>
                     <span style="font-size: 12px; color:gray">{{ item.expense }}</span>
                 </template>
+
                 <template v-slot:item.amount="{ item }">
                     <span :style="{ color: item.adjust === 'Y' ? 'black' : 'red' }">{{ item.amount }}</span>
                 </template>
+
                 <!-- 페이지네이션 버튼 중앙 정렬 -->
                 <template v-slot:footer.page-text>
                     <div class="text-center">
