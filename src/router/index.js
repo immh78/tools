@@ -1,17 +1,17 @@
-import { createRouter, createWebHashHistory } from 'vue-router';
-import EngQuiz from '../pages/EngQuiz.vue';
-import Login from '../pages/Login.vue';
-import DuesList from '../pages/DuesList.vue';
+// src/router/index.js 또는 main.js
+import { createRouter, createWebHashHistory } from 'vue-router'
+import EngQuiz from '../pages/EngQuiz.vue'
+import DuesList from '../pages/DuesList.vue'
 
 const routes = [
-  { path: '/vite-project/quiz', component: EngQuiz }, 
-  { path: '/vite-project/login', component: Login },
-  { path: '/vite-project/dues', component: DuesList },
-];
+  { path: '/', redirect: '/eng-quiz' },
+  { path: '/eng-quiz', component: EngQuiz },
+  { path: '/dues-list', component: DuesList }
+]
 
 const router = createRouter({
-  history: createWebHashHistory(),
-  routes,
-});
+  history: createWebHashHistory('/vite-project/'), // hash 모드 사용
+  routes
+})
 
-export default router;
+export default router
