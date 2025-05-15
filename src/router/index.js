@@ -1,17 +1,16 @@
-import { createRouter, createWebHashHistory } from 'vue-router';
+import { createRouter, createWebHistory } from 'vue-router';
 import EngQuiz from '../pages/EngQuiz.vue';
 import Login from '../pages/Login.vue';
 import DuesList from '../pages/DuesList.vue';
 
 const routes = [
-  { path: '/quiz', component: EngQuiz }, 
-  { path: '/', component: EngQuiz }, 
-  { path: '/login', component: Login },
-  { path: '/dues', component: DuesList },
+  { path: '/vite-project/quiz', component: EngQuiz }, 
+  { path: '/vite-project/login', component: Login },
+  { path: '/vite-project/dues', component: DuesList },
 ];
 
 const router = createRouter({
-  history: createWebHashHistory(),
+  history: createWebHistory(),
   routes,
 });
 
