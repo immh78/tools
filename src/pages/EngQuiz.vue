@@ -14,7 +14,7 @@ const wordFontSize = ref(70);
 const isMeaningView = ref(false);
 const isMeaningWrongWordView = ref(false);
 const isSetPopup = ref(false);
-const currentWord = ref({});
+const currentWord = ref({"word":"Loaing..."});
 const correctCount = ref(0);
 const wrongCount = ref(0);
 const progress = ref(0);
@@ -318,8 +318,6 @@ onMounted(async () => {
                         </v-col>
                     </v-row>
                 </v-sheet>
-
-
             </v-container>
             <v-snackbar v-model="isMeaningWrongWordView" :timeout="2000" color="success" variant="tonal">
                 {{ meaningWrongWord }}
