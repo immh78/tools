@@ -19,6 +19,7 @@ export default defineConfig({
         theme_color: '#42b883',
         background_color: '#ffffff',
         display: 'standalone',
+        scope: '/vite-project/',        
         start_url: '/vite-project/#/eng-quiz',
         icons: [
           {
