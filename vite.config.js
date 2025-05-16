@@ -19,7 +19,7 @@ export default defineConfig({
         theme_color: '#42b883',
         background_color: '#ffffff',
         display: 'standalone',
-        start_url: '/',
+        start_url: '/vite-project/#/eng-quiz',
         icons: [
           {
             src: 'book_6.png',
