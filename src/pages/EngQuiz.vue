@@ -207,12 +207,14 @@ async function saveQuizChapter(data) {
     }
 }
 
-async function getChapter() {
+async function getChapter(user) {
     await fetchquizChapters();
+
+    console.log(user);
 
     if (quizChapters.value) {
         chapters.value = Object.values(quizChapters.value)
-            .filter(item => item.select === true && item.user === currUser.value) // select가 true인 항목 필터링
+            .filter(item => item.select === true && item.user === user) // select가 true인 항목 필터링
             .map(item => item.chapter);
     }
 }
@@ -225,6 +227,8 @@ watch(chapters, (newValue, oldValue) => {
 
     let action = null;
     let chapter = "";
+    let user = "";
+
 
     // 추가된 값과 삭제된 값에 따라 로직 실행
     if (addedValues.length > 0) {
@@ -242,7 +246,7 @@ watch(chapters, (newValue, oldValue) => {
         // 초기값과 비교하여 달라진것만 update
         if (idx > -1) {
             // 변경된 값에 따라 추가 로직 실행
-            const data = { [idx]: { "chapter": chapter, "select": action } };
+            const data = { [idx]: { "chapter": chapter, "select": action, "user": currUser.value }};
             quizChapters.value[idx].select = action;
             saveQuizChapter(data);
             console.log("chapter update : ", quizChapters.value);
@@ -259,7 +263,7 @@ onMounted(async () => {
         currUser.value = "CW";
     }
 
-    await getChapter();
+    await getChapter(currUser.value);
 
     await fetch('words.json')
         .then(response => response.json())
