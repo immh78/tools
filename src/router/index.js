@@ -6,6 +6,7 @@ import DuesList from '../pages/DuesList.vue'
 const routes = [
   { path: '/', redirect: '/eng-quiz' },
   { path: '/eng-quiz', component: EngQuiz },
+  { path: '/eng-quiz-gw', component: EngQuiz },
   { path: '/dues-list', component: DuesList }
 ]
 

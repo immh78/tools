@@ -14,11 +14,14 @@ const wordFontSize = ref(70);
 const isMeaningView = ref(false);
 const isMeaningWrongWordView = ref(false);
 const isSetPopup = ref(false);
-const currentWord = ref({"word":"Loaing..."});
+const currentWord = ref({ "word": "Loaing..." });
 const correctCount = ref(0);
 const wrongCount = ref(0);
 const progress = ref(0);
 const totalCount = ref(0);
+const currUser = ref("");
+const preCorrectWord = ref({});
+const preWrongWord = ref({});
 
 /* DB 관련 변수 */
 const quizChapters = ref(null);
@@ -68,10 +71,17 @@ function pickRandomWord() {
         index = 0;
     }
     currentWord.value = { ...selectWords.value[index] };
+    setWordFondSize(currentWord.value.word);
+}
+
+function setWordFondSize(text) {
+
+    //console.log(text);
+    
     let tempFontSize = 70;
 
-    if (currentWord.value.word.length > 8) {
-        tempFontSize -= (currentWord.value.word.length - 7) * 10;
+    if (text.length > 8) {
+        tempFontSize -= (text.length - 7) * 10;
     }
 
     if (tempFontSize < 40) {
@@ -79,7 +89,6 @@ function pickRandomWord() {
     } else {
         wordFontSize.value = tempFontSize;
     }
-
 }
 
 function markCorrect() {
@@ -91,6 +100,11 @@ function markCorrect() {
     if (currentWord.value.wrongCount > 0) {
         wrongWords.value = wrongWords.value.filter(item => item.word !== currentWord.value.word);
     }
+
+
+    preCorrectWord.value = { ...currentWord.value };
+
+    //console.log("#1", preCorrectWord.value);
 
     pickRandomWord();
     updateProgress();
@@ -112,7 +126,32 @@ function markWrong() {
         wrongWords.value.push(currentWord.value);
     }
 
+    //console.log("#2", currentWord.value);
+    preWrongWord.value = { ...currentWord.value };
+
     pickRandomWord();
+}
+
+function cancelCorrect() {
+    //console.log("#3", preCorrectWord.value);
+    if (Object.keys(preCorrectWord.value).length === 0) return;
+    correctCount.value--;
+    currentWord.value = { ...preCorrectWord.value };
+    selectWords.value.push(preCorrectWord.value);
+    preCorrectWord.value = {};
+    setWordFondSize(currentWord.value.word);
+    updateProgress();
+}
+
+function cancelWrong() {
+    if (Object.keys(preWrongWord.value).length === 0) return;
+    wrongCount.value--;
+    currentWord.value = { ...preWrongWord.value };
+    selectWords.value.push(preWrongWord.value);
+    wrongWords.value = wrongWords.value.filter(item => item.word !== preWrongWord.value.word);
+    preWrongWord.value = {};
+    setWordFondSize(currentWord.value.word);
+    updateProgress();
 }
 
 function updateProgress() {
@@ -173,7 +212,7 @@ async function getChapter() {
 
     if (quizChapters.value) {
         chapters.value = Object.values(quizChapters.value)
-            .filter(item => item.select === true) // select가 true인 항목 필터링
+            .filter(item => item.select === true && item.user === currUser.value) // select가 true인 항목 필터링
             .map(item => item.chapter);
     }
 }
@@ -214,6 +253,12 @@ watch(chapters, (newValue, oldValue) => {
 });
 
 onMounted(async () => {
+    if (window.location.href.includes("eng-quiz-gw")) {
+        currUser.value = "GW";
+    } else {
+        currUser.value = "CW";
+    }
+
     await getChapter();
 
     await fetch('words.json')
@@ -228,6 +273,7 @@ onMounted(async () => {
 
     selectingWord('');
     pickRandomWord();
+
 
 })
 
@@ -244,7 +290,8 @@ onMounted(async () => {
                     <v-btn icon="mdi-cog" @click="isSetPopup = true"></v-btn>
                 </template>
 
-                <v-app-bar-title><v-icon>mdi-book</v-icon> 채원이 영어 단어장</v-app-bar-title>
+                <v-app-bar-title><v-icon>mdi-book</v-icon> {{ currUser === "GW" ? "경원" : "채원" }}이 영어
+                    단어장</v-app-bar-title>
             </v-app-bar>
             <v-container>
                 <v-row justify="center">
@@ -293,21 +340,25 @@ onMounted(async () => {
                     </v-col>
                 </v-row>
                 <v-row id="buttonRow">
-                    <v-col cols="auto">
+                    <v-col cols="4">
                         <v-btn color="light-green-lighten-5" @click="isMeaningView = !isMeaningView"><v-icon
                                 color="green">mdi-magnify</v-icon>뜯보기</v-btn>
                     </v-col>
-                    <v-col cols="auto">
+                    <v-col cols="4" class="no-wrap">
                         <v-badge color="blue" :content="correctCount"><v-btn color="blue-lighten-5"
                                 @click="markCorrect()"><v-icon color="blue">mdi-check-bold</v-icon>정답</v-btn></v-badge>
+                        <v-btn :color="Object.keys(preCorrectWord).length === 0 ? 'gray' : 'blue'" icon="mdi-undo"
+                            variant="text" size="24px" @click="cancelCorrect()"></v-btn>
                     </v-col>
-                    <v-col cols="auto">
+                    <v-col cols="4" class="no-wrap">
                         <v-badge color="error" :content="wrongCount"><v-btn color="red-lighten-5"
                                 @click="markWrong()"><v-icon color="red">mdi-close-thick</v-icon>오답</v-btn></v-badge>
+                        <v-btn :color="Object.keys(preWrongWord).length === 0 ? 'gray' : 'red'" icon="mdi-undo"
+                            variant="text" size="24px" @click="cancelWrong()"></v-btn>
                     </v-col>
                 </v-row>
-                <v-sheet v-if="wrongWords.length > 0" id="wrongWordRow" class="pa-4 mx-auto" max-width="380" rounded="lg"
-                    width="92%" color="#fff2f4">
+                <v-sheet v-if="wrongWords.length > 0" id="wrongWordRow" class="pa-4 mx-auto" max-width="380"
+                    rounded="lg" width="92%" color="#fff2f4">
                     <v-row>
                         <v-col cols="auto">
 
@@ -326,7 +377,8 @@ onMounted(async () => {
                 <v-card title="학습 단원 선택">
                     <v-container>
                         <v-row>
-                            <v-col v-for="(c, index) in quizChapters" :key="index" cols="6">
+                            <v-col v-for="(c, index) in quizChapters.filter(item => item.user === currUser)"
+                                :key="index" cols="6">
                                 <v-switch v-model="chapters" color="red" :label="c.chapter" :value="c.chapter"
                                     hide-details></v-switch>
                             </v-col>
@@ -403,5 +455,10 @@ onMounted(async () => {
     /* 화면 우측에서 16px 왼쪽 */
     z-index: 1050;
     /* 다른 요소 위에 표시되도록 설정 */
+}
+
+.no-wrap {
+    display: flex;
+    flex-wrap: nowrap;
 }
 </style>
