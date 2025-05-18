@@ -345,18 +345,18 @@ onMounted(async () => {
                 </v-row>
                 <v-row id="buttonRow">
                     <v-col cols="4">
-                        <v-btn color="light-green-lighten-5" @click="isMeaningView = !isMeaningView"><v-icon
+                        <v-btn color="light-green-lighten-5" @click="isMeaningView = !isMeaningView" style="height: 50px;"><v-icon
                                 color="green">mdi-magnify</v-icon>뜯보기</v-btn>
                     </v-col>
                     <v-col cols="4" class="no-wrap">
                         <v-badge color="blue" :content="correctCount"><v-btn color="blue-lighten-5"
-                                @click="markCorrect()"><v-icon color="blue">mdi-check-bold</v-icon>정답</v-btn></v-badge>
+                                @click="markCorrect()" style="height: 50px;"><v-icon color="blue">mdi-check-bold</v-icon>정답</v-btn></v-badge>
                         <v-btn :color="Object.keys(preCorrectWord).length === 0 ? 'gray' : 'blue'" icon="mdi-undo"
                             variant="text" size="24px" @click="cancelCorrect()"></v-btn>
                     </v-col>
                     <v-col cols="4" class="no-wrap">
                         <v-badge color="error" :content="wrongCount"><v-btn color="red-lighten-5"
-                                @click="markWrong()"><v-icon color="red">mdi-close-thick</v-icon>오답</v-btn></v-badge>
+                                @click="markWrong()" style="height: 50px;"><v-icon color="red">mdi-close-thick</v-icon>오답</v-btn></v-badge>
                         <v-btn :color="Object.keys(preWrongWord).length === 0 ? 'gray' : 'red'" icon="mdi-undo"
                             variant="text" size="24px" @click="cancelWrong()"></v-btn>
                     </v-col>
