@@ -1,12 +1,9 @@
 // src/router/index.js 또는 main.js
 import { createRouter, createWebHashHistory } from 'vue-router'
-import EngQuiz from '../pages/EngQuiz.vue'
 import DuesList from '../pages/DuesList.vue'
 
 const routes = [
-  { path: '/', redirect: '/eng-quiz' },
-  { path: '/eng-quiz', component: EngQuiz },
-  { path: '/eng-quiz-gw', component: EngQuiz },
+  { path: '/', redirect: '/dues-list' },
   { path: '/dues-list', component: DuesList }
 ]
 
