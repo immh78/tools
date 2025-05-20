@@ -87,7 +87,7 @@ onMounted(async () => {
 
 <template>
     <div class="top-center-container">
-        <h1>{{ chapters?.length }}</h1>
+        <h1>{{ chapters ? chapters?.length : "Loding..." }} </h1>
         <v-btn class="adjust-button" @click="setChapter()">데이터 오류 보정</v-btn>
     </div>
 </template>
