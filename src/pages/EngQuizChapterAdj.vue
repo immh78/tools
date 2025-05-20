@@ -86,6 +86,23 @@ onMounted(async () => {
 </script>
 
 <template>
-    <v-btn @click="setChapter()">데이터 오류 보정</v-btn>
-    <h3>{{ chapters?.length }}</h3>
+    <div class="top-center-container">
+        <h1>{{ chapters?.length }}</h1>
+        <v-btn class="adjust-button" @click="setChapter()">데이터 오류 보정</v-btn>
+    </div>
 </template>
+
+<style scoped>
+.top-center-container {
+    display: flex;
+    flex-direction: column; /* 수직 정렬 */
+    justify-content: flex-start; /* 상단에 배치 */
+    align-items: center; /* 가로 중앙 정렬 */
+    height: 100vh; /* 화면 전체 높이 */
+    padding-top: 20px; /* 상단 여백 추가 (필요 시 조정) */
+}
+
+.adjust-button {
+    margin-top: 50px; /* 추가적인 여백 조정 가능 */
+}
+</style>
