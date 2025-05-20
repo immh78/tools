@@ -28,12 +28,13 @@ async function getChapter() {
     //console.log(user);
 
     if (quizChapters.value) {
-        chapters.value = Object.values(quizChapters.value)
-            .filter(item => !item.hasOwnProperty('user')) // select가 true인 항목 필터링
+        chapters.value = [...Object.values(quizChapters.value)
+            .filter(item => !item.hasOwnProperty('user'))
             .map(item => ({
                 chapter: item.chapter,
                 select: item.select
-            }));
+            }))
+        ];
     }
 
     console.log(chapters.value);
@@ -72,8 +73,8 @@ function setChapter() {
 
         console.log("idx :", idx);
 
-        if (idx >= 0 ) {
-            const saveData = { [idx]: { "chapter": row.chapter, "select": row.select, "user": user }};
+        if (idx >= 0) {
+            const saveData = { [idx]: { "chapter": row.chapter, "select": row.select, "user": user } };
             saveQuizChapter(saveData);
         }
     }
@@ -87,4 +88,5 @@ onMounted(async () => {
 <template>
     <v-btn @click="getChapter()">데이터 오류 조회</v-btn>
     <v-btn @click="setChapter()">데이터 오류 보정</v-btn>
+    <h3>{{ chapters?.length }}</h3>
 </template>
