@@ -81,12 +81,11 @@ function setChapter() {
 }
 
 onMounted(async () => {
-    console.log("onMounted!!");
+    getChapter();
 });
 </script>
 
 <template>
-    <v-btn @click="getChapter()">데이터 오류 조회</v-btn>
     <v-btn @click="setChapter()">데이터 오류 보정</v-btn>
     <h3>{{ chapters?.length }}</h3>
 </template>
