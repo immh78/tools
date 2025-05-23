@@ -1,7 +1,7 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted } from 'vue';
 
-const API_KEY = 'AIzaSyCEPaxRsfZoKOSzjnxqFyuCtchTyNwFrp0'; // 본인의 Google API Key 입력
+const API_KEY = 'AIzaSyAjcEIdV46fa6Kw3Hdyzf3No_3cXtScRLc'; // 본인의 Google API Key 입력
 const SHEET_ID = '1-NlBFmwdIZop6pDvasfBtT7sn1jdwIfuCTq4bcHvN0s'; // 본인의 Sheet ID 입력
 const RANGE = '시트1'; // 원하는 범위 지정
 
