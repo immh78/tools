@@ -16,9 +16,11 @@ function sendSMS() {
 }
 
 function formatSMSMessage() {
-  msg.value = rows.value
-    .map(row => `${row.date}\t${row.amount}원`) // 각 행을 "날짜\t금액원" 형식으로 변환
-    .join('\n'); // 각 행을 줄바꿈으로 연결
+    rows.value.splice(rows.value.length - 1, 0, { date: "--------------", amount: "" });
+
+    msg.value = rows.value
+        .map(row => `${row.date}     \t${row.amount}${row.date.substring(0,1) === "-" ? "":"원"}`) // 각 행을 "날짜\t금액원" 형식으로 변환
+        .join('\n'); // 각 행을 줄바꿈으로 연결
 }
 
 
@@ -31,16 +33,16 @@ onMounted(async () => {
 
         const rawRows = data.values.slice(1); // 첫 번째 행은 헤더이므로 제외
         rows.value = rawRows
-             .filter(row => row[0] !== undefined)
-             .map(row => ({
-            date: row[0], // 1열: 날짜
-            amount: row[1], // 2열: 금액            
-        }));
+            .filter(row => row[0] !== undefined)
+            .map(row => ({
+                date: row[0], // 1열: 날짜
+                amount: row[1], // 2열: 금액            
+            }));
 
 
         formatSMSMessage();
 
-        console.log('Fetched data:', msg.value);        
+        console.log('Fetched data:', msg.value);
     } catch (error) {
         console.error('Error fetching data:', error);
     }
@@ -52,4 +54,3 @@ onMounted(async () => {
         <button @click="sendSMS">SMS 보내기</button>
     </div>
 </template>
-

@@ -1,6 +1,6 @@
 <template>
   <div class="main-page">
-    <h1>메인 페이지</h1>
+    <h1>도구 목록</h1>
     <div class="button-container">
       <v-btn
         v-for="route in filteredRoutes"
@@ -8,7 +8,7 @@
         class="nav-button"
         @click="navigateTo(route.path)"
       >
-        {{ route.name || route.path }}
+        {{ route.comment }}
       </v-btn>
     </div>
   </div>
@@ -45,7 +45,7 @@ function navigateTo(path) {
 }
 
 .nav-button {
-  width: 200px;
+  width: 300px;
   font-size: 16px;
 }
 </style>

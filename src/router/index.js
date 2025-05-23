@@ -6,10 +6,10 @@ import EnqQuizChapterAdj from '../pages/EngQuizChapterAdj.vue'
 import TljSMS from '../pages/TljSMS.vue'
 
 const routes = [
-  { path: '/', component: Main },
-  { path: '/dues-list', component: DuesList },
-  { path: '/engquiz-adj', component: EnqQuizChapterAdj },
-  { path: '/tlj-sms', component: TljSMS },
+  { path: '/', component: Main, comment: '메인 페이지' },
+  { path: '/dues-list', component: DuesList, comment: '우리린 가족여행 회비 목록' },
+  { path: '/engquiz-adj', component: EnqQuizChapterAdj, comment: '영어 퀴즈 DB 오류 조정' },
+  { path: '/tlj-sms', component: TljSMS, comment: '뚜레쥬르 선입금 문자발송' },
 ]
 
 const router = createRouter({
