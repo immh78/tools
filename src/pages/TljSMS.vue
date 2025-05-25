@@ -25,10 +25,9 @@ function formatSMSMessage() {
     msgRows.splice(msgRows.length - 1, 0, { date: "--------------------", amount: "" });
 
     msg.value = msgRows
-        .map(row => `${row.date}     \t${row.amount}${row.date.substring(0,1) === "-" ? "":"원"}`) // 각 행을 "날짜\t금액원" 형식으로 변환
+        .map(row => `${row.date}     \t${row.amount}${row.date.substring(0, 1) === "-" ? "" : "원"}`) // 각 행을 "날짜\t금액원" 형식으로 변환
         .join('\n'); // 각 행을 줄바꿈으로 연결
 }
-
 
 onMounted(async () => {
     const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${RANGE}?key=${API_KEY}`;
@@ -45,10 +44,10 @@ onMounted(async () => {
                 amount: row[1], // 2열: 금액            
             }));
 
-
+        //console.log(rows.value);
         formatSMSMessage();
 
-        console.log('Fetched data:', msg.value);
+        //console.log('Fetched data:', msg.value);
     } catch (error) {
         console.error('Error fetching data:', error);
     }
@@ -69,16 +68,17 @@ onMounted(async () => {
             </v-app-bar>
 
             <v-data-table :headers="headers" :items="rows" class="elevation-1" no-data-text="조회중입니다."
-                hide-default-footer items-per-page="-1" :show-items-per-page="false">               
-
-                <!-- 페이지네이션 버튼 중앙 정렬 -->
-                <template v-slot:footer.page-text>
-                    <div class="text-center">
-                        <v-pagination v-model="page" :length="Math.ceil(rows.length / 14)"
-                            total-visible="7"></v-pagination>
-                    </div>
+                hide-default-footer items-per-page="-1":show-items-per-page="false">
+                <template v-slot:item="{ item, index }">
+                    <tr :style="item.date === '합계' ? 'background-color: #fffad4 !important;' : ''">
+                        <td>{{ item.date }}</td>
+                        <td style="text-align: right;">{{ item.amount }}</td>
+                    </tr>
                 </template>
-            </v-data-table>            
+            </v-data-table>
         </v-main>
     </v-app>
 </template>
+
+<style scoped>
+</style>
