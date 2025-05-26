@@ -1,5 +1,5 @@
 <script setup>
-import { ref,computed, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router';
 import FingerprintJS from '@fingerprintjs/fingerprintjs';
 
@@ -43,11 +43,9 @@ onMounted(async () => {
     </template>
 
     <!-- 그 외 visitorId만 표시 -->
-    <template v-else-if="visitorId">
-      <div class="visitor-id-overlay">
-        {{ visitorId }}
-      </div>
-    </template>
+    <div class="visitor-id-overlay">
+      {{ visitorId }}
+    </div>
   </div>
 </template>
 
