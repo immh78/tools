@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useLogger } from '../composables/useLogger';
+import html2canvas from 'html2canvas';
 
 useLogger();
 
