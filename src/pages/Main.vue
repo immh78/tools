@@ -2,6 +2,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router';
 import FingerprintJS from '@fingerprintjs/fingerprintjs';
+import html2canvas from 'html2canvas';
 
 const visitorId = ref('');
 const router = useRouter();
