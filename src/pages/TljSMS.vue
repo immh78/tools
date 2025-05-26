@@ -36,8 +36,8 @@ function textShare() {
     formatSMSMessage();
 
     navigator.share({
-        title: '선결제내역 공유',
-        text: '\n\n' + msg.value,
+        //title: '선결제내역 공유',
+        text: msg.value,
     });
 }
 
