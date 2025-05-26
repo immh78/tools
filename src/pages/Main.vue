@@ -9,7 +9,8 @@ const router = useRouter();
 const ALLOWED_IDS = [
   '0c07db1e97c10dd364d0c7c97d8ebf5e',
   '5067475d1c7a690eb128aa0806366f71',
-  'bc0f8e17b63badde366f133fe707f57f'
+  'bc0f8e17b63badde366f133fe707f57f',
+  '91cb2a05340782fc6626678fce9f9e31'
 ];
 
 // 라우트 배열에서 메인 페이지(`/`)를 제외한 라우트만 필터링
