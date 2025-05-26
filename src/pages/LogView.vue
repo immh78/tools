@@ -61,9 +61,10 @@ function processLogs(logs, visitors) {
             if (!entries[key]) {
                 entries[key] = {
                     page,
-                    visitor: visitors[visitorId] || `${visitorId.slice(0, 6)}...`,
+                    visitor: visitors[visitorId].name || `${visitorId.slice(0, 6)}...`,
                     count: 1,
-                    latest: log.datetime
+                    latest: log.datetime,
+                    isHost: visitors[visitorId].isHost || false
                 }
             } else {
                 entries[key].count++
