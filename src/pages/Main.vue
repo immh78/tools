@@ -23,10 +23,14 @@ function navigateTo(path) {
 
 const tableRef = ref(null)
 
-function textShare() {
+  console.log("textShare");
+
   const shareTable = async () => {
     try {
       const canvas = await html2canvas(tableRef.value)
+
+      console.log(canvas);
+
       const blob = await new Promise((resolve) =>
         canvas.toBlob(resolve, 'image/png')
       )
@@ -51,7 +55,6 @@ function textShare() {
       console.error('공유 중 오류 발생:', error)
     }
   }
-}
 
 // visitorId가 허용된 ID인지 여부 판단
 const isAllowed = computed(() => ALLOWED_IDS.includes(visitorId.value));
@@ -73,7 +76,7 @@ onMounted(async () => {
           <v-btn v-for="route in filteredRoutes" :key="route.path" class="nav-button" @click="navigateTo(route.path)">
             {{ route.comment }}
           </v-btn>
-          <v-btn @click="textShare()">공유 테스트</v-btn>
+          <v-btn @click="shareTable">공유 테스트</v-btn>
         </div>
       </div>
       <table ref="tableRef">
