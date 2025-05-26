@@ -32,6 +32,16 @@ function formatSMSMessage() {
         .join('\n'); // 각 행을 줄바꿈으로 연결
 }
 
+function textShare() {
+    formatSMSMessage();
+
+    navigator.share({
+        title: '선결제내역 공유',
+        text: msg.value,
+    });
+}
+
+
 onMounted(async () => {
     const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${RANGE}?key=${API_KEY}`;
 
@@ -48,7 +58,7 @@ onMounted(async () => {
             }));
 
         //console.log(rows.value);
-        formatSMSMessage();
+
 
         //console.log('Fetched data:', msg.value);
     } catch (error) {
@@ -65,13 +75,13 @@ onMounted(async () => {
                     <v-img gradient="to top right, rgba(19,84,122,.8), rgba(128,208,199,.8)"></v-img>
                 </template>
                 <template v-slot:append>
-                    <v-btn icon="mdi-send" @click="sendSMS()"></v-btn>
+                    <v-btn icon="mdi-send" @click="textShare()"></v-btn>
                 </template>
                 <v-app-bar-title><v-icon>mdi-cupcake</v-icon> 뚜레쥬르 선결제 금액</v-app-bar-title>
             </v-app-bar>
 
             <v-data-table :headers="headers" :items="rows" class="elevation-1" no-data-text="조회중입니다."
-                hide-default-footer items-per-page="-1":show-items-per-page="false">
+                hide-default-footer items-per-page="-1" :show-items-per-page="false">
                 <template v-slot:item="{ item, index }">
                     <tr :style="item.date === '합계' ? 'background-color: #fffad4 !important;' : ''">
                         <td>{{ item.date }}</td>
@@ -83,5 +93,4 @@ onMounted(async () => {
     </v-app>
 </template>
 
-<style scoped>
-</style>
+<style scoped></style>
