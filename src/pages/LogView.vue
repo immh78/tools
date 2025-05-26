@@ -10,10 +10,10 @@ const visitorTable = ref(null);
 const error = ref(null);
 const tableData = ref([])
 const headers = ref([
-    { title: '페이지', align: 'start', key: 'page', value: 'page', width: 110 },
-    { title: '방문자자', align: 'start', key: 'visitor', value: 'visitor' },
-    { title: '방문횟수', align: 'end', key: 'count', value: 'count' },
-    { title: '최근 방문 시간', align: 'center', key: 'latest', value: 'latest' },
+    { title: 'Page', align: 'start', key: 'page', value: 'page', width: 110 },
+    { title: 'Visitor', align: 'start', key: 'visitor', value: 'visitor' },
+    { title: 'Count', align: 'end', key: 'count', value: 'count' },
+    { title: 'Date', align: 'center', key: 'latest', value: 'latest' },
 ]);
 
 async function getLogs() {
