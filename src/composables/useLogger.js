@@ -18,7 +18,11 @@ const logPageVisit = async () => {
 
   // 3. 현재 시각
   const now = new Date();
-  const datetime = now.toISOString().replace(/[-T:.Z]/g, '').slice(0, 14); // "20250512041212" 형식
+  const datetime = now.toLocaleString('ko-KR', {
+    timeZone: 'Asia/Seoul',
+    hour12: false, // 24시간제로 설정
+  }).replace(/[-T:. ]/g, '').slice(0, 14);
+
 
   // 4. 로그 구조
   const logEntry = { datetime, visitorId };
