@@ -3,7 +3,7 @@ import { database, ref as firebaseRef, get, update } from "../config/firebase";
 import { ref, computed, onMounted } from 'vue';
 import { useLogger } from '../composables/useLogger';
 
-//useLogger();
+useLogger();
 
 const logTable = ref(null);
 const visitorTable = ref(null);
@@ -90,7 +90,7 @@ function processLogs(logs, visitors) {
         isHost: entry.isHost
     }));
 
-    console.log("*** data : ", tableData);
+    //console.log("*** data : ", tableData);
 }
 
 const filteredTableData = computed(() => {
