@@ -20,9 +20,9 @@ function navigateTo(path) {
   router.push(path);
 }
 
-function textShare() {
-  const tableRef = ref(null)
+const tableRef = ref(null)
 
+function textShare() {
   const shareTable = async () => {
     try {
       const canvas = await html2canvas(tableRef.value)
@@ -127,5 +127,15 @@ onMounted(async () => {
   font-size: 9px;
   color: #888;
   z-index: 999;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+th, td {
+  border: 1px solid #999;
+  padding: 8px;
+  text-align: center;
 }
 </style>
