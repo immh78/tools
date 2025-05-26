@@ -20,6 +20,13 @@ function navigateTo(path) {
   router.push(path);
 }
 
+function textShare() {
+  navigator.share({
+            title: '텍스트 공유',
+            text: '복사',
+          });
+}
+
 // visitorId가 허용된 ID인지 여부 판단
 const isAllowed = computed(() => ALLOWED_IDS.includes(visitorId.value));
 
@@ -40,8 +47,10 @@ onMounted(async () => {
           <v-btn v-for="route in filteredRoutes" :key="route.path" class="nav-button" @click="navigateTo(route.path)">
             {{ route.comment }}
           </v-btn>
+          <v-btn @click="textShare()">공유 테스트</v-btn>
         </div>
       </div>
+
     </template>
 
     <!-- 그 외 visitorId만 표시 -->
