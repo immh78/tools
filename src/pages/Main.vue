@@ -1,11 +1,15 @@
 <script setup>
-import { ref,onMounted } from 'vue'
+import { ref,computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router';
 import FingerprintJS from '@fingerprintjs/fingerprintjs';
 
 const visitorId = ref('');
 const router = useRouter();
-const TARGET_ID = '0c07db1e97c10dd364d0c7c97d8ebf5e';
+// 허용된 visitorId 목록
+const ALLOWED_IDS = [
+  '0c07db1e97c10dd364d0c7c97d8ebf5e',
+  '5067475d1c7a690eb128aa0806366f71'
+];
 
 // 라우트 배열에서 메인 페이지(`/`)를 제외한 라우트만 필터링
 const filteredRoutes = router.options.routes.filter(route => route.path !== '/');
@@ -13,6 +17,9 @@ const filteredRoutes = router.options.routes.filter(route => route.path !== '/')
 function navigateTo(path) {
   router.push(path);
 }
+
+// visitorId가 허용된 ID인지 여부 판단
+const isAllowed = computed(() => ALLOWED_IDS.includes(visitorId.value));
 
 onMounted(async () => {
   const fp = await FingerprintJS.load();
@@ -24,7 +31,7 @@ onMounted(async () => {
 <template>
   <div>
     <!-- visitorId 일치할 때만 전체 UI 렌더링 -->
-    <template v-if="visitorId === TARGET_ID">
+    <template v-if="isAllowed">
       <div class="main-page">
         <h1>도구 목록</h1>
         <div class="button-container">
