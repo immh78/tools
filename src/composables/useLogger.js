@@ -11,9 +11,9 @@ const logPageVisit = async () => {
 
   // 2. URL에서 pageId 추출
   const pathSegments = window.location.href.split('/');
-  console.log('Path:', window.location); // 디버깅용 로그
+  //console.log('Path:', window.location); // 디버깅용 로그
 
-  console.log('Path Segments:', pathSegments); // 디버깅용 로그
+  //console.log('Path Segments:', pathSegments); // 디버깅용 로그
   const pageId = pathSegments[pathSegments.length - 1] || 'home';
 
   // 3. 현재 시각
