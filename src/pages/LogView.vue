@@ -1,9 +1,9 @@
 <script setup>
 import { database, ref as firebaseRef, get, update } from "../config/firebase";
-import { ref, onMounted } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useLogger } from '../composables/useLogger';
 
-useLogger();
+//useLogger();
 
 const logTable = ref(null);
 const visitorTable = ref(null);
@@ -15,6 +15,8 @@ const headers = ref([
     { title: 'Count', align: 'end', key: 'count', value: 'count' },
     { title: 'Date', align: 'center', key: 'latest', value: 'latest' },
 ]);
+
+const isHostView = ref(false);
 
 async function getLogs() {
     const dbRef = firebaseRef(database, "logs");
@@ -84,9 +86,18 @@ function processLogs(logs, visitors) {
         page: entry.page,
         visitor: entry.visitor,
         count: entry.count,
-        latest: formatDate(entry.latest)
-    }))
+        latest: formatDate(entry.latest),
+        isHost: entry.isHost
+    }));
+
+    console.log("*** data : ", tableData);
 }
+
+const filteredTableData = computed(() => {
+    return isHostView.value 
+        ? tableData.value 
+        : tableData.value.filter(item => !item.isHost);
+});
 
 onMounted(async () => {
     await getLogs();
@@ -104,16 +115,20 @@ onMounted(async () => {
                 <v-img gradient="to top right, rgba(19,84,122,.8), rgba(128,208,199,.8)"></v-img>
             </template>
             <v-app-bar-title><v-icon>mdi-note-search-outline</v-icon> 로그 조회</v-app-bar-title>
+            <v-space />
+            <v-switch v-model="isHostView"  color="yellow" label="전체조회" class="v-switch-centered"></v-switch>
         </v-app-bar>
         <v-main>
-
-            <v-data-table :headers="headers" :items="tableData" class="elevation-1" no-data-text="조회중입니다."
+            <v-data-table :headers="headers" :items="filteredTableData" class="elevation-1" no-data-text="조회중입니다."
                 hide-default-footer items-per-page="-1" :show-items-per-page="false">
             </v-data-table>
-
         </v-main>
     </v-app>
 
 </template>
 
-<style scoped></style>
+<style scoped>
+.v-switch-centered {
+    margin: auto 0; /* Center vertically */
+}
+</style>
