@@ -65,6 +65,32 @@ onMounted(async () => {
         console.error('Error fetching data:', error);
     }
 });
+
+async function shareTableAsImage() {
+    const tableElement = document.querySelector('.v-data-table'); // v-data-table 요소 선택
+    if (!tableElement) {
+        console.error('Table element not found');
+        return;
+    }
+
+    try {
+        const canvas = await html2canvas(tableElement); // html2canvas로 캡처
+        const image = canvas.toDataURL('image/png'); // 이미지를 Data URL로 변환
+
+        // 공유 API 사용
+        if (navigator.share) {
+            await navigator.share({
+                title: '선결제 내역',
+                text: '아래 이미지를 확인하세요.',
+                files: [new File([await (await fetch(image)).blob()], 'table.png', { type: 'image/png' })],
+            });
+        } else {
+            alert('공유 API를 지원하지 않는 브라우저입니다.');
+        }
+    } catch (error) {
+        console.error('Error sharing table as image:', error);
+    }
+}
 </script>
 
 <template>
@@ -75,7 +101,7 @@ onMounted(async () => {
                     <v-img gradient="to top right, rgba(19,84,122,.8), rgba(128,208,199,.8)"></v-img>
                 </template>
                 <template v-slot:append>
-                    <v-btn icon="mdi-send" @click="textShare()"></v-btn>
+                    <v-btn icon="mdi-send" @click="shareTableAsImage()"></v-btn>
                 </template>
                 <v-app-bar-title><v-icon>mdi-cupcake</v-icon> 뚜레쥬르 선결제 금액</v-app-bar-title>
             </v-app-bar>
