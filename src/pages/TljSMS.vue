@@ -37,7 +37,7 @@ function textShare() {
 
     navigator.share({
         title: '선결제내역 공유',
-        text: msg.value,
+        text: '\n\n' + msg.value,
     });
 }
 
