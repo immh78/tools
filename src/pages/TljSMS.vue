@@ -1,5 +1,8 @@
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useLogger } from '../composables/useLogger';
+
+useLogger();
 
 const rows = ref([]);
 const msg = ref("");

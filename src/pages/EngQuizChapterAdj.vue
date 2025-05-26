@@ -1,6 +1,9 @@
 <script setup>
 import { database, ref as firebaseRef, get, update } from "../config/firebase";
 import { ref, onMounted } from 'vue';
+import { useLogger } from '../composables/useLogger';
+
+useLogger();
 
 const quizChapters = ref(null);
 const chapters = ref(null);
