@@ -21,10 +21,35 @@ function navigateTo(path) {
 }
 
 function textShare() {
-  navigator.share({
-            title: '텍스트 공유',
-            text: '복사',
-          });
+  const tableRef = ref(null)
+
+  const shareTable = async () => {
+    try {
+      const canvas = await html2canvas(tableRef.value)
+      const blob = await new Promise((resolve) =>
+        canvas.toBlob(resolve, 'image/png')
+      )
+
+      if (!blob) {
+        alert('이미지로 변환 실패')
+        return
+      }
+
+      const file = new File([blob], 'table.png', { type: 'image/png' })
+
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          title: '테이블 이미지',
+          text: '공유된 테이블입니다.',
+          files: [file],
+        })
+      } else {
+        alert('공유 기능을 지원하지 않는 브라우저입니다.')
+      }
+    } catch (error) {
+      console.error('공유 중 오류 발생:', error)
+    }
+  }
 }
 
 // visitorId가 허용된 ID인지 여부 판단
@@ -50,7 +75,20 @@ onMounted(async () => {
           <v-btn @click="textShare()">공유 테스트</v-btn>
         </div>
       </div>
-
+      <table ref="tableRef">
+        <thead>
+          <tr>
+            <th>이름</th>
+            <th>나이</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>홍길동</td>
+            <td>30</td>
+          </tr>
+        </tbody>
+      </table>
     </template>
 
     <!-- 그 외 visitorId만 표시 -->
