@@ -3,7 +3,7 @@ import { database, ref as firebaseRef, get, update } from "../config/firebase";
 import { ref, computed, onMounted } from 'vue';
 import { useLogger } from '../composables/useLogger';
 
-useLogger();
+//useLogger();
 
 const logTable = ref(null);
 const visitorTable = ref(null);
@@ -55,26 +55,30 @@ async function getVisitors() {
 function processLogs(logs, visitors) {
     const entries = {}
 
+    //console.log(visitors);
+
     for (const page in logs) {
         logs[page].forEach(log => {
-            const visitorId = log.visitorId
-            const key = `${page}_${visitorId}`
+            const visitorId = log.visitorId;
+            const visitor = visitors[visitorId] || {}; // visitors[visitorId]가 없으면 빈 객체로 대체
+
+            const key = `${page}_${visitorId}`;
 
             if (!entries[key]) {
                 entries[key] = {
                     page,
-                    visitor: visitors[visitorId].name || `${visitorId.slice(0, 6)}...`,
+                    visitor: visitor.name || `${visitorId.slice(0, 6)}...`, // visitor.name이 없으면 기본값 설정
                     count: 1,
                     latest: log.datetime,
-                    isHost: visitors[visitorId].isHost || false
-                }
+                    isHost: visitor.isHost || false // visitor.isHost가 없으면 false로 설정
+                };
             } else {
-                entries[key].count++
+                entries[key].count++;
                 if (log.datetime > entries[key].latest) {
-                    entries[key].latest = log.datetime
+                    entries[key].latest = log.datetime;
                 }
             }
-        })
+        });
     }
 
     const formatDate = datetime => {
