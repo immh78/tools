@@ -140,34 +140,21 @@ async function shareTableAsImage() {
         const canvas = await html2canvas(tableElement);
         const context = canvas.getContext('2d');
 
-        // 제목 추가
+        // 텍스트 추가
+        const fontSize = 60; // 텍스트 폰트 크기
+        const textX = 180; // 텍스트의 X 좌표 (중앙 정렬)
+        const textY = canvas.width / 2;  // 텍스트의 Y 좌표 (테이블 위에 겹치도록 설정)
 
-        const fontSize = 60; // 제목 폰트 크기
-        const padding = 20; // 제목과 테이블 간의 간격
-        const titleHeight = fontSize + padding;
+        //console.log(textX, textY);
+        // 반투명 텍스트 설정
+        context.globalAlpha = 0.1; // 투명도 설정 (0.0 ~ 1.0)
+        context.font = `bold ${fontSize}px Arial`;
+        context.fillStyle = "#000000"; // 검은색 텍스트
+        context.textAlign = "center";
+        context.fillText(title, textX, textY);
 
-        // 기존 캔버스 크기를 확장하여 제목 공간 추가
-        const newCanvas = document.createElement('canvas');
-        newCanvas.width = canvas.width;
-        newCanvas.height = canvas.height + titleHeight;
-        const newContext = newCanvas.getContext('2d');
-
-        // 배경색 설정 (선택 사항)
-        newContext.fillStyle = "#ffffff"; // 흰색 배경
-        newContext.fillRect(0, 0, newCanvas.width, newCanvas.height);
-
-        // 제목 그리기
-        newContext.font = `${fontSize}px Arial`;
-        newContext.fillStyle = "#000000"; // 검은색 텍스트
-        newContext.textAlign = "center";
-        newContext.fillText(title, newCanvas.width / 2, fontSize);
-
-        // 기존 캔버스 내용 복사
-        newContext.drawImage(canvas, 0, titleHeight);
-
-        // 새로운 캔버스를 이미지로 변환
-        const image = newCanvas.toDataURL('image/png');
-
+        // 이미지 변환
+        const image = canvas.toDataURL('image/png');
 
         // 공유 API 사용
         if (navigator.share) {
@@ -237,9 +224,9 @@ async function shareTableAsImage() {
                 </v-tabs-window-item>
                 <v-tabs-window-item value="usageDetail">
                     <v-card class="mx-auto" elevation="4">
-                        <v-data-table id="usageDetailTable"  :headers="usageHeaders" :items="usageDetail" hide-default-footer
-                            items-per-page="-1" :show-items-per-page="false">  
-                                                      
+                        <v-data-table id="usageDetailTable" :headers="usageHeaders" :items="usageDetail"
+                            hide-default-footer items-per-page="-1" :show-items-per-page="false">
+
                         </v-data-table>
                     </v-card>
                 </v-tabs-window-item>
@@ -259,15 +246,12 @@ tr {
     height: 60px !important;
     /* 원하는 높이로 설정 */
 }
+
 ::v-deep(#usageDetailTable td, #usageDetailTable th) {
-    font-size: 24px; /* 테이블의 셀(td)과 헤더(th) 글꼴 크기 설정 */
+    font-size: 24px;
+    /* 테이블의 셀(td)과 헤더(th) 글꼴 크기 설정 */
 }
 
-::v-deep(.v-data-table) {
-    border: 2px solid #000; /* 테이블 외곽선 설정 */
-    border-radius: 8px; /* 테이블 모서리를 둥글게 설정 (선택 사항) */
-    overflow: hidden; /* 둥근 모서리에서 내용이 넘치지 않도록 설정 */
-}
 td {
     font-size: 28px;
 }
