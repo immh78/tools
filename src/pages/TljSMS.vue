@@ -131,6 +131,10 @@ async function shareTableAsImage() {
     background-color: hsl(82, 46%, 75%);
 }
 
+tr {
+    height: 64px !important; /* 원하는 높이로 설정 */
+}
+
 td {
     font-size: 28px;
 }
