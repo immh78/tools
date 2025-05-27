@@ -14,7 +14,7 @@ const RANGE = '뚜레쥬르'; // 원하는 범위 지정
 
 const headers = ref([
     { title: '날짜', align: 'start', key: 'date', value: 'date', width: 200 },
-    { title: '금액', align: 'end', sortable: false, key: 'amount', value: 'amount'},
+    { title: '금액', align: 'end', sortable: false, key: 'amount', value: 'amount' },
 ]);
 
 // const phoneNumber = ref('01092751025')
@@ -111,8 +111,12 @@ async function shareTableAsImage() {
                 hide-default-footer items-per-page="-1" :show-items-per-page="false">
                 <template v-slot:item="{ item, index }">
                     <tr :style="item.date === '합계' ? 'background-color: #fffad4 !important;' : ''">
-                        <td >{{ item.date }}</td>
-                        <td style="text-align: right;">{{ item.amount }}</td>
+                        <td>{{ item.date }}</td>
+                        <td :style="{ textAlign: 'right', 
+                                      fontWeight: item.date === '합계' ? 'bold' : 'normal',
+                                      color: item.date === '합계' ? 'blue' : 'black' }">
+                            {{ item.amount }}
+                        </td>
                     </tr>
                 </template>
             </v-data-table>
@@ -122,11 +126,12 @@ async function shareTableAsImage() {
 
 <style>
 .v-data-table__th {
-    font-size: 32px;
-    font-weight:bold;
-    background-color:hsl(82, 46%, 75%);
+    font-size: 28px;
+    font-weight: bold;
+    background-color: hsl(82, 46%, 75%);
 }
+
 td {
-    font-size: 32px;
+    font-size: 28px;
 }
 </style>
