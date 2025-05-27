@@ -3,19 +3,27 @@ import { ref, onMounted } from 'vue'
 import { useLogger } from '../composables/useLogger';
 import html2canvas from 'html2canvas';
 
-useLogger();
+// useLogger();
 
 const rows = ref([]);
-const msg = ref("");
+const usageSummary = ref([]);
+const usageDetail = ref([]);
 
 const API_KEY = 'AIzaSyAjcEIdV46fa6Kw3Hdyzf3No_3cXtScRLc'; // 본인의 Google API Key 입력
 const SHEET_ID = '1z9zfiUomAKR99RLNblL4melEgFexRIGdYgbewhTIB38'; // 본인의 Sheet ID 입력
-const RANGE = '뚜레쥬르'; // 원하는 범위 지정
 
-const headers = ref([
+const headers = [
     { title: '날짜', align: 'start', key: 'date', value: 'date', width: 200 },
     { title: '금액', align: 'end', sortable: false, key: 'amount', value: 'amount' },
-]);
+];
+
+const usageHeaders = [
+    { title: '제품', align: 'start', key: 'name', value: 'name' },
+    { title: '수량', align: 'end', sortable: false, key: 'qty', value: 'qty' },
+    { title: '금액', align: 'end', sortable: false, key: 'amount', value: 'amount' },
+];
+
+const tab = ref(null);
 
 // const phoneNumber = ref('01092751025')
 
@@ -41,9 +49,8 @@ const headers = ref([
 //         text: msg.value,
 //     });
 // }
-
-
-onMounted(async () => {
+async function getPrepayment() {
+    const RANGE = '뚜레쥬르'; // 원하는 범위 지정
     const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${RANGE}?key=${API_KEY}`;
 
     try {
@@ -58,17 +65,50 @@ onMounted(async () => {
                 amount: row[1], // 2열: 금액            
             }));
 
-        //console.log(rows.value);
 
-
-        //console.log('Fetched data:', msg.value);
     } catch (error) {
         console.error('Error fetching data:', error);
     }
+}
+
+async function getUsage() {
+    const RANGE = '뚜레쥬르 사용'; // 원하는 범위 지정
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${RANGE}?key=${API_KEY}`;
+
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+
+        const rawRows = data.values;
+
+        usageSummary.value = rawRows.slice(0, 3)
+            .map(row => (row[1]));
+
+        //console.log("raw", rawRows.slice(1).filter(row => row[5] > "0"));
+
+        usageDetail.value = rawRows.slice(1)
+            .filter(row => row[5] > "0")
+            .map(row => ({
+                name: row[3],
+                qty: row[4],
+                amount: row[5],
+            }));
+
+        //console.log("sum", usageSummary.value);
+        //console.log("detail", usageDetail.value);
+
+    } catch (error) {
+        console.error('Error fetching data:', error);
+    }
+}
+
+onMounted(async () => {
+    getPrepayment();
+    getUsage();
 });
 
 async function shareTableAsImage() {
-    const tableElement = document.querySelector('.v-data-table'); // v-data-table 요소 선택
+    const tableElement = document.getElementById(tab.value + "Table"); // v-data-table 요소 선택
     if (!tableElement) {
         console.error('Table element not found');
         return;
@@ -106,33 +146,63 @@ async function shareTableAsImage() {
                 </template>
                 <v-app-bar-title><v-icon>mdi-cupcake</v-icon> 뚜레쥬르 선결제 금액</v-app-bar-title>
             </v-app-bar>
+            <v-tabs v-model="tab" bg-color="primary">
+                <v-tab value="prepayment">선결제 내역</v-tab>
+                <v-tab value="usage">사용내역</v-tab>
+            </v-tabs>
 
-            <v-data-table :headers="headers" :items="rows" no-data-text="조회중입니다." loading-text="조회중입니다."
-                hide-default-footer items-per-page="-1" :show-items-per-page="false">
-                <template v-slot:item="{ item, index }">
-                    <tr :style="item.date === '합계' ? 'background-color: #fffad4 !important;' : ''">
-                        <td>{{ item.date }}</td>
-                        <td :style="{ textAlign: 'right', 
-                                      fontWeight: item.date === '합계' ? 'bold' : 'normal',
-                                      color: item.date === '합계' ? 'blue' : 'black' }">
-                            {{ item.amount }}
-                        </td>
-                    </tr>
-                </template>
-            </v-data-table>
+            <v-tabs-window v-model="tab">
+                <v-tabs-window-item value="prepayment">
+                    <v-data-table id="prepaymentTable" :headers="headers" :items="rows" no-data-text="조회중입니다."
+                        loading-text="조회중입니다." hide-default-footer items-per-page="-1" :show-items-per-page="false">
+                        <template v-slot:item="{ item, index }">
+                            <tr :style="item.date === '합계' ? 'background-color: #fffad4 !important;' : ''">
+                                <td>{{ item.date }}</td>
+                                <td :style="{
+                                    textAlign: 'right',
+                                    fontWeight: item.date === '합계' ? 'bold' : 'normal',
+                                    color: item.date === '합계' ? 'blue' : 'black'
+                                }">
+                                    {{ item.amount }}
+                                </td>
+                            </tr>
+                        </template>
+                    </v-data-table>
+                </v-tabs-window-item>
+                <v-tabs-window-item value="usage">
+                    <v-card class="mx-auto" elevation="4">
+                        <v-data-table id="usageTable" :items="usageSummary" hide-default-header hide-default-footer
+                            items-per-page="-1" :show-items-per-page="false">
+                            <template v-slot:item="{ item, index }">
+                                <tr class="text-no-wrap">
+                                    <td style="background-color: rgb(199, 221, 162);">{{ index === 0 ? '선결제금액' : index
+                                        === 1 ? '사용금액' : '잔여금액' }}</td>
+                                    <td style="text-align: right;">{{ item }}</td>
+                                </tr>
+                            </template>
+                        </v-data-table>
+                    </v-card>
+                    <v-card class="mx-auto my-8" elevation="4" max-width="344">
+                        <v-data-table :headers="usageHeaders" :items="usageDetail" hide-default-footer
+                            items-per-page="-1" :show-items-per-page="false">
+                        </v-data-table>
+                    </v-card>
+                </v-tabs-window-item>
+            </v-tabs-window>
         </v-main>
     </v-app>
 </template>
 
 <style scoped>
-::v-deep(.v-data-table__th) {
+::v-deep(#prepaymentTable .v-data-table__th) {
     font-size: 28px;
     font-weight: bold;
-    background-color: hsl(82, 46%, 75%);
+    background-color: rgb(199, 221, 162);
 }
 
 tr {
-    height: 60px !important; /* 원하는 높이로 설정 */
+    height: 60px !important;
+    /* 원하는 높이로 설정 */
 }
 
 td {
