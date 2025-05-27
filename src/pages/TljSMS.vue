@@ -110,18 +110,26 @@ onMounted(async () => {
 async function shareTableAsImage() {
 
     let title = "";
+    let textX = 0;
+    let textY = 0;
 
     switch (tab.value) {
         case 'prepayment':
             title = '선결제 내역';
+            textX = -70;
+            textY = 340;
             break;
 
         case 'usage':
             title = '사용 내역';
+            textX = -20;
+            textY = 300;
             break;
 
         case 'usageDetail':
             title = '구매 희망 제품';
+            textX = -100;
+            textY = 360;
             break;
 
         default:
@@ -142,8 +150,7 @@ async function shareTableAsImage() {
 
         // 텍스트 추가
         const fontSize = 60; // 텍스트 폰트 크기
-        const textX = 14; // 텍스트의 X 좌표 (중앙 정렬)
-        const textY = 220;  // 텍스트의 Y 좌표 (테이블 위에 겹치도록 설정)
+
 
         //console.log(textX, textY);
         // 반투명 텍스트 설정
@@ -151,6 +158,8 @@ async function shareTableAsImage() {
         context.font = `bold ${fontSize}px Arial`;
         context.fillStyle = "#000000"; // 검은색 텍스트
         context.textAlign = "left";
+        // 텍스트를 대각선으로 회전 (45도)
+        context.rotate(-0.4);
         context.fillText(title, textX, textY);
 
         // 이미지 변환
