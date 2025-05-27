@@ -62,7 +62,7 @@ function processLogs(logs, visitors) {
             const visitorId = log.visitorId;
             const visitor = visitors[visitorId] || {}; // visitors[visitorId]가 없으면 빈 객체로 대체
 
-            const key = `${page}_${visitorId}`;
+            const key = `${page}_${visitor.name || visitorId}`;
 
             if (!entries[key]) {
                 entries[key] = {
