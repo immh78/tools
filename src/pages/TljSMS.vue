@@ -107,7 +107,7 @@ async function shareTableAsImage() {
                 <v-app-bar-title><v-icon>mdi-cupcake</v-icon> 뚜레쥬르 선결제 금액</v-app-bar-title>
             </v-app-bar>
 
-            <v-data-table :headers="headers" :items="rows" no-data-text="조회중입니다."
+            <v-data-table :headers="headers" :items="rows" no-data-text="조회중입니다." loading-text="조회중입니다."
                 hide-default-footer items-per-page="-1" :show-items-per-page="false">
                 <template v-slot:item="{ item, index }">
                     <tr :style="item.date === '합계' ? 'background-color: #fffad4 !important;' : ''">
@@ -122,11 +122,11 @@ async function shareTableAsImage() {
 
 <style>
 .v-data-table__th {
-    font-size: 24px;
+    font-size: 32px;
     font-weight:bold;
     background-color:hsl(82, 46%, 75%);
 }
 td {
-    font-size: 24px;
+    font-size: 32px;
 }
 </style>
