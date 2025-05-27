@@ -142,8 +142,8 @@ async function shareTableAsImage() {
 
         // 텍스트 추가
         const fontSize = 60; // 텍스트 폰트 크기
-        const textX = 14; // 텍스트의 X 좌표 (중앙 정렬)
-        const textY = 220;  // 텍스트의 Y 좌표 (테이블 위에 겹치도록 설정)
+        const textX = 12; // 텍스트의 X 좌표 (중앙 정렬)
+        const textY = 240;  // 텍스트의 Y 좌표 (테이블 위에 겹치도록 설정)
 
         //console.log(textX, textY);
         // 반투명 텍스트 설정
