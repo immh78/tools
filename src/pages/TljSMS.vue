@@ -132,7 +132,7 @@ async function shareTableAsImage() {
 }
 
 tr {
-    height: 64px !important; /* 원하는 높이로 설정 */
+    height: 60px !important; /* 원하는 높이로 설정 */
 }
 
 td {
