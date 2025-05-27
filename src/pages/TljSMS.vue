@@ -124,7 +124,7 @@ async function shareTableAsImage() {
     </v-app>
 </template>
 
-<style>
+<style scoped>
 .v-data-table__th {
     font-size: 28px;
     font-weight: bold;
