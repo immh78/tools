@@ -128,7 +128,7 @@ async function shareTableAsImage() {
 
         case 'usageDetail':
             title = '구매 희망 제품';
-            textX = -100;
+            textX = -110;
             textY = 360;
             break;
 
