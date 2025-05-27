@@ -125,7 +125,7 @@ async function shareTableAsImage() {
 </template>
 
 <style scoped>
-.v-data-table__th {
+::v-deep(.v-data-table__th) {
     font-size: 28px;
     font-weight: bold;
     background-color: hsl(82, 46%, 75%);
