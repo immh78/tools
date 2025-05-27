@@ -13,34 +13,34 @@ const SHEET_ID = '1z9zfiUomAKR99RLNblL4melEgFexRIGdYgbewhTIB38'; // 본인의 Sh
 const RANGE = '뚜레쥬르'; // 원하는 범위 지정
 
 const headers = ref([
-    { title: '날짜', align: 'start', key: 'date', value: 'date', width: 110 },
-    { title: '금액', align: 'end', sortable: false, key: 'amount', value: 'amount' },
+    { title: '날짜', align: 'start', key: 'date', value: 'date', width: 200 },
+    { title: '금액', align: 'end', sortable: false, key: 'amount', value: 'amount'},
 ]);
 
-const phoneNumber = ref('01092751025')
+// const phoneNumber = ref('01092751025')
 
-function sendSMS() {
-    const smsLink = `sms:${phoneNumber.value}?body=${encodeURIComponent(msg.value)}`
-    window.location.href = smsLink
-}
+// function sendSMS() {
+//     const smsLink = `sms:${phoneNumber.value}?body=${encodeURIComponent(msg.value)}`
+//     window.location.href = smsLink
+// }
 
-function formatSMSMessage() {
-    const msgRows = [...rows.value];
-    msgRows.splice(msgRows.length - 1, 0, { date: "--------------------", amount: "" });
+// function formatSMSMessage() {
+//     const msgRows = [...rows.value];
+//     msgRows.splice(msgRows.length - 1, 0, { date: "--------------------", amount: "" });
 
-    msg.value = msgRows
-        .map(row => `${row.date}     \t${row.amount}${row.date.substring(0, 1) === "-" ? "" : "원"}`) // 각 행을 "날짜\t금액원" 형식으로 변환
-        .join('\n'); // 각 행을 줄바꿈으로 연결
-}
+//     msg.value = msgRows
+//         .map(row => `${row.date}     \t${row.amount}${row.date.substring(0, 1) === "-" ? "" : "원"}`) // 각 행을 "날짜\t금액원" 형식으로 변환
+//         .join('\n'); // 각 행을 줄바꿈으로 연결
+// }
 
-function textShare() {
-    formatSMSMessage();
+// function textShare() {
+//     formatSMSMessage();
 
-    navigator.share({
-        //title: '선결제내역 공유',
-        text: msg.value,
-    });
-}
+//     navigator.share({
+//         //title: '선결제내역 공유',
+//         text: msg.value,
+//     });
+// }
 
 
 onMounted(async () => {
@@ -107,11 +107,11 @@ async function shareTableAsImage() {
                 <v-app-bar-title><v-icon>mdi-cupcake</v-icon> 뚜레쥬르 선결제 금액</v-app-bar-title>
             </v-app-bar>
 
-            <v-data-table :headers="headers" :items="rows" class="elevation-1" no-data-text="조회중입니다."
+            <v-data-table :headers="headers" :items="rows" no-data-text="조회중입니다."
                 hide-default-footer items-per-page="-1" :show-items-per-page="false">
                 <template v-slot:item="{ item, index }">
                     <tr :style="item.date === '합계' ? 'background-color: #fffad4 !important;' : ''">
-                        <td>{{ item.date }}</td>
+                        <td >{{ item.date }}</td>
                         <td style="text-align: right;">{{ item.amount }}</td>
                     </tr>
                 </template>
@@ -120,4 +120,13 @@ async function shareTableAsImage() {
     </v-app>
 </template>
 
-<style scoped></style>
+<style>
+.v-data-table__th {
+    font-size: 24px;
+    font-weight:bold;
+    background-color:hsl(82, 46%, 75%);
+}
+td {
+    font-size: 24px;
+}
+</style>
