@@ -146,7 +146,7 @@ async function shareTableAsImage() {
                 </template>
                 <v-app-bar-title><v-icon>mdi-cupcake</v-icon> 뚜레쥬르 선결제 금액</v-app-bar-title>
             </v-app-bar>
-            <v-tabs v-model="tab" bg-color="primary">
+            <v-tabs v-model="tab" bg-color="#202020">
                 <v-tab value="prepayment">선결제 내역</v-tab>
                 <v-tab value="usage">사용내역</v-tab>
             </v-tabs>
