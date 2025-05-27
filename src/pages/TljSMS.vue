@@ -182,7 +182,7 @@ async function shareTableAsImage() {
                             </template>
                         </v-data-table>
                     </v-card>
-                    <v-card class="mx-auto my-8" elevation="4" max-width="344">
+                    <v-card class="mx-auto my-8" elevation="4" max-width="300">
                         <v-data-table :headers="usageHeaders" :items="usageDetail" hide-default-footer
                             items-per-page="-1" :show-items-per-page="false">
                         </v-data-table>
