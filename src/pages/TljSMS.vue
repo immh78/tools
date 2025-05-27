@@ -147,7 +147,7 @@ async function shareTableAsImage() {
 
         //console.log(textX, textY);
         // 반투명 텍스트 설정
-        context.globalAlpha = 0.1; // 투명도 설정 (0.0 ~ 1.0)
+        context.globalAlpha = 0.05; // 투명도 설정 (0.0 ~ 1.0)
         context.font = `bold ${fontSize}px Arial`;
         context.fillStyle = "#000000"; // 검은색 텍스트
         context.textAlign = "left";
