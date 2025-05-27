@@ -3,7 +3,7 @@ import { ref, onMounted } from 'vue'
 import { useLogger } from '../composables/useLogger';
 import html2canvas from 'html2canvas';
 
- useLogger();
+useLogger();
 
 const rows = ref([]);
 const usageSummary = ref([]);
@@ -19,7 +19,7 @@ const headers = [
 
 const usageHeaders = [
     { title: '제품', align: 'start', key: 'name', value: 'name' },
-    { title: '수량', align: 'end', sortable: false, key: 'qty', value: 'qty' },
+    { title: '수량', align: 'center', sortable: false, key: 'qty', value: 'qty' },
     { title: '금액', align: 'end', sortable: false, key: 'amount', value: 'amount' },
 ];
 
@@ -108,15 +108,66 @@ onMounted(async () => {
 });
 
 async function shareTableAsImage() {
+
+    let title = "";
+
+    switch (tab.value) {
+        case 'prepayment':
+            title = '선결제 내역';
+            break;
+
+        case 'usage':
+            title = '사용 내역';
+            break;
+
+        case 'usageDetail':
+            title = '구매 희망 제품';
+            break;
+
+        default:
+            break;
+    }
+
     const tableElement = document.getElementById(tab.value + "Table"); // v-data-table 요소 선택
+
     if (!tableElement) {
         console.error('Table element not found');
         return;
     }
 
     try {
-        const canvas = await html2canvas(tableElement); // html2canvas로 캡처
-        const image = canvas.toDataURL('image/png'); // 이미지를 Data URL로 변환
+        // html2canvas로 테이블 캡처
+        const canvas = await html2canvas(tableElement);
+        const context = canvas.getContext('2d');
+
+        // 제목 추가
+
+        const fontSize = 32; // 제목 폰트 크기
+        const padding = 20; // 제목과 테이블 간의 간격
+        const titleHeight = fontSize + padding;
+
+        // 기존 캔버스 크기를 확장하여 제목 공간 추가
+        const newCanvas = document.createElement('canvas');
+        newCanvas.width = canvas.width;
+        newCanvas.height = canvas.height + titleHeight;
+        const newContext = newCanvas.getContext('2d');
+
+        // 배경색 설정 (선택 사항)
+        newContext.fillStyle = "#ffffff"; // 흰색 배경
+        newContext.fillRect(0, 0, newCanvas.width, newCanvas.height);
+
+        // 제목 그리기
+        newContext.font = `${fontSize}px Arial`;
+        newContext.fillStyle = "#000000"; // 검은색 텍스트
+        newContext.textAlign = "center";
+        newContext.fillText(title, newCanvas.width / 2, fontSize);
+
+        // 기존 캔버스 내용 복사
+        newContext.drawImage(canvas, 0, titleHeight);
+
+        // 새로운 캔버스를 이미지로 변환
+        const image = newCanvas.toDataURL('image/png');
+
 
         // 공유 API 사용
         if (navigator.share) {
@@ -149,6 +200,7 @@ async function shareTableAsImage() {
             <v-tabs v-model="tab" bg-color="#202020">
                 <v-tab value="prepayment">선결제 내역</v-tab>
                 <v-tab value="usage">사용내역</v-tab>
+                <v-tab value="usageDetail">사용상세내역</v-tab>
             </v-tabs>
 
             <v-tabs-window v-model="tab">
@@ -182,9 +234,12 @@ async function shareTableAsImage() {
                             </template>
                         </v-data-table>
                     </v-card>
-                    <v-card class="mx-auto my-8" elevation="4" max-width="300">
-                        <v-data-table :headers="usageHeaders" :items="usageDetail" hide-default-footer
-                            items-per-page="-1" :show-items-per-page="false">
+                </v-tabs-window-item>
+                <v-tabs-window-item value="usageDetail">
+                    <v-card class="mx-auto" elevation="4">
+                        <v-data-table id="usageDetailTable"  :headers="usageHeaders" :items="usageDetail" hide-default-footer
+                            items-per-page="-1" :show-items-per-page="false">  
+                                                      
                         </v-data-table>
                     </v-card>
                 </v-tabs-window-item>
@@ -194,7 +249,7 @@ async function shareTableAsImage() {
 </template>
 
 <style scoped>
-::v-deep(#prepaymentTable .v-data-table__th) {
+::v-deep(.v-data-table__th) {
     font-size: 28px;
     font-weight: bold;
     background-color: rgb(199, 221, 162);
@@ -204,7 +259,15 @@ tr {
     height: 60px !important;
     /* 원하는 높이로 설정 */
 }
+::v-deep(#usageDetailTable td, #usageDetailTable th) {
+    font-size: 24px; /* 테이블의 셀(td)과 헤더(th) 글꼴 크기 설정 */
+}
 
+::v-deep(.v-data-table) {
+    border: 2px solid #000; /* 테이블 외곽선 설정 */
+    border-radius: 8px; /* 테이블 모서리를 둥글게 설정 (선택 사항) */
+    overflow: hidden; /* 둥근 모서리에서 내용이 넘치지 않도록 설정 */
+}
 td {
     font-size: 28px;
 }
