@@ -142,7 +142,7 @@ async function shareTableAsImage() {
 
         // 제목 추가
 
-        const fontSize = 32; // 제목 폰트 크기
+        const fontSize = 60; // 제목 폰트 크기
         const padding = 20; // 제목과 테이블 간의 간격
         const titleHeight = fontSize + padding;
 
