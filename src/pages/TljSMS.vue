@@ -150,11 +150,12 @@ async function shareTableAsImage() {
 
         // 텍스트 추가
         const fontSize = 60; // 텍스트 폰트 크기
-
+        const textX = 14; // 텍스트의 X 좌표 (중앙 정렬)
+        const textY = 220;  // 텍스트의 Y 좌표 (테이블 위에 겹치도록 설정)
 
         //console.log(textX, textY);
         // 반투명 텍스트 설정
-        context.globalAlpha = 0.1; // 투명도 설정 (0.0 ~ 1.0)
+        context.globalAlpha = 0.05; // 투명도 설정 (0.0 ~ 1.0)
         context.font = `bold ${fontSize}px Arial`;
         context.fillStyle = "#000000"; // 검은색 텍스트
         context.textAlign = "left";
