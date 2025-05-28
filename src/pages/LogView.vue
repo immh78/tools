@@ -3,7 +3,7 @@ import { database, ref as firebaseRef, get, update } from "../config/firebase";
 import { ref, computed, onMounted } from 'vue';
 import { useLogger } from '../composables/useLogger';
 
-//useLogger();
+useLogger();
 
 const logTable = ref(null);
 const visitorTable = ref(null);
