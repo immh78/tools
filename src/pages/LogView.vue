@@ -82,8 +82,8 @@ function processLogs(logs, visitors) {
     }
 
     const formatDate = datetime => {
-        return `${datetime.slice(0, 4)}-${datetime.slice(4, 6)}-${datetime.slice(6, 8)} ` +
-            `${datetime.slice(8, 10)}:${datetime.slice(10, 12)}:${datetime.slice(12, 14)}`
+        return `${datetime.slice(4, 6)}/${datetime.slice(6, 8)} ` +
+            `${datetime.slice(8, 10)}:${datetime.slice(10, 12)}`
     }
 
     tableData.value = Object.values(entries).map(entry => ({
