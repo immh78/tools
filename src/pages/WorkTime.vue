@@ -10,11 +10,18 @@ const isOver = ref(false);
 const isOverPay = ref(false);
 const overTimePay = ref(0);
 const todayWorkTime = ref(0);
+const isSnackbar = ref(false);
+const startTime = ref("");
 
 const base = ref(0);
 const prog = ref(0);
 
+const isPopup = ref(false);
+
 async function getWorkTimeInfo() {
+    isOver.value = false;
+    isOverPay.value = false;
+
     const dbRef = firebaseRef(database, "work-time");
     await get(dbRef)
         .then(snapshot => {
@@ -30,7 +37,12 @@ async function getWorkTimeInfo() {
     base.value = workTimeInfo.value.planTime;
 
     start.value = workTimeInfo.value.start;
-    todayWorkTime.value = calctodayWorkTime(start.value);
+
+    if (start.value === "") {
+        todayWorkTime.value = 0;
+    } else {
+        todayWorkTime.value = Number(calctodayWorkTime(start.value));
+    }
 
     if (todayWorkTime.value > 8) {
         todayWorkTime.value -= 1;
@@ -39,17 +51,17 @@ async function getWorkTimeInfo() {
     }
 
     // workTimeInfo.value.actTime = 162;
-    prog.value = workTimeInfo.value.actTime + todayWorkTime.value;
-    console.log(workTimeInfo.value.actTime + todayWorkTime.value);
+    prog.value = Number(workTimeInfo.value.actTime) + Number(todayWorkTime.value);
+    //console.log(prog.value);
 
-    if (workTimeInfo.value.actTime + todayWorkTime.value > workTimeInfo.value.planTime) {
+    if (prog.value > workTimeInfo.value.planTime) {
         isOver.value = true;
-        base.value = workTimeInfo.value.actTime + todayWorkTime.value;
+        base.value = prog.value;
         prog.value = workTimeInfo.value.planTime;
 
-        if (workTimeInfo.value.actTime + todayWorkTime.value - workTimeInfo.value.planTime > 16.5) {
+        if (Number(workTimeInfo.value.actTime) + Number(todayWorkTime.value) - Number(workTimeInfo.value.planTime) > 16.5) {
             isOverPay.value = true;
-            overTimePay.value = workTimeInfo.value.salary / 240 * 1.5 * (workTimeInfo.value.actTime + todayWorkTime.value - workTimeInfo.value.planTime - 16.5);
+            overTimePay.value = Math.round(workTimeInfo.value.salary / 240 * 1.5 * (Number(workTimeInfo.value.actTime) + Number(todayWorkTime.value) - workTimeInfo.value.planTime - 16.5)).toLocaleString();;
         }
     }
 
@@ -82,42 +94,50 @@ function getNow() {
 }
 
 async function saveTodayWorkTime() {
+    const time = Number(workTimeInfo.value.actTime) + Number(todayWorkTime.value);
+    const data = { "actTime": time.toFixed(2), "start": "" };
 
-    const time = workTimeInfo.value.actTime + todayWorkTime.value;
-
-    const data = {"actTime":time,"start":""};
-
-    try {
-        const dbRef = firebaseRef(database, "work-time");
-        await update(dbRef, data); // 데이터를 저장
-    } catch (err) {
-        console.error("Error saving data:", err);
-    }
-
+    saveData(data)
     getWorkTimeInfo();
 }
 
 async function saveWorkInfo() {
-    const data = {"actTime":workTimeInfo.value.actTime,"planTime":workTimeInfo.value.planTime};
-
-    try {
-        const dbRef = firebaseRef(database, "work-time");
-        await update(dbRef, data); // 데이터를 저장
-    } catch (err) {
-        console.error("Error saving data:", err);
-    }
-
+    const data = { "actTime": workTimeInfo.value.actTime, "planTime": workTimeInfo.value.planTime };
+    saveData(data);
     getWorkTimeInfo();
 }
 
 function openStartPopup() {
     if (workTimeInfo.value.start === "") {
-        saveStart
-    } 
+        const now = getNow();
+        const data = { "start": now };
+
+        saveData(data);
+        getWorkTimeInfo();
+    } else {
+        //console.log("start", workTimeInfo.value.start);
+        startTime.value = workTimeInfo.value.start.slice(0, 2) + ":" + workTimeInfo.value.start.slice(2);
+        isPopup.value = true;
+    }
 }
 
-async function saveStart() {
-    const data = {"start":""};
+function saveStart() {
+    const data = { "start": startTime.value.slice(0, 2) + startTime.value.slice(3) };
+    isPopup.value = false;
+
+    saveData(data);
+    getWorkTimeInfo();
+}
+
+async function saveData(data) {
+    try {
+        const dbRef = firebaseRef(database, "work-time");
+        await update(dbRef, data); // 데이터를 저장
+    } catch (err) {
+        console.error("Error saving data:", err);
+    }
+
+    isSnackbar.value = true;
 }
 
 onMounted(async () => {
@@ -148,12 +168,40 @@ onMounted(async () => {
                 <v-text-field label="의무 근무시간" v-model="workTimeInfo.planTime" variant="outlined"
                     class="mt-2"></v-text-field>
                 <v-text-field label="누적 근무시간" v-model="workTimeInfo.actTime" variant="outlined"></v-text-field>
-                <v-text-field v-if="workTimeInfo.start" label="금일 근무시간" v-model="todayWorkTime" variant="outlined"></v-text-field>
-                <h3 v-if="isOverPay">{{ overTimePay }}</h3>
+                <v-text-field label="금일 근무시간" v-model="todayWorkTime"
+                    :style="{ color: workTimeInfo.start === '' ? 'white' : 'black' }" variant="outlined"
+                    readonly></v-text-field>
             </v-card>
-            <v-btn @click="saveStart()">출근</v-btn><v-btn @click="saveTodayWorkTime()">퇴근</v-btn>
+            <div style="display: flex; justify-content: center; align-items: center;">
+                <v-btn class="ma-2" @click="openStartPopup()"><v-icon>mdi-home-import-outline</v-icon> 출근</v-btn>
+                <v-btn class="ma-2" @click="saveTodayWorkTime()"
+                    :disabled="workTimeInfo.start === ''"><v-icon>mdi-home-export-outline</v-icon> 퇴근</v-btn>
+            </div>
+            <v-card class="ma-2" v-if="isOverPay" variant="flat" color="indigo-darken-3"
+                style="position: fixed; bottom: 20px; right: 20px; display: flex; align-items: center; justify-content: center; width: auto; padding: 10px;">
+                <div class="text-h7" style="text-align: center;">
+                    {{ overTimePay }}원
+                </div>
+            </v-card>
         </v-main>
+
+        <v-dialog v-model="isPopup" max-width="500">
+            <v-card title="출입시간">
+
+                <v-text-field class="ma-2" v-model="startTime" type="time" variant="outlined"></v-text-field>
+
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+
+                    <v-btn text="취소" @click="isPopup = false"></v-btn>
+                    <v-btn text="저장" @click="saveStart()"></v-btn>
+                </v-card-actions>
+            </v-card>
+
+        </v-dialog>
     </v-app>
+
+    <v-snackbar v-model="isSnackbar">저장 완료!</v-snackbar>
 </template>
 
 <style scoped></style>
