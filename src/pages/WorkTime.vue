@@ -41,7 +41,7 @@ async function getWorkTimeInfo() {
     if (start.value === "") {
         todayWorkTime.value = 0;
     } else {
-        todayWorkTime.value = Number(calctodayWorkTime(start.value));
+        todayWorkTime.value = calctodayWorkTime(start.value);
     }
 
     if (todayWorkTime.value > 8) {
@@ -51,7 +51,7 @@ async function getWorkTimeInfo() {
     }
 
     // workTimeInfo.value.actTime = 162;
-    prog.value = Number(workTimeInfo.value.actTime) + Number(todayWorkTime.value);
+    prog.value = workTimeInfo.value.actTime + todayWorkTime.value;
     //console.log(prog.value);
 
     if (prog.value > workTimeInfo.value.planTime) {
@@ -59,9 +59,9 @@ async function getWorkTimeInfo() {
         base.value = prog.value;
         prog.value = workTimeInfo.value.planTime;
 
-        if (Number(workTimeInfo.value.actTime) + Number(todayWorkTime.value) - Number(workTimeInfo.value.planTime) > 16.5) {
+        if (workTimeInfo.value.actTime + todayWorkTime.value - workTimeInfo.value.planTime > 16.5) {
             isOverPay.value = true;
-            overTimePay.value = Math.round(workTimeInfo.value.salary / 240 * 1.5 * (Number(workTimeInfo.value.actTime) + Number(todayWorkTime.value) - workTimeInfo.value.planTime - 16.5)).toLocaleString();;
+            overTimePay.value = Math.round(workTimeInfo.value.salary / 240 * 1.5 * (workTimeInfo.value.actTime + todayWorkTime.value - workTimeInfo.value.planTime - 16.5)).toLocaleString();;
         }
     }
 
@@ -85,7 +85,7 @@ function calctodayWorkTime(pStart) {
     const diffInMinutes = nowTotalMinutes - startTotalMinutes;
     const diffInHours = diffInMinutes / 60;
 
-    return diffInHours.toFixed(2);
+    return Number(diffInHours.toFixed(2));
 }
 
 function getNow() {
@@ -94,8 +94,8 @@ function getNow() {
 }
 
 async function saveTodayWorkTime() {
-    const time = Number(workTimeInfo.value.actTime) + Number(todayWorkTime.value);
-    const data = { "actTime": time.toFixed(2), "start": "" };
+    const time = workTimeInfo.value.actTime + todayWorkTime.value;
+    const data = { "actTime": Number(time.toFixed(2)), "start": "" };
 
     saveData(data)
     getWorkTimeInfo();
