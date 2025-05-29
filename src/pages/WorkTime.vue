@@ -35,9 +35,12 @@ async function getWorkTimeInfo() {
 
 
     base.value = workTimeInfo.value.planTime;
-
     start.value = workTimeInfo.value.start;
 
+    refreshCalcTime();
+}
+
+function refreshCalcTime() {
     if (start.value === "") {
         todayWorkTime.value = 0;
     } else {
@@ -64,7 +67,6 @@ async function getWorkTimeInfo() {
             overTimePay.value = Math.round(workTimeInfo.value.salary / 240 * 1.5 * (workTimeInfo.value.actTime + todayWorkTime.value - workTimeInfo.value.planTime - 16.5)).toLocaleString();
         }
     }
-
 }
 
 function calctodayWorkTime(pStart) {
@@ -176,6 +178,8 @@ onMounted(async () => {
                 <v-btn class="ma-2" @click="openStartPopup()"><v-icon>mdi-home-import-outline</v-icon> 출근</v-btn>
                 <v-btn class="ma-2" @click="saveTodayWorkTime()"
                     :disabled="workTimeInfo.start === ''"><v-icon>mdi-home-export-outline</v-icon> 퇴근</v-btn>
+                <v-btn icon="mdi-reload" class="ma-2" @click="refreshCalcTime()" :disabled="workTimeInfo.start === ''"
+                    variant="flat"></v-btn>
             </div>
             <v-card class="ma-2" v-if="isOverPay" variant="flat" color="indigo-darken-3"
                 style="position: fixed; bottom: 20px; right: 20px; display: flex; align-items: center; justify-content: center; width: auto; padding: 10px;">
