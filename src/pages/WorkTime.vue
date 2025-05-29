@@ -12,11 +12,13 @@ const overTimePay = ref(0);
 const todayWorkTime = ref(0);
 const isSnackbar = ref(false);
 const startTime = ref("");
+const lastRefreshTime = ref("");
 
 const base = ref(0);
 const prog = ref(0);
 
 const isPopup = ref(false);
+
 
 async function getWorkTimeInfo() {
     isOver.value = false;
@@ -67,6 +69,10 @@ function refreshCalcTime() {
             overTimePay.value = Math.round(workTimeInfo.value.salary / 240 * 1.5 * (workTimeInfo.value.actTime + todayWorkTime.value - workTimeInfo.value.planTime - 16.5)).toLocaleString();
         }
     }
+
+    const d = getNow();;
+
+    lastRefreshTime.value = d.slice(0, 2) + ":" + d.slice(2);
 }
 
 function calctodayWorkTime(pStart) {
@@ -174,6 +180,9 @@ onMounted(async () => {
                     :style="{ color: workTimeInfo.start === '' ? 'white' : 'black' }" variant="outlined"
                     readonly></v-text-field>
             </v-card>
+            <div class="mr-2" style="display: flex; justify-content: right; align-items: right;">
+                <span style="font-size:11px;">( {{lastRefreshTime}} )</span> 
+            </div>
             <div style="display: flex; justify-content: center; align-items: center;">
                 <v-btn class="ma-2" @click="openStartPopup()"><v-icon>mdi-home-import-outline</v-icon> 출근</v-btn>
                 <v-btn class="ma-2" @click="saveTodayWorkTime()"
