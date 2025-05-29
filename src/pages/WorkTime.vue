@@ -102,7 +102,7 @@ async function saveTodayWorkTime() {
 }
 
 async function saveWorkInfo() {
-    const data = { "actTime": workTimeInfo.value.actTime, "planTime": workTimeInfo.value.planTime };
+    const data = { "actTime": Number(workTimeInfo.value.actTime), "planTime": Number(workTimeInfo.value.planTime) };
     saveData(data);
     getWorkTimeInfo();
 }
