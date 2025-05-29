@@ -1,8 +1,8 @@
 <script setup>
 import { database, ref as firebaseRef, get, update } from "../config/firebase";
 import { ref, onMounted } from 'vue';
-//import { useLogger } from '../composables/useLogger';
-//useLogger();
+import { useLogger } from '../composables/useLogger';
+useLogger();
 
 const workTimeInfo = ref({});
 const start = ref("");
