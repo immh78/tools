@@ -180,15 +180,12 @@ onMounted(async () => {
                     :style="{ color: workTimeInfo.start === '' ? 'white' : 'black' }" variant="outlined"
                     readonly></v-text-field>
             </v-card>
-            <div class="mr-2" style="display: flex; justify-content: right; align-items: right;">
-                <span style="font-size:11px;">( {{lastRefreshTime}} )</span> 
-            </div>
             <div style="display: flex; justify-content: center; align-items: center;">
                 <v-btn class="ma-2" @click="openStartPopup()"><v-icon>mdi-home-import-outline</v-icon> 출근</v-btn>
                 <v-btn class="ma-2" @click="saveTodayWorkTime()"
                     :disabled="workTimeInfo.start === ''"><v-icon>mdi-home-export-outline</v-icon> 퇴근</v-btn>
-                <v-btn icon="mdi-reload" class="ma-2" @click="refreshCalcTime()" :disabled="workTimeInfo.start === ''"
-                    variant="flat"></v-btn>
+                <v-btn prepend-icon="mdi-reload" class="ma-2" @click="refreshCalcTime()" :disabled="workTimeInfo.start === ''"
+                    variant="flat"><span style="font-size:11px;">({{lastRefreshTime}})</span></v-btn>
             </div>
             <v-card class="ma-2" v-if="isOverPay" variant="flat" color="indigo-darken-3"
                 style="position: fixed; bottom: 20px; right: 20px; display: flex; align-items: center; justify-content: center; width: auto; padding: 10px;">
