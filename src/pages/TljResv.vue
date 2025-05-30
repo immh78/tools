@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useLogger } from '../composables/useLogger';
 import html2canvas from 'html2canvas';
 import { database, ref as firebaseRef, get, update, remove } from "../config/firebase";
@@ -184,15 +184,7 @@ function openPrepayPopup(item) {
 
     if (item == null) {
         isPrepayAdd.value = true;
-        if (tljResv.value.prepayment) {
-            const prepaymentKeys = Object.keys(tljResv.value.prepayment).map(Number); // 문자열이 아닌 숫자로 변환
-            // 0부터 순차적으로 증가하며 비어있는 값을 찾기
-            while (prepaymentKeys.includes(key)) {
-                key++;
-            }
-        } else {
-            key = 0;
-        }
+        key = getPrepaymentNewKey();
 
         d = formatDate("-", getToday());
     } else {
@@ -206,6 +198,22 @@ function openPrepayPopup(item) {
 
     isPrepayPopup.value = true;
 }
+
+function getPrepaymentNewKey() {
+    let key = 0;
+    if (tljResv.value.prepayment) {
+        const prepaymentKeys = Object.keys(tljResv.value.prepayment).map(Number); // 문자열이 아닌 숫자로 변환
+        // 0부터 순차적으로 증가하며 비어있는 값을 찾기
+        while (prepaymentKeys.includes(key)) {
+            key++;
+        }
+    } else {
+        key = 0;
+    }
+
+    return key;
+}
+
 
 async function prepayUpdate() {
     const d = formatDate("", prepayItem.value.date);
@@ -251,13 +259,12 @@ async function prepayDelete(target) {
     selectDate();
 }
 
-
 function openResvPopup(item) {
     console.log("* item:", item);
     let key = 0;
     let product = "";
     let amount = 0;
-    let qty = 0;
+    let qty = 1;
 
     if (item == null) {
         isResvAdd.value = true;
@@ -269,7 +276,7 @@ function openResvPopup(item) {
             }
         } else {
             key = 0;
-        }        
+        }
     } else {
         isResvAdd.value = false;
         key = item.key;
@@ -305,7 +312,6 @@ async function resvUpdate() {
 
     selectDate();
 }
-
 
 async function resvDelete(target) {
     let key = "";
@@ -353,6 +359,41 @@ function formatDate(gb, dateStr) {
     }
 }
 
+function remainApply() {
+    prepayDelete();
+
+    const key = getPrepaymentNewKey();
+    const amount = summary.value.prepayment - summary.value.reservation;
+    prepayKey.value = key;
+
+    prepayItem.value.date = getToday();
+    prepayItem.value.amount = amount;
+    prepayUpdate();
+    tab.value = "prepayment";
+}
+
+watch(() => resvItem.value.qty, (newQty) => {
+    const amount = tljResv.value.product[resvItem.value.product];
+
+    if (amount > 0) {
+        if (newQty > 0) {
+            resvItem.value.amount = amount * newQty;
+        } else {
+            resvItem.value.amount = null;
+        }
+    }
+});
+
+watch(() => resvItem.value.product, (newProduct) => {
+    const amount = tljResv.value.product[newProduct];
+
+    if (amount > 0) {
+        if (resvItem.value.qty > 0) {
+            resvItem.value.amount = amount * resvItem.value.qty;
+        }
+    }
+});
+
 onMounted(async () => {
     selectDate();
 });
@@ -385,7 +426,7 @@ onMounted(async () => {
                                 @click="openPrepayPopup(item)">
                                 <td>{{ item.date === '합계' ? '합계' : item.date.slice(4, 6) + '/'
                                     + item.date.slice(6, 8)
-                                    }}</td>
+                                }}</td>
                                 <td :style="{
                                     textAlign: 'right',
                                     fontWeight: item.date === '합계' ? 'bold' : 'normal',
@@ -409,13 +450,15 @@ onMounted(async () => {
                             (summary.prepayment - summary.reservation).toLocaleString()
                                 }}</v-col></v-row>
                     </v-container>
+                    <v-btn @click="remainApply()">잔액 선결제 반영</v-btn>
                 </v-tabs-window-item>
                 <v-tabs-window-item value="reservation">
                     <v-card class="mx-auto" elevation="4">
                         <v-data-table id="reservationTable" :headers="resvHeaders" :items="resvTab" hide-default-footer
                             items-per-page="-1" :show-items-per-page="false">
                             <template v-slot:item="{ item, index }">
-                                <tr :style="item.product === '합계' ? 'background-color: #fffad4 !important;' : ''" @click="openResvPopup(item)">
+                                <tr :style="item.product === '합계' ? 'background-color: #fffad4 !important;' : ''"
+                                    @click="openResvPopup(item)">
                                     <td>{{ item.product }}</td>
                                     <td style="text-align: center;">{{ item.qty }}</td>
                                     <td :style="{
@@ -430,7 +473,7 @@ onMounted(async () => {
                         </v-data-table>
                     </v-card>
                     <v-btn @click="openResvPopup()">추가</v-btn>
-                    <v-btn @click="">전체삭제</v-btn>
+                    <v-btn @click="resvDelete()">전체삭제</v-btn>
                 </v-tabs-window-item>
             </v-tabs-window>
         </v-main>
