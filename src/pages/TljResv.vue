@@ -48,7 +48,7 @@ async function selectDate() {
             }
         })
         .catch(err => {
-            console.error("Error fetching data:", err);
+            //console.error("Error fetching data:", err);
         });
 
     // Calculate sum
@@ -97,11 +97,11 @@ async function selectDate() {
     productTab.value = Object.keys(tljResv.value.product);
 
 
-    console.log("* Prepayment:", prepayTab.value);
-    console.log("* Reservation:", resvTab.value);
-    console.log("* Summary:", summary.value);
-    console.log("* product:", productTab.value);
-    console.log("* tljResv:", tljResv.value);
+    //console.log("* Prepayment:", prepayTab.value);
+    //console.log("* Reservation:", resvTab.value);
+    //console.log("* Summary:", summary.value);
+    //console.log("* product:", productTab.value);
+    //console.log("* tljResv:", tljResv.value);
 
 }
 
@@ -177,7 +177,7 @@ async function shareTableAsImage() {
 }
 
 function openPrepayPopup(item) {
-    console.log("* item:", item);
+    //console.log("* item:", item);
     let key = 0;
     let d = "";
     let amount = 0;
@@ -260,7 +260,7 @@ async function prepayDelete(target) {
 }
 
 function openResvPopup(item) {
-    console.log("* item:", item);
+    //console.log("* item:", item);
     let key = 0;
     let product = "";
     let amount = 0;
@@ -287,7 +287,7 @@ function openResvPopup(item) {
     resvKey.value = key;
     resvItem.value = { "product": product, "qty": qty, "amount": amount };
 
-    console.log("* resvItem:", resvItem.value);
+    //console.log("* resvItem:", resvItem.value);
 
     isResvPopup.value = true;
 }
@@ -423,10 +423,10 @@ onMounted(async () => {
                         loading-text="조회중입니다." hide-default-footer items-per-page="-1" :show-items-per-page="false">
                         <template v-slot:item="{ item }">
                             <tr :style="item.date === '합계' ? 'background-color: #fffad4 !important;' : ''"
-                                @click="openPrepayPopup(item)">
+                                @click="item.date === '합계' ? '' : openPrepayPopup(item)">
                                 <td>{{ item.date === '합계' ? '합계' : item.date.slice(4, 6) + '/'
                                     + item.date.slice(6, 8)
-                                }}</td>
+                                    }}</td>
                                 <td :style="{
                                     textAlign: 'right',
                                     fontWeight: item.date === '합계' ? 'bold' : 'normal',
@@ -437,43 +437,51 @@ onMounted(async () => {
                             </tr>
                         </template>
                     </v-data-table>
-                    <v-btn @click="openPrepayPopup()">추가</v-btn>
-                    <v-btn @click="prepayDelete()">전체삭제</v-btn>
+                    <v-container style="text-align: center;">
+                        <v-btn class="ma-1" @click="openPrepayPopup()">추가</v-btn>
+                        <v-btn class="ma-1" @click="prepayDelete()">전체삭제</v-btn>
+                    </v-container>
                 </v-tabs-window-item>
                 <v-tabs-window-item value="summary">
-                    <v-container id="summaryTable">
-                        <v-row><v-col class="sum-header">선결제금액</v-col><v-col class="sum-value d-flex justify-end">{{
-                            summary.prepayment.toLocaleString() }}</v-col></v-row>
-                        <v-row><v-col class="sum-header">사용금액</v-col><v-col class="sum-value d-flex justify-end">{{
-                            summary.reservation.toLocaleString() }}</v-col></v-row>
-                        <v-row><v-col class="sum-header">잔여금액</v-col><v-col class="sum-value d-flex justify-end">{{
-                            (summary.prepayment - summary.reservation).toLocaleString()
+                    <v-container id="summaryTable" fluid class="py-1">
+                        <v-row class="table-row px-2"><v-col class="sum-header table-cell">선결제금액</v-col><v-col
+                                class="sum-value table-cell d-flex justify-end">{{
+                                    summary.prepayment.toLocaleString() }}</v-col></v-row>
+                        <v-row class="table-row px-2"><v-col class="sum-header table-cell">사용금액</v-col><v-col
+                                class="sum-value table-cell d-flex justify-end">{{
+                                    summary.reservation.toLocaleString() }}</v-col></v-row>
+                        <v-row class="table-row px-2"><v-col class="sum-header table-cell">잔여금액</v-col><v-col
+                                class="sum-value table-cell d-flex justify-end">{{
+                                    (summary.prepayment - summary.reservation).toLocaleString()
                                 }}</v-col></v-row>
                     </v-container>
-                    <v-btn @click="remainApply()">잔액 선결제 반영</v-btn>
+                    <v-container style="text-align: center;">
+                        <v-btn class="ma-1" @click="remainApply()">잔액 선결제 반영</v-btn>
+                    </v-container>
+
                 </v-tabs-window-item>
                 <v-tabs-window-item value="reservation">
-                    <v-card class="mx-auto" elevation="4">
-                        <v-data-table id="reservationTable" :headers="resvHeaders" :items="resvTab" hide-default-footer
-                            items-per-page="-1" :show-items-per-page="false">
-                            <template v-slot:item="{ item, index }">
-                                <tr :style="item.product === '합계' ? 'background-color: #fffad4 !important;' : ''"
-                                    @click="openResvPopup(item)">
-                                    <td>{{ item.product }}</td>
-                                    <td style="text-align: center;">{{ item.qty }}</td>
-                                    <td :style="{
-                                        textAlign: 'right',
-                                        fontWeight: item.date === '합계' ? 'bold' : 'normal',
-                                        color: item.date === '합계' ? 'blue' : 'black'
-                                    }">
-                                        {{ item.amount.toLocaleString() }}
-                                    </td>
-                                </tr>
-                            </template>
-                        </v-data-table>
-                    </v-card>
-                    <v-btn @click="openResvPopup()">추가</v-btn>
-                    <v-btn @click="resvDelete()">전체삭제</v-btn>
+                    <v-data-table id="reservationTable" :headers="resvHeaders" :items="resvTab" hide-default-footer
+                        items-per-page="-1" :show-items-per-page="false">
+                        <template v-slot:item="{ item, index }">
+                            <tr :style="item.product === '합계' ? 'background-color: #fffad4 !important;' : ''"
+                                @click="item.product === '합계' ? '' : openResvPopup(item)">
+                                <td>{{ item.product }}</td>
+                                <td style="text-align: center;">{{ item.qty }}</td>
+                                <td :style="{
+                                    textAlign: 'right',
+                                    fontWeight: item.date === '합계' ? 'bold' : 'normal',
+                                    color: item.date === '합계' ? 'blue' : 'black'
+                                }">
+                                    {{ item.amount.toLocaleString() }}
+                                </td>
+                            </tr>
+                        </template>
+                    </v-data-table>
+                    <v-container style="text-align: center;">
+                        <v-btn class="ma-1" @click="openResvPopup()">추가</v-btn>
+                        <v-btn class="ma-1" @click="resvDelete()">전체삭제</v-btn>
+                    </v-container>
                 </v-tabs-window-item>
             </v-tabs-window>
         </v-main>
@@ -486,9 +494,8 @@ onMounted(async () => {
                     <v-text-field label="금액" v-model="prepayItem.amount" type="number" autofocus clearable />
                 </v-card-text>
                 <v-card-actions>
-                    <v-btn color="primary" @click="prepayUpdate()" icon="mdi-check-bold"></v-btn>
-                    <v-btn color="error" @click="prepayDelete(prepayKey)" :disabled="isPrepayAdd"
-                        icon="mdi-delete"></v-btn>
+                    <v-btn @click="prepayUpdate()" icon="mdi-check-bold"></v-btn>
+                    <v-btn @click="prepayDelete(prepayKey)" :disabled="isPrepayAdd" icon="mdi-delete"></v-btn>
                     <v-btn @click="isPrepayPopup = false" icon="mdi-close-thick"></v-btn>
                 </v-card-actions>
             </v-card>
@@ -499,12 +506,13 @@ onMounted(async () => {
                 <v-card-title>예약</v-card-title>
                 <v-card-text>
                     <v-combobox v-model="resvItem.product" label="제품" :items="productTab"></v-combobox>
-                    <v-text-field label="수량" v-model="resvItem.qty" type="number" clearable />
+                    <v-number-input v-model="resvItem.qty" controlVariant="default" label="수량" :min="1"
+                        inset></v-number-input>
                     <v-text-field label="금액" v-model="resvItem.amount" type="number" autofocus clearable />
                 </v-card-text>
                 <v-card-actions>
-                    <v-btn color="primary" @click="resvUpdate()" icon="mdi-check-bold"></v-btn>
-                    <v-btn color="error" @click="resvDelete(resvKey)" :disabled="isResvAdd" icon="mdi-delete"></v-btn>
+                    <v-btn @click="resvUpdate()" icon="mdi-check-bold"></v-btn>
+                    <v-btn @click="resvDelete(resvKey)" :disabled="isResvAdd" icon="mdi-delete"></v-btn>
                     <v-btn @click="isResvPopup = false" icon="mdi-close-thick"></v-btn>
                 </v-card-actions>
             </v-card>
@@ -529,6 +537,13 @@ td {
     font-size: 28px;
 }
 
+#summaryTable {
+    width: 100%;
+    max-width: 100%;
+    padding-left: 0;
+    padding-right: 0;
+}
+
 .sum-header {
     font-size: 28px;
     font-weight: bold;
@@ -537,5 +552,9 @@ td {
 
 .sum-value {
     font-size: 28px;
+}
+
+.table-row {
+    border-bottom: 1px solid silver;
 }
 </style>
