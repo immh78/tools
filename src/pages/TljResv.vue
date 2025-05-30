@@ -2,11 +2,10 @@
 import { ref, onMounted } from 'vue'
 import { useLogger } from '../composables/useLogger';
 import html2canvas from 'html2canvas';
-import { database, ref as firebaseRef, get, update } from "../config/firebase";
+import { database, ref as firebaseRef, get, update, remove } from "../config/firebase";
 
 //useLogger();
 
-const isPrepayPopup = ref(false);
 
 const tljResv = ref({});
 const tab = ref("");
@@ -15,8 +14,18 @@ const summary = ref({
     reservation: 0
 });
 
+const isPrepayPopup = ref(false);
+const isPrepayAdd = ref(false);
 const prepayTab = ref([]);
 const resvTab = ref([]);
+const prepayItem = ref({});
+const prepayKey = ref("");
+
+const isResvPopup = ref(false);
+const isResvAdd = ref(false);
+const productTab = ref([]);
+const resvItem = ref({});
+const resvKey = ref("");
 
 
 const prepayHeaders = [
@@ -42,25 +51,37 @@ async function selectDate() {
             console.error("Error fetching data:", err);
         });
 
-
-
     // Calculate sum
-    summary.value.prepayment = tljResv.value.prepayment.reduce((sum, item) => sum + item.amount, 0);
-    summary.value.reservation = tljResv.value.reservation.reduce((sum, item) => sum + item.amount, 0);
+    prepayTab.value = [];
+    if (tljResv.value.prepayment) {
+        summary.value.prepayment = tljResv.value.prepayment.reduce((sum, item) => sum + item.amount, 0);
 
-    const prepaymentKeys = Object.keys(tljResv.value.prepayment).map(Number)
-    prepaymentKeys.forEach(key => {
-        const itemPrepay = tljResv.value.prepayment[key];
-        itemPrepay.key = key;  // 각 항목에 key 값을 추가
-        prepayTab.value.push(itemPrepay);
-    });
+        const prepaymentKeys = Object.keys(tljResv.value.prepayment).map(Number)
 
-    const reservationKeys = Object.keys(tljResv.value.reservation).map(Number)
-    reservationKeys.forEach(key => {
-        const itemResv = tljResv.value.reservation[key];
-        itemResv.key = key;  // 각 항목에 key 값을 추가
-        resvTab.value.push(itemResv);
-    });
+        prepaymentKeys.forEach(key => {
+            const itemPrepay = tljResv.value.prepayment[key];
+            itemPrepay.key = key;  // 각 항목에 key 값을 추가
+            prepayTab.value.push(itemPrepay);
+        });
+
+    } else {
+        summary.value.prepayment = 0;
+    }
+
+    resvTab.value = [];
+    if (tljResv.value.reservation) {
+        summary.value.reservation = tljResv.value.reservation.reduce((sum, item) => sum + item.amount, 0);
+        const reservationKeys = Object.keys(tljResv.value.reservation).map(Number)
+
+        reservationKeys.forEach(key => {
+            const itemResv = tljResv.value.reservation[key];
+            itemResv.key = key;  // 각 항목에 key 값을 추가
+            resvTab.value.push(itemResv);
+        });
+    } else {
+        summary.value.reservation = 0;
+    }
+
 
     prepayTab.value.push({
         "amount": summary.value.prepayment,
@@ -72,10 +93,14 @@ async function selectDate() {
         "product": "합계"
     });
 
+    // 상품명 리스트
+    productTab.value = Object.keys(tljResv.value.product);
+
 
     console.log("* Prepayment:", prepayTab.value);
     console.log("* Reservation:", resvTab.value);
     console.log("* Summary:", summary.value);
+    console.log("* product:", productTab.value);
     console.log("* tljResv:", tljResv.value);
 
 }
@@ -151,33 +176,180 @@ async function shareTableAsImage() {
     }
 }
 
+function openPrepayPopup(item) {
+    console.log("* item:", item);
+    let key = 0;
+    let d = "";
+    let amount = 0;
 
-function openPrepayPopup() {
+    if (item == null) {
+        isPrepayAdd.value = true;
+        if (tljResv.value.prepayment) {
+            const prepaymentKeys = Object.keys(tljResv.value.prepayment).map(Number); // 문자열이 아닌 숫자로 변환
+            // 0부터 순차적으로 증가하며 비어있는 값을 찾기
+            while (prepaymentKeys.includes(key)) {
+                key++;
+            }
+        } else {
+            key = 0;
+        }
 
+        d = formatDate("-", getToday());
+    } else {
+        isPrepayAdd.value = false;
+        key = item.key;
+        d = formatDate("-", item.date);
+        amount = item.amount;
+    }
+    prepayKey.value = key;
+    prepayItem.value = { "date": d, "amount": amount };
+
+    isPrepayPopup.value = true;
 }
 
-async function prepayAdd() {
-    const prepaymentKeys = Object.keys(tljResv.value.prepayment).map(Number); // 문자열이 아닌 숫자로 변환
-
-    // 0부터 순차적으로 증가하며 비어있는 값을 찾기
-    let nextKey = 0;
-
-    while (prepaymentKeys.includes(nextKey)) {
-        nextKey++;
-    }
-
+async function prepayUpdate() {
+    const d = formatDate("", prepayItem.value.date);
     const data = {
-        [nextKey]: {
-            "amount": 900,
-            "date": '20250529'
+        [prepayKey.value]: {
+            "amount": Number(prepayItem.value.amount),
+            "date": d
         }
     }
+
+    //console.log("* save data", data);
 
     try {
         const dbRef = firebaseRef(database, "tlj-resv/prepayment");
         await update(dbRef, data); // 데이터를 저장
     } catch (err) {
         console.error("Error saving data:", err);
+    }
+
+    isPrepayPopup.value = false;
+
+    selectDate();
+}
+
+async function prepayDelete(target) {
+    let key = "";
+
+    if (target != null) {
+        key = "/" + prepayKey.value;
+    }
+
+    //console.log("delete key", "tlj-resv/prepayment"+ key);
+
+    try {
+        const dbRef = firebaseRef(database, "tlj-resv/prepayment" + key);
+        await remove(dbRef); // 데이터를 저장
+    } catch (err) {
+        console.error("Error saving data:", err);
+    }
+
+    isPrepayPopup.value = false;
+
+    selectDate();
+}
+
+
+function openResvPopup(item) {
+    console.log("* item:", item);
+    let key = 0;
+    let product = "";
+    let amount = 0;
+    let qty = 0;
+
+    if (item == null) {
+        isResvAdd.value = true;
+        if (tljResv.value.reservation) {
+            const reservationKeys = Object.keys(tljResv.value.reservation).map(Number); // 문자열이 아닌 숫자로 변환
+            // 0부터 순차적으로 증가하며 비어있는 값을 찾기
+            while (reservationKeys.includes(key)) {
+                key++;
+            }
+        } else {
+            key = 0;
+        }        
+    } else {
+        isResvAdd.value = false;
+        key = item.key;
+        amount = item.amount;
+        product = item.product;
+        qty = item.qty;
+    }
+    resvKey.value = key;
+    resvItem.value = { "product": product, "qty": qty, "amount": amount };
+
+    console.log("* resvItem:", resvItem.value);
+
+    isResvPopup.value = true;
+}
+
+async function resvUpdate() {
+    const data = {
+        [resvKey.value]: {
+            "product": resvItem.value.product,
+            "qty": Number(resvItem.value.qty),
+            "amount": Number(resvItem.value.amount)
+        }
+    }
+
+    try {
+        const dbRef = firebaseRef(database, "tlj-resv/reservation");
+        await update(dbRef, data); // 데이터를 저장
+    } catch (err) {
+        console.error("Error saving data:", err);
+    }
+
+    isResvPopup.value = false;
+
+    selectDate();
+}
+
+
+async function resvDelete(target) {
+    let key = "";
+
+    if (target != null) {
+        key = "/" + resvKey.value;
+    }
+
+    //console.log("delete key", "tlj-resv/prepayment"+ key);
+
+    try {
+        const dbRef = firebaseRef(database, "tlj-resv/reservation" + key);
+        await remove(dbRef); // 데이터를 저장
+    } catch (err) {
+        console.error("Error saving data:", err);
+    }
+
+    isResvPopup.value = false;
+
+    selectDate();
+}
+
+
+
+function getToday() {
+    const today = new Date();
+
+    const year = today.getFullYear();
+
+    // 월은 0부터 시작하므로 1을 더함, padStart로 두 자리수 맞춤
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+
+    // 일도 두 자리수 맞춤
+    const day = String(today.getDate()).padStart(2, '0');
+
+    return `${year}${month}${day}`;
+}
+
+
+function formatDate(gb, dateStr) {
+    if (gb === "-") {
+        return `${dateStr.slice(0, 4)}-${dateStr.slice(4, 6)}-${dateStr.slice(6, 8)}`;
+    } else {
+        return dateStr.replaceAll('-', '');
     }
 }
 
@@ -209,7 +381,8 @@ onMounted(async () => {
                         :items="prepayTab.filter(item => item !== undefined)" no-data-text="조회중입니다."
                         loading-text="조회중입니다." hide-default-footer items-per-page="-1" :show-items-per-page="false">
                         <template v-slot:item="{ item }">
-                            <tr :style="item.date === '합계' ? 'background-color: #fffad4 !important;' : ''">
+                            <tr :style="item.date === '합계' ? 'background-color: #fffad4 !important;' : ''"
+                                @click="openPrepayPopup(item)">
                                 <td>{{ item.date === '합계' ? '합계' : item.date.slice(4, 6) + '/'
                                     + item.date.slice(6, 8)
                                     }}</td>
@@ -223,7 +396,8 @@ onMounted(async () => {
                             </tr>
                         </template>
                     </v-data-table>
-                    <v-btn @click="isPrepayPopup = true">추가</v-btn>
+                    <v-btn @click="openPrepayPopup()">추가</v-btn>
+                    <v-btn @click="prepayDelete()">전체삭제</v-btn>
                 </v-tabs-window-item>
                 <v-tabs-window-item value="summary">
                     <v-container id="summaryTable">
@@ -241,7 +415,7 @@ onMounted(async () => {
                         <v-data-table id="reservationTable" :headers="resvHeaders" :items="resvTab" hide-default-footer
                             items-per-page="-1" :show-items-per-page="false">
                             <template v-slot:item="{ item, index }">
-                                <tr :style="item.product === '합계' ? 'background-color: #fffad4 !important;' : ''">
+                                <tr :style="item.product === '합계' ? 'background-color: #fffad4 !important;' : ''" @click="openResvPopup(item)">
                                     <td>{{ item.product }}</td>
                                     <td style="text-align: center;">{{ item.qty }}</td>
                                     <td :style="{
@@ -255,6 +429,8 @@ onMounted(async () => {
                             </template>
                         </v-data-table>
                     </v-card>
+                    <v-btn @click="openResvPopup()">추가</v-btn>
+                    <v-btn @click="">전체삭제</v-btn>
                 </v-tabs-window-item>
             </v-tabs-window>
         </v-main>
@@ -263,15 +439,34 @@ onMounted(async () => {
             <v-card>
                 <v-card-title>선결제 내역 추가</v-card-title>
                 <v-card-text>
-                    <v-text-field label="날짜" v-model="tljResv.prepayment.date" />
-                    <v-text-field label="금액" v-model="tljResv.prepayment.amount" type="number" />
+                    <v-text-field label="날짜" v-model="prepayItem.date" type="date" />
+                    <v-text-field label="금액" v-model="prepayItem.amount" type="number" autofocus clearable />
                 </v-card-text>
                 <v-card-actions>
-                    <v-btn color="primary" @click="prepayAdd">추가</v-btn>
-                    <v-btn @click="isPrepayPopup = false">닫기</v-btn>
+                    <v-btn color="primary" @click="prepayUpdate()" icon="mdi-check-bold"></v-btn>
+                    <v-btn color="error" @click="prepayDelete(prepayKey)" :disabled="isPrepayAdd"
+                        icon="mdi-delete"></v-btn>
+                    <v-btn @click="isPrepayPopup = false" icon="mdi-close-thick"></v-btn>
                 </v-card-actions>
             </v-card>
         </v-dialog>
+
+        <v-dialog v-model="isResvPopup" max-width="600px">
+            <v-card>
+                <v-card-title>예약</v-card-title>
+                <v-card-text>
+                    <v-combobox v-model="resvItem.product" label="제품" :items="productTab"></v-combobox>
+                    <v-text-field label="수량" v-model="resvItem.qty" type="number" clearable />
+                    <v-text-field label="금액" v-model="resvItem.amount" type="number" autofocus clearable />
+                </v-card-text>
+                <v-card-actions>
+                    <v-btn color="primary" @click="resvUpdate()" icon="mdi-check-bold"></v-btn>
+                    <v-btn color="error" @click="resvDelete(resvKey)" :disabled="isResvAdd" icon="mdi-delete"></v-btn>
+                    <v-btn @click="isResvPopup = false" icon="mdi-close-thick"></v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+
     </v-app>
 </template>
 

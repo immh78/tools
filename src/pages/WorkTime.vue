@@ -64,6 +64,8 @@ function refreshCalcTime() {
         base.value = prog.value;
         prog.value = workTimeInfo.value.planTime;
 
+        console.log("over", workTimeInfo.value.actTime + todayWorkTime.value - workTimeInfo.value.planTime - 16.5);
+
         if (workTimeInfo.value.actTime + todayWorkTime.value - workTimeInfo.value.planTime > 16.5) {
             isOverPay.value = true;
             overTimePay.value = Math.round(workTimeInfo.value.salary / 240 * 1.5 * (workTimeInfo.value.actTime + todayWorkTime.value - workTimeInfo.value.planTime - 16.5)).toLocaleString();
