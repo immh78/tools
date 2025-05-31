@@ -443,7 +443,7 @@ onMounted(async () => {
                     </v-container>
                 </v-tabs-window-item>
                 <v-tabs-window-item value="summary">
-                    <v-container id="summaryTable" fluid>
+                    <v-container id="summaryTable" fluid class="py-2">
                         <v-row class="table-row px-2"><v-col class="sum-header table-cell">선결제금액</v-col><v-col
                                 class="sum-value table-cell d-flex justify-end">{{
                                     summary.prepayment.toLocaleString() }}</v-col></v-row>
