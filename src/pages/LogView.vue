@@ -10,7 +10,7 @@ const visitorTable = ref(null);
 const error = ref(null);
 const tableData = ref([])
 const headers = ref([
-    { title: 'Page', align: 'start', key: 'page', value: 'page', width: 110 },
+    { title: 'Page', align: 'start', key: 'page', value: 'page' },
     { title: 'Visitor', align: 'start', key: 'visitor', value: 'visitor' },
     { title: 'Count', align: 'end', key: 'count', value: 'count' },
     { title: 'Date', align: 'center', key: 'latest', value: 'latest' },
