@@ -27,6 +27,8 @@ const productTab = ref([]);
 const resvItem = ref({});
 const resvKey = ref("");
 
+const isConfirmPopup = ref(false);
+const confirmAction = ref("");
 
 const prepayHeaders = [
     { title: '날짜', align: 'start', key: 'date', value: 'date', width: 200 },
@@ -372,6 +374,25 @@ function remainApply() {
     tab.value = "prepayment";
 }
 
+function openConfirmPopup(action) {
+    confirmAction.value = action;
+    isConfirmPopup.value = true;
+}
+
+function action() {
+    isConfirmPopup.value = false;
+    switch (confirmAction.value) {
+        case 'DEL_PREPAY':
+            prepayDelete();
+            break;
+        case 'DEL_RESV' :
+            resvDelete();
+            break;
+        case 'REMAIN_APPLY':
+            remainApply();
+    }
+}
+
 watch(() => resvItem.value.qty, (newQty) => {
     const amount = tljResv.value.product[resvItem.value.product];
 
@@ -439,7 +460,7 @@ onMounted(async () => {
                     </v-data-table>
                     <v-container style="text-align: center;">
                         <v-btn class="ma-1" @click="openPrepayPopup()">추가</v-btn>
-                        <v-btn class="ma-1" @click="prepayDelete()">전체삭제</v-btn>
+                        <v-btn class="ma-1" @click="openConfirmPopup('DEL_PREPAY')">전체삭제</v-btn>
                     </v-container>
                 </v-tabs-window-item>
                 <v-tabs-window-item value="summary">
@@ -456,7 +477,7 @@ onMounted(async () => {
                                 }}</v-col></v-row>
                     </v-container>
                     <v-container style="text-align: center;">
-                        <v-btn class="ma-1" @click="remainApply()">잔액 선결제 반영</v-btn>
+                        <v-btn class="ma-1" @click="openConfirmPopup('REMAIN_APPLY')">잔액 선결제 반영</v-btn>
                     </v-container>
 
                 </v-tabs-window-item>
@@ -480,7 +501,7 @@ onMounted(async () => {
                     </v-data-table>
                     <v-container style="text-align: center;">
                         <v-btn class="ma-1" @click="openResvPopup()">추가</v-btn>
-                        <v-btn class="ma-1" @click="resvDelete()">전체삭제</v-btn>
+                        <v-btn class="ma-1" @click="openConfirmPopup('DEL_RESV')">전체삭제</v-btn>
                     </v-container>
                 </v-tabs-window-item>
             </v-tabs-window>
@@ -514,6 +535,15 @@ onMounted(async () => {
                     <v-btn @click="resvUpdate()" icon="mdi-check-bold"></v-btn>
                     <v-btn @click="resvDelete(resvKey)" :disabled="isResvAdd" icon="mdi-delete"></v-btn>
                     <v-btn @click="isResvPopup = false" icon="mdi-close-thick"></v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+        <v-dialog v-model="isConfirmPopup" max-width="600px">
+            <v-card>
+                <v-card-title>{{ confirmAction === 'DEL_PREPAY' ? '선행결제내역 삭제' : confirmAction === 'DEL_RESV' ? '예약상품내역 삭제' : '잔액 선결제 반영' }}</v-card-title>
+                <v-card-actions> 
+                    <v-btn @click="action()" icon="mdi-check-bold"></v-btn>
+                    <v-btn @click="isConfirmPopup = false" icon="mdi-close-thick"></v-btn>
                 </v-card-actions>
             </v-card>
         </v-dialog>
