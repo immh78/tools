@@ -170,7 +170,7 @@ onMounted(async () => {
             <v-card class="mt-2 ml-2 mr-2" variant="flat">
                 <v-progress-linear v-model="prog" color="blue"
                     :bg-color="isOver ? isOverPay ? 'red-darken-1' : 'yellow-darken-3' : 'blue-lighten-5'"
-                    bg-opacity="1" height="14" rounded :max="base">
+                    bg-opacity="1" height="8" rounded :max="base">
                 </v-progress-linear>
             </v-card>
 
