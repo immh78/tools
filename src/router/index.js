@@ -3,7 +3,7 @@ import { createRouter, createWebHashHistory } from 'vue-router';
 import Main from '../pages/Main.vue';
 import DuesList from '../pages/DuesList.vue';
 import EnqQuizChapterAdj from '../pages/EngQuizChapterAdj.vue';
-import TljSMS from '../pages/TljSMS.vue';
+//import TljSMS from '../pages/TljSMS.vue';
 import TljResv from '../pages/TljResv.vue';
 import LogView from '../pages/LogView.vue';
 import WorkTime from '../pages/WorkTime.vue';
