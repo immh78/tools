@@ -4,7 +4,7 @@ import { useLogger } from '../composables/useLogger';
 import html2canvas from 'html2canvas';
 import { database, ref as firebaseRef, get, update, remove } from "../config/firebase";
 
-//useLogger();
+useLogger();
 
 
 const tljResv = ref({});
