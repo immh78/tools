@@ -147,6 +147,7 @@ async function addAction() {
     }
 
     isOpenPopup.value = false;
+    selectData();
 
 }
 

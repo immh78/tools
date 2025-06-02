@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useLogger } from '../composables/useLogger';
 import { database, ref as firebaseRef, get, update, remove } from "../config/firebase";
 
@@ -7,8 +7,14 @@ import { database, ref as firebaseRef, get, update, remove } from "../config/fir
 
 
 const carBook = ref({});
-const tab = ref("");
-const estimatedMileage = ref(0);
+const tab = ref("SORENTO");
+const mileageSORENTO = ref(0);
+const mileageSM6 = ref(0);
+const mileage = ref(0);
+const lastChangeOilSORENTO = ref(0);
+const lastChangeOilSM6 = ref(0);
+const oilMileage = ref(0);
+const oilChangeMileage = 15000;
 
 
 async function selectData() {
@@ -25,11 +31,17 @@ async function selectData() {
 
     console.log("* carBook", carBook.value);
 
-    estimatedMileage.value = calcEstimatedMileage(carBook.value.SORENTO);
+    mileageSORENTO.value = calcEstimatedMileage(carBook.value.SORENTO);
+    mileageSM6.value = calcEstimatedMileage(carBook.value.SM6);
 
-    console.log("estimatedMileage.value", estimatedMileage.value);
-    console.log("SM6", calcEstimatedMileage(carBook.value.SM6))
+    lastChangeOilSORENTO.value = getLastChangeOilMileage(carBook.value.SORENTO);
+    lastChangeOilSM6.value = getLastChangeOilMileage(carBook.value.SM6);
 
+
+    console.log("mileageSORENTO", mileageSORENTO.value);
+    console.log("mileageSM6", mileageSM6.value);
+    console.log("lastChangeOilSORENTO", lastChangeOilSORENTO.value);
+    console.log("lastChangeOilSM6", lastChangeOilSM6.value);
 }
 
 function calcEstimatedMileage(data) {
@@ -70,6 +82,19 @@ function calcEstimatedMileage(data) {
     return mileage2 + Math.round(avgPerDay * daysSinceLast)
 }
 
+function getLastChangeOilMileage(data) {
+    console.log("filter data", data.filter(item => item.category === '엔진오일'))
+
+    const latest = (data.filter(item => item.category === '엔진오일').reduce((latest, current) => {
+        const latestDate = Number(latest.date);
+        const currentDate = Number(current.date);
+        return currentDate > latestDate ? current : latest;
+    }));
+
+
+    return latest.mileage;
+}
+
 function daysBetweenToday(dateString) {
     //console.log("dateString", dateString)
 
@@ -100,9 +125,41 @@ function getToday() {
     return `${year}-${month}-${day}`;
 }
 
+watch(() => tab.value, (newTab) => {
+    changeTab(newTab);
+});
+
+function changeTab(newTab) {
+    if (newTab === "SORENTO") {
+        mileage.value = mileageSORENTO.value;
+        oilMileage.value = mileageSORENTO.value - lastChangeOilSORENTO.value;
+
+
+    } else {
+        mileage.value = mileageSM6.value;
+        oilMileage.value = mileageSM6.value - lastChangeOilSM6.value;
+    }
+}
+
+function getProgressColor(value) {
+    if (value <= 80) {
+        return 'blue';
+    } else {
+        // 50~100 사이를 red 쪽으로 점점 변화시킴
+        // 0: blue, 1: red
+        const ratio = (value - 80) / 50;
+        const red = Math.round(0 + (255 - 0) * ratio);
+        const green = Math.round(0 + (0 - 0) * ratio);
+        const blue = Math.round(255 - (255 - 0) * ratio);
+
+        return `rgb(${red}, ${green}, ${blue})`;
+    }
+}
 
 onMounted(async () => {
-    selectData();
+    await selectData();
+    changeTab(tab.value);
+
 });
 </script>
 
@@ -115,6 +172,16 @@ onMounted(async () => {
                 </template>
                 <v-app-bar-title><v-icon>mdi-car-wrench</v-icon> 차계부</v-app-bar-title>
             </v-app-bar>
+            <v-tabs v-model="tab" bg-color="#202020">
+                <v-tab value="SORENTO">SORENTO</v-tab>
+                <v-tab value="SM6">SM6</v-tab>
+            </v-tabs>
+            <v-sheet>
+                <v-text-field v-model="mileage" label="주행거리"></v-text-field>
+                <v-progress-linear :location="null" :color="getProgressColor(oilMileage / oilChangeMileage * 100)"
+                    height="20" :max="oilChangeMileage" v-model="oilMileage" rounded>{{ oilMileage
+                    }}</v-progress-linear>
+            </v-sheet>
         </v-main>
     </v-app>
 </template>
