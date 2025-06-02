@@ -96,7 +96,7 @@ onMounted(async () => {
             <v-row v-for="(value, key) in taskList">
                 <v-col>
                     <h3 class="text-black mt-1 ml-2">{{ key }}</h3>
-                    <v-sheet class="d-flex align-center mx-2 px-4 py-8" color="#d4d4d4" rounded="lg"
+                    <v-sheet class="d-flex align-center mx-2 px-4 py-8" color="#f4f4f4" rounded="lg"
                         @click="openPopup(key)">
 
                         <v-progress-linear :location="null" color="primary" height="20" :max="regularTask.duration[key]"
@@ -107,7 +107,7 @@ onMounted(async () => {
             </v-row>
         </v-main>
 
-        <v-dialog v-model="isOpenPopup" max-width="600px">
+        <v-dialog v-model="isOpenPopup" max-width="380px">
             <v-card>
                 <v-card-title>{{ selectTask }}</v-card-title>
                 <v-text-field v-if="taskList[selectTask].place" label="장소" autofocus clearable />
