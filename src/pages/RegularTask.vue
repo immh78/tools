@@ -8,6 +8,7 @@ import { database, ref as firebaseRef, get, update, remove } from "../config/fir
 
 const regularTask = ref({});
 const taskList = [];
+const task = ref([]);
 
 async function selectData() {
     const dbRef = firebaseRef(database, "regular-task");
@@ -25,10 +26,30 @@ async function selectData() {
     console.log("* regularTask", regularTask.value);
 
     taskList.value = Object.entries(regularTask.value.duration)
-    .sort((a, b) => a[1] - b[1])
-    .map(([key]) => key);
+        .sort((a, b) => a[1] - b[1])
+        .map(([key]) => key);
 
     console.log("* taskList", taskList.value);
+
+    const t1 = {};
+    for (let i = 0; i < taskList.value.length; i++) {
+        t1.value = regularTask.value.task[taskList.value[i]].reduce((latest, current) => {
+            return current.date > latest.date ? current : latest
+        });
+
+        
+        console.log("* t1", taskList.value[i], t1.value);
+        console.log("* duration", regularTask.value.duration[taskList.value[i]]);
+        task.value.push({[taskList.value[i]]:t1.value});
+        
+
+    };
+
+    console.log("* task", task.value);
+    console.log("* task(1)", task.value[1]);
+
+
+
 
 
 }
