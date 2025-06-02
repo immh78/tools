@@ -7,14 +7,9 @@ import { database, ref as firebaseRef, get, update, remove } from "../config/fir
 
 
 const carBook = ref({});
-const taskList = ref({});
-const isOpenPopup = ref(false);
-const selectTask = ref("");
-const haircutPlace = ref([]);
-const dentistPlace = ref([]);
-const date = ref("");
-const place = ref("");
-const cost = ref(0);
+const tab = ref("");
+const estimatedMileage = ref(0);
+
 
 async function selectData() {
     const dbRef = firebaseRef(database, "car-book");
@@ -28,57 +23,51 @@ async function selectData() {
             //console.error("Error fetching data:", err);
         });
 
-
     console.log("* carBook", carBook.value);
-    console.log("* regularTask.task", regularTask.value.task);
 
-    const result = {}
+    estimatedMileage.value = calcEstimatedMileage(carBook.value.SORENTO);
 
-    for (const [key, entries] of Object.entries(regularTask.value.task)) {
-        if (!entries || entries.length === 0) continue;
+    console.log("estimatedMileage.value", estimatedMileage.value);
+    console.log("SM6", calcEstimatedMileage(carBook.value.SM6))
 
-        const latest = entries.reduce((latest, current) => {
-            const latestDate = Number(latest.date);
-            const currentDate = Number(current.date);
-            return currentDate > latestDate ? current : latest;
-        });
+}
 
-        latest["diffDays"] = daysBetweenToday(latest["date"]);
-        result[key] = latest;
+function calcEstimatedMileage(data) {
+    // 날짜를 Date 객체로 변환
+    const parseDate = (dateStr) => {
+        const year = parseInt(dateStr.slice(0, 4))
+        const month = parseInt(dateStr.slice(4, 6)) - 1
+        const day = parseInt(dateStr.slice(6, 8))
+        return new Date(year, month, day)
     }
 
-    // 2단계: duration 값 기준으로 key 정렬
-    const sortedKeys = Object.entries(regularTask.value.duration)
-        .sort((a, b) => a[1] - b[1])  // value 기준 정렬
-        .map(([key]) => key);         // key만 추출
+    // 마지막 두 항목을 날짜 순으로 정렬 후 가져오기
+    const sortedData = [...data].sort((a, b) => parseDate(b.date) - parseDate(a.date));
 
-    // 3단계: 정렬된 순서대로 taskList 구성
-    taskList.value = {};
-    for (const key of sortedKeys) {
-        if (result[key]) {
-            taskList.value[key] = result[key];
+    const latest = sortedData[0];
+    let previous = {};
+
+    for (let i = 1; i < sortedData.length; i++) {
+        if (latest.date > sortedData[i].date) {
+            previous = sortedData[i];
+            break;
         }
     }
+    const date1 = parseDate(previous.date)
+    const date2 = parseDate(latest.date)
 
-    console.log("taskList", taskList.value);
+    const mileage1 = previous.mileage
+    const mileage2 = latest.mileage
 
-    // place만 추출하고 중복 제거
-    haircutPlace.value = [
-    ...new Set(
-        regularTask.value.task['이발']
-        .map(entry => entry.place)
-        .filter(place => place !== undefined && place !== null && place !== "")
-    )
-    ];
+    const daysDiff = (date2 - date1) / (1000 * 60 * 60 * 24)
+    const mileageDiff = mileage2 - mileage1
 
-        // place만 추출하고 중복 제거
-    dentistPlace.value = [
-    ...new Set(
-        regularTask.value.task['스케일링']
-        .map(entry => entry.place)
-        .filter(place => place !== undefined && place !== null && place !== "")
-    )
-    ];
+    const avgPerDay = mileageDiff / daysDiff
+
+    const today = new Date()
+    const daysSinceLast = (today - date2) / (1000 * 60 * 60 * 24)
+
+    return mileage2 + Math.round(avgPerDay * daysSinceLast)
 }
 
 function daysBetweenToday(dateString) {
@@ -93,7 +82,7 @@ function daysBetweenToday(dateString) {
 
     // 밀리초 단위 차이 → 일수
     const diffTime = today - targetDate;
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) -1;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) - 1;
     return diffDays
 }
 
@@ -112,45 +101,6 @@ function getToday() {
 }
 
 
-function openPopup(param) {
-    selectTask.value = param;
-    place.value = taskList.value[param].place;
-    cost.value =  taskList.value[param].cost;
-    date.value = getToday();
-    isOpenPopup.value = true;
-}
-
-async function addAction() {
-    const key = regularTask.value.task[selectTask.value].length;
-
-    const data = {
-        [key]: {
-            "date": date.value.replaceAll('-', '')
-        }
-    }
-
-    if (taskList.value[selectTask.value].place) {
-        data[key].place = place.value;
-    }
-
-    if (taskList.value[selectTask.value].cost >= 0) {
-        data[key].cost = Number(cost.value);
-    }
-
-    console.log("save data", data);
-
-    try {
-        const dbRef = firebaseRef(database, "regular-task/task/" + selectTask.value);
-        await update(dbRef, data); // 데이터를 저장
-    } catch (err) {
-        console.error("Error saving data:", err);
-    }
-
-    isOpenPopup.value = false;
-
-}
-
-
 onMounted(async () => {
     selectData();
 });
@@ -163,35 +113,9 @@ onMounted(async () => {
                 <template v-slot:image>
                     <v-img gradient="to top right, rgba(19,84,122,.8), rgba(128,208,199,.8)"></v-img>
                 </template>
-                <v-app-bar-title><v-icon>mdi-clipboard-check-outline</v-icon> 정기적으로 할일</v-app-bar-title>
+                <v-app-bar-title><v-icon>mdi-car-wrench</v-icon> 차계부</v-app-bar-title>
             </v-app-bar>
-            <v-row v-for="(value, key) in taskList">
-                <v-col>
-                    <h3 class="text-black mt-1 ml-2">{{ key }}</h3>
-                    <v-sheet class="d-flex align-center mx-2 px-2 py-4" color="#f4f4f4" rounded="lg"
-                        @click="openPopup(key)">
-
-                        <v-progress-linear :location="null" :color="regularTask.duration[key] <= value.diffDays ? 'error' : 'primary'" height="20" :max="regularTask.duration[key]"
-                            v-model="value.diffDays" rounded>{{ value.diffDays }}</v-progress-linear>
-                        <div class="ms-4"  style="font-size: 10px;">{{ regularTask.duration[key] }}</div>
-                    </v-sheet>
-                </v-col>
-            </v-row>
         </v-main>
-
-        <v-dialog v-model="isOpenPopup" max-width="380px">
-            <v-card>
-                <v-card-title>{{ selectTask }}</v-card-title>
-                <v-text-field label="날짜" v-model="date" type="date" />
-                <v-combobox v-if="taskList[selectTask].place" v-model="place" label="장소" :items="selectTask === '이발' ? haircutPlace : dentistPlace"></v-combobox>
-                <v-text-field v-if="taskList[selectTask].cost >= 0" v-model="cost" label="금액" type="number" clearable autofocus />
-                <v-card-actions>
-                    <v-btn @click="addAction()" icon="mdi-check-bold"></v-btn>
-                    <v-btn @click="isOpenPopup = false" icon="mdi-close-thick"></v-btn>
-                </v-card-actions>
-            </v-card>
-        </v-dialog>
-
     </v-app>
 </template>
 

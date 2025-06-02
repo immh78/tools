@@ -8,6 +8,7 @@ import TljResv from '../pages/TljResv.vue';
 import LogView from '../pages/LogView.vue';
 import WorkTime from '../pages/WorkTime.vue';
 import RegularTask from '../pages/RegularTask.vue';
+import CarBook from '../pages/CarBook.vue';
 import Test from '../pages/Test.vue';
 
 const routes = [
@@ -19,6 +20,7 @@ const routes = [
   { path: '/log-view', component: LogView, comment: '로그 조회' },
   { path: '/work-time', component: WorkTime, comment: '근무 시간' },
   { path: '/regular-task', component: RegularTask, comment: '정기적인 할일' },
+  { path: '/car-book', component: CarBook, comment: '차계부' },
   { path: '/test', component: Test, comment: '테스트' },  
 ]
 
