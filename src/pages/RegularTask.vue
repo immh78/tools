@@ -10,6 +10,11 @@ const regularTask = ref({});
 const taskList = ref({});
 const isOpenPopup = ref(false);
 const selectTask = ref("");
+const haircutPlace = ref([]);
+const dentistPlace = ref([]);
+const date = ref("");
+const place = ref("");
+const cost = ref(0);
 
 async function selectData() {
     const dbRef = firebaseRef(database, "regular-task");
@@ -56,6 +61,24 @@ async function selectData() {
     }
 
     console.log("taskList", taskList.value);
+
+    // place만 추출하고 중복 제거
+    haircutPlace.value = [
+    ...new Set(
+        regularTask.value.task['이발']
+        .map(entry => entry.place)
+        .filter(place => place !== undefined && place !== null && place !== "")
+    )
+    ];
+
+        // place만 추출하고 중복 제거
+    dentistPlace.value = [
+    ...new Set(
+        regularTask.value.task['스케일링']
+        .map(entry => entry.place)
+        .filter(place => place !== undefined && place !== null && place !== "")
+    )
+    ];
 }
 
 function daysBetweenToday(dateString) {
@@ -70,14 +93,63 @@ function daysBetweenToday(dateString) {
 
     // 밀리초 단위 차이 → 일수
     const diffTime = today - targetDate;
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) -1;
     return diffDays
 }
 
+function getToday() {
+    const today = new Date();
+
+    const year = today.getFullYear();
+
+    // 월은 0부터 시작하므로 1을 더함, padStart로 두 자리수 맞춤
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+
+    // 일도 두 자리수 맞춤
+    const day = String(today.getDate()).padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
+}
+
+
 function openPopup(param) {
     selectTask.value = param;
+    place.value = taskList.value[param].place;
+    cost.value =  taskList.value[param].cost;
+    date.value = getToday();
     isOpenPopup.value = true;
 }
+
+async function addAction() {
+    const key = regularTask.value.task[selectTask.value].length;
+
+    const data = {
+        [key]: {
+            "date": date.value.replaceAll('-', '')
+        }
+    }
+
+    if (taskList.value[selectTask.value].place) {
+        data[key].place = place.value;
+    }
+
+    if (taskList.value[selectTask.value].cost >= 0) {
+        data[key].cost = Number(cost.value);
+    }
+
+    console.log("save data", data);
+
+    try {
+        const dbRef = firebaseRef(database, "regular-task/task/" + selectTask.value);
+        await update(dbRef, data); // 데이터를 저장
+    } catch (err) {
+        console.error("Error saving data:", err);
+    }
+
+    isOpenPopup.value = false;
+
+}
+
 
 onMounted(async () => {
     selectData();
@@ -96,12 +168,12 @@ onMounted(async () => {
             <v-row v-for="(value, key) in taskList">
                 <v-col>
                     <h3 class="text-black mt-1 ml-2">{{ key }}</h3>
-                    <v-sheet class="d-flex align-center mx-2 px-4 py-8" color="#f4f4f4" rounded="lg"
+                    <v-sheet class="d-flex align-center mx-2 px-2 py-4" color="#f4f4f4" rounded="lg"
                         @click="openPopup(key)">
 
                         <v-progress-linear :location="null" color="primary" height="20" :max="regularTask.duration[key]"
                             v-model="value.diffDays" rounded>{{ value.diffDays }}</v-progress-linear>
-                        <div class="ms-4">{{ regularTask.duration[key] }}</div>
+                        <div class="ms-4"  style="font-size: 10px;">{{ regularTask.duration[key] }}</div>
                     </v-sheet>
                 </v-col>
             </v-row>
@@ -110,10 +182,11 @@ onMounted(async () => {
         <v-dialog v-model="isOpenPopup" max-width="380px">
             <v-card>
                 <v-card-title>{{ selectTask }}</v-card-title>
-                <v-text-field v-if="taskList[selectTask].place" label="장소" autofocus clearable />
-                <v-text-field v-if="taskList[selectTask].cost" label="금액" type="number" clearable />
+                <v-text-field label="날짜" v-model="date" type="date" />
+                <v-combobox v-if="taskList[selectTask].place" v-model="place" label="장소" :items="selectTask === '이발' ? haircutPlace : dentistPlace"></v-combobox>
+                <v-text-field v-if="taskList[selectTask].cost >= 0" v-model="cost" label="금액" type="number" clearable autofocus />
                 <v-card-actions>
-                    <v-btn @click="action()" icon="mdi-check-bold"></v-btn>
+                    <v-btn @click="addAction()" icon="mdi-check-bold"></v-btn>
                     <v-btn @click="isOpenPopup = false" icon="mdi-close-thick"></v-btn>
                 </v-card-actions>
             </v-card>
