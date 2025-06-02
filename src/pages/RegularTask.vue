@@ -29,8 +29,8 @@ async function selectData() {
         });
 
 
-    console.log("* regularTask", regularTask.value);
-    console.log("* regularTask.task", regularTask.value.task);
+    //console.log("* regularTask", regularTask.value);
+    //console.log("* regularTask.task", regularTask.value.task);
 
     const result = {}
 
@@ -60,7 +60,7 @@ async function selectData() {
         }
     }
 
-    console.log("taskList", taskList.value);
+    //console.log("taskList", taskList.value);
 
     // place만 추출하고 중복 제거
     haircutPlace.value = [
@@ -137,7 +137,7 @@ async function addAction() {
         data[key].cost = Number(cost.value);
     }
 
-    console.log("save data", data);
+    //console.log("save data", data);
 
     try {
         const dbRef = firebaseRef(database, "regular-task/task/" + selectTask.value);
@@ -167,8 +167,8 @@ onMounted(async () => {
             </v-app-bar>
             <v-row v-for="(value, key) in taskList">
                 <v-col>
-                    <h3 class="text-black mt-1 ml-2">{{ key }}</h3>
-                    <v-sheet class="d-flex align-center mx-2 px-2 py-4" color="#f4f4f4" rounded="lg"
+                    <h3 class="text-black mt-0 ml-2">{{ key }}</h3>
+                    <v-sheet class="d-flex align-center mx-2 px-2 py-3" color="#f4f4f4" rounded="lg"
                         @click="openPopup(key)">
 
                         <v-progress-linear :location="null" :color="regularTask.duration[key] <= value.diffDays ? 'error' : 'primary'" height="20" :max="regularTask.duration[key]"
