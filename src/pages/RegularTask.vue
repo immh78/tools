@@ -167,7 +167,7 @@ onMounted(async () => {
             </v-app-bar>
             <v-row v-for="(value, key) in taskList">
                 <v-col>
-                    <h3 class="text-black mt-0 ml-2">{{ key }}</h3>
+                    <h5 class="text-black mt-0 ml-2">{{ key }}</h5>
                     <v-sheet class="d-flex align-center mx-2 px-2 py-3" color="#f4f4f4" rounded="lg"
                         @click="openPopup(key)">
 
