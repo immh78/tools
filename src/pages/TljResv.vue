@@ -41,7 +41,7 @@ const resvHeaders = [
     { title: '금액', align: 'end', sortable: false, key: 'amount', value: 'amount' },
 ];
 
-async function selectDate() {
+async function selectData() {
     const dbRef = firebaseRef(database, "tlj-resv");
     await get(dbRef)
         .then(snapshot => {
@@ -237,7 +237,7 @@ async function prepayUpdate() {
 
     isPrepayPopup.value = false;
 
-    selectDate();
+    selectData();
 }
 
 async function prepayDelete(target) {
@@ -258,7 +258,7 @@ async function prepayDelete(target) {
 
     isPrepayPopup.value = false;
 
-    selectDate();
+    selectData();
 }
 
 function openResvPopup(item) {
@@ -312,7 +312,7 @@ async function resvUpdate() {
 
     isResvPopup.value = false;
 
-    selectDate();
+    selectData();
 }
 
 async function resvDelete(target) {
@@ -333,7 +333,7 @@ async function resvDelete(target) {
 
     isResvPopup.value = false;
 
-    selectDate();
+    selectData();
 }
 
 
@@ -416,7 +416,7 @@ watch(() => resvItem.value.product, (newProduct) => {
 });
 
 onMounted(async () => {
-    selectDate();
+    selectData();
 });
 </script>
 

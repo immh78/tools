@@ -7,6 +7,7 @@ import EnqQuizChapterAdj from '../pages/EngQuizChapterAdj.vue';
 import TljResv from '../pages/TljResv.vue';
 import LogView from '../pages/LogView.vue';
 import WorkTime from '../pages/WorkTime.vue';
+import RegularTask from '../pages/RegularTask.vue';
 import Test from '../pages/Test.vue';
 
 const routes = [
@@ -17,6 +18,7 @@ const routes = [
   { path: '/tlj-sms', component: TljResv, comment: '뚜레쥬르 식권대장 예약' },
   { path: '/log-view', component: LogView, comment: '로그 조회' },
   { path: '/work-time', component: WorkTime, comment: '근무 시간' },
+  { path: '/regular-task', component: RegularTask, comment: '정기적인 할일' },
   { path: '/test', component: Test, comment: '테스트' },  
 ]
 
