@@ -64,20 +64,20 @@ async function selectData() {
 
     // place만 추출하고 중복 제거
     haircutPlace.value = [
-    ...new Set(
-        regularTask.value.task['이발']
-        .map(entry => entry.place)
-        .filter(place => place !== undefined && place !== null && place !== "")
-    )
+        ...new Set(
+            regularTask.value.task['이발']
+                .map(entry => entry.place)
+                .filter(place => place !== undefined && place !== null && place !== "")
+        )
     ];
 
-        // place만 추출하고 중복 제거
+    // place만 추출하고 중복 제거
     dentistPlace.value = [
-    ...new Set(
-        regularTask.value.task['스케일링']
-        .map(entry => entry.place)
-        .filter(place => place !== undefined && place !== null && place !== "")
-    )
+        ...new Set(
+            regularTask.value.task['스케일링']
+                .map(entry => entry.place)
+                .filter(place => place !== undefined && place !== null && place !== "")
+        )
     ];
 }
 
@@ -93,7 +93,7 @@ function daysBetweenToday(dateString) {
 
     // 밀리초 단위 차이 → 일수
     const diffTime = today - targetDate;
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) -1;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) - 1;
     return diffDays
 }
 
@@ -115,7 +115,7 @@ function getToday() {
 function openPopup(param) {
     selectTask.value = param;
     place.value = taskList.value[param].place;
-    cost.value =  taskList.value[param].cost;
+    cost.value = taskList.value[param].cost;
     date.value = getToday();
     isOpenPopup.value = true;
 }
@@ -149,20 +149,21 @@ async function addAction() {
     isOpenPopup.value = false;
 
 }
-function getProgressColor(value) {
-      if (value <= 50) {
-          return 'blue';
-            } else {
-                // 50~100 사이를 red 쪽으로 점점 변화시킴
-                    // 0: blue, 1: red
-                        const ratio = (value - 50) / 50;
-                            const red = Math.round(0 + (255 - 0) * ratio);
-                                const green = Math.round(0 + (0 - 0) * ratio);
-                                    const blue = Math.round(255 - (255 - 0) * ratio);
 
-                                        return `rgb(${red}, ${green}, ${blue})`;
-                                          }
-                                          }
+function getProgressColor(value) {
+    if (value <= 80) {
+        return 'blue';
+    } else {
+        // 50~100 사이를 red 쪽으로 점점 변화시킴
+        // 0: blue, 1: red
+        const ratio = (value - 80) / 50;
+        const red = Math.round(0 + (255 - 0) * ratio);
+        const green = Math.round(0 + (0 - 0) * ratio);
+        const blue = Math.round(255 - (255 - 0) * ratio);
+
+        return `rgb(${red}, ${green}, ${blue})`;
+    }
+}
 
 
 onMounted(async () => {
@@ -185,9 +186,11 @@ onMounted(async () => {
                     <v-sheet class="d-flex align-center mx-2 px-2 py-3" color="#f4f4f4" rounded="lg"
                         @click="openPopup(key)">
 
-                        <v-progress-linear :location="null" :color="regularTask.duration[key] <= value.diffDays ? 'error' : 'primary'" height="20" :max="regularTask.duration[key]"
-                            v-model="value.diffDays" rounded>{{ value.diffDays }}</v-progress-linear>
-                        <div class="ms-4"  style="font-size: 10px;">{{ regularTask.duration[key] }}</div>
+                        <v-progress-linear :location="null"
+                            :color="getProgressColor(value.diffDays / regularTask.duration[key] * 100)" height="20"
+                            :max="regularTask.duration[key]" v-model="value.diffDays" rounded>{{ value.diffDays
+                            }}</v-progress-linear>
+                        <div class="ms-4" style="font-size: 10px;">{{ regularTask.duration[key] }}</div>
                     </v-sheet>
                 </v-col>
             </v-row>
@@ -197,8 +200,10 @@ onMounted(async () => {
             <v-card>
                 <v-card-title>{{ selectTask }}</v-card-title>
                 <v-text-field label="날짜" v-model="date" type="date" />
-                <v-combobox v-if="taskList[selectTask].place" v-model="place" label="장소" :items="selectTask === '이발' ? haircutPlace : dentistPlace"></v-combobox>
-                <v-text-field v-if="taskList[selectTask].cost >= 0" v-model="cost" label="금액" type="number" clearable autofocus />
+                <v-combobox v-if="taskList[selectTask].place" v-model="place" label="장소"
+                    :items="selectTask === '이발' ? haircutPlace : dentistPlace"></v-combobox>
+                <v-text-field v-if="taskList[selectTask].cost >= 0" v-model="cost" label="금액" type="number" clearable
+                    autofocus />
                 <v-card-actions>
                     <v-btn @click="addAction()" icon="mdi-check-bold"></v-btn>
                     <v-btn @click="isOpenPopup = false" icon="mdi-close-thick"></v-btn>
