@@ -149,6 +149,20 @@ async function addAction() {
     isOpenPopup.value = false;
 
 }
+function getProgressColor(value) {
+      if (value <= 50) {
+          return 'blue';
+            } else {
+                // 50~100 사이를 red 쪽으로 점점 변화시킴
+                    // 0: blue, 1: red
+                        const ratio = (value - 50) / 50;
+                            const red = Math.round(0 + (255 - 0) * ratio);
+                                const green = Math.round(0 + (0 - 0) * ratio);
+                                    const blue = Math.round(255 - (255 - 0) * ratio);
+
+                                        return `rgb(${red}, ${green}, ${blue})`;
+                                          }
+                                          }
 
 
 onMounted(async () => {
