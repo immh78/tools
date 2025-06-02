@@ -3,7 +3,7 @@ import { ref, onMounted, computed } from 'vue'
 import { useLogger } from '../composables/useLogger';
 import { database, ref as firebaseRef, get, update, remove } from "../config/firebase";
 
-//useLogger();
+useLogger();
 
 
 const regularTask = ref({});
