@@ -41,6 +41,10 @@ onMounted(async () => {
           <v-btn v-for="route in filteredRoutes" :key="route.path" class="nav-button" @click="navigateTo(route.path)">
             {{ route.comment }}
           </v-btn>
+          <v-btn href="https://console.firebase.google.com/u/0/project/my-firebase-9450e/database/my-firebase-9450e-default-rtdb/data">Firebase</v-btn>
+          <v-btn href="https://github.com/immh78/vite-project">github</v-btn>
+
+        
         </div>
       </div>
     </template>
