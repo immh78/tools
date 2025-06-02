@@ -171,7 +171,7 @@ onMounted(async () => {
                     <v-sheet class="d-flex align-center mx-2 px-2 py-4" color="#f4f4f4" rounded="lg"
                         @click="openPopup(key)">
 
-                        <v-progress-linear :location="null" color="primary" height="20" :max="regularTask.duration[key]"
+                        <v-progress-linear :location="null" :color="regularTask.duration[key] <= value.diffDays ? 'error' : 'primary'" height="20" :max="regularTask.duration[key]"
                             v-model="value.diffDays" rounded>{{ value.diffDays }}</v-progress-linear>
                         <div class="ms-4"  style="font-size: 10px;">{{ regularTask.duration[key] }}</div>
                     </v-sheet>
