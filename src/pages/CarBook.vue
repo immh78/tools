@@ -24,7 +24,7 @@ const comboList = ['엔진오일', '주행거리'];
 const addData = ref({});
 
 const headers = [
-    { title: '날짜', align: 'start', key: 'date', value: 'date', width: 130 },
+    { title: '날짜', align: 'start', key: 'date', value: 'date', width: 140 },
     { title: '항목', align: 'start', key: 'category', value: 'category', nowrap:true },
     { title: '주행거리', align: 'end', key: 'mileage', value: 'mileage', width: 120 },
 ];
