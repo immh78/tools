@@ -191,14 +191,14 @@ onMounted(async () => {
             </v-app-bar>
             <v-row v-for="(value, key) in taskList">
                 <v-col>
-                    <h4 class="text-black mt-0 ml-2">{{ key }}</h4>
+                    <h5 class="text-black mt-0 ml-2">{{ key }}</h5>
                     <v-sheet class="d-flex align-center mx-2 px-2 py-3" color="#f4f4f4" rounded="lg"
                         @click="openPopup(key)">
 
-                        <v-progress-linear :location="null"
-                            :color="getProgressColor(value.diffDays / regularTask.duration[key] * 100)" height="20"
+                        <v-progress-linear
+                            :color="getProgressColor(value.diffDays / regularTask.duration[key] * 100)" height="14"
                             :max="regularTask.duration[key]" v-model="value.diffDays"
-                            :style="{ color: getProgressTextColor(value.diffDays / regularTask.duration[key] * 100) }"
+                            :style="{ color: getProgressTextColor(value.diffDays / regularTask.duration[key] * 100), fontSize: '11px' }"
                             rounded>
                             {{ value.diffDays }}
                         </v-progress-linear>
