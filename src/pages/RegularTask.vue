@@ -122,10 +122,10 @@ function openPopup(param) {
 
     function getProgressTextColor(value) {
     // value: 퍼센트 (0~100)
-    if (value <= 80) {
-        return 'white'; // 어두운 배경에 흰 글씨
+    if (value <= 55) {
+        return 'black'; // 어두운 배경에 흰 글씨
     } else {
-        return 'black'; // 밝은 배경에 검정 글씨
+        return 'white'; // 밝은 배경에 검정 글씨
     }
     }
 async function addAction() {
