@@ -1,10 +1,9 @@
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, setBlockTracking } from 'vue'
 import { useLogger } from '../composables/useLogger';
 import { database, ref as firebaseRef, get, update, remove } from "../config/firebase";
 
 //useLogger();
-
 
 const carBook = ref({});
 const tab = ref("SORENTO");
@@ -42,25 +41,25 @@ async function selectData() {
             //console.error("Error fetching data:", err);
         });
 
-    console.log("* carBook", carBook.value);
+    //console.log("* carBook", carBook.value);
 
     listSORENTO.value = sortData(carBook.value.SORENTO);
     listSM6.value = sortData(carBook.value.SM6);
 
-    console.log("listSORENTO", listSORENTO.value);
-    console.log("listSM6", listSM6.value);
+    //console.log("listSORENTO", listSORENTO.value);
+    //console.log("listSM6", listSM6.value);
 
     mileageSORENTO.value = calcEstimatedMileage(listSORENTO.value);
     mileageSM6.value = calcEstimatedMileage(listSM6.value);
 
-    console.log("mileageSORENTO", mileageSORENTO.value);
-    console.log("mileageSM6", mileageSM6.value);
+    //console.log("mileageSORENTO", mileageSORENTO.value);
+    //console.log("mileageSM6", mileageSM6.value);
 
     lastChangeOilSORENTO.value = getLastChangeOilMileage(listSORENTO.value);
     lastChangeOilSM6.value = getLastChangeOilMileage(listSM6.value);
 
-    console.log("lastChangeOilSORENTO", lastChangeOilSORENTO.value);
-    console.log("lastChangeOilSM6", lastChangeOilSM6.value);
+    //console.log("lastChangeOilSORENTO", lastChangeOilSORENTO.value);
+    //console.log("lastChangeOilSM6", lastChangeOilSM6.value);
 }
 
 function parseDate(dateStr) {
@@ -87,7 +86,7 @@ function calcEstimatedMileage(data) {
         }
     }
 
-    console.log("parseDate", previous.date, latest.date)
+    //console.log("parseDate", previous.date, latest.date)
     const date1 = parseDate(previous.date)
     const date2 = parseDate(latest.date)
 
@@ -106,14 +105,13 @@ function calcEstimatedMileage(data) {
 }
 
 function getLastChangeOilMileage(data) {
-    console.log("filter data", data.filter(item => item.category === '엔진오일'))
+    //console.log("filter data", data.filter(item => item.category === '엔진오일'))
 
     const latest = (data.filter(item => item.category === '엔진오일').reduce((latest, current) => {
         const latestDate = Number(latest.date);
         const currentDate = Number(current.date);
         return currentDate > latestDate ? current : latest;
     }));
-
 
     return latest.mileage;
 }
@@ -127,7 +125,6 @@ function changeTab(newTab) {
         mileage.value = mileageSORENTO.value;
         oilMileage.value = mileageSORENTO.value - lastChangeOilSORENTO.value;
         list.value = listSORENTO.value;
-
 
     } else {
         mileage.value = mileageSM6.value;
@@ -160,21 +157,46 @@ function getProgressColor(value) {
     }
 }
 
-function addAction() {
+function getToday() {
+    const today = new Date();
+
+    const year = today.getFullYear();
+
+    // 월은 0부터 시작하므로 1을 더함, padStart로 두 자리수 맞춤
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+
+    // 일도 두 자리수 맞춤
+    const day = String(today.getDate()).padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
+}
+
+function openAddPopup() {
+    addData.value = {
+        "date":getToday(),
+        "mileage":mileage.value
+    }
+    isAddPopup.value = true;
+}
+
+async function addAction() {
     const key = carBook.value[tab.value].length;
+    addData.value.date = addData.value.date.replaceAll('-', '');
+    addData.value.cost = Number(addData.value.cost);
+    addData.value.mileage = Number(addData.value.mileage);
 
     const data = {
         [key]: addData.value
     }
 
-    console.log("save data", data);
+    //console.log("save data", data);
 
-    // try {
-    //     const dbRef = firebaseRef(database, "car-book/" + tab.value);
-    //     await update(dbRef, data); // 데이터를 저장
-    // } catch (err) {
-    //     console.error("Error saving data:", err);
-    // }
+    try {
+        const dbRef = firebaseRef(database, "car-book/" + tab.value);
+        await update(dbRef, data); // 데이터를 저장
+    } catch (err) {
+        console.error("Error saving data:", err);
+    }
 
     isAddPopup.value = false;
     selectData();
@@ -196,7 +218,7 @@ onMounted(async () => {
                     <v-img gradient="to top right, rgba(19,84,122,.8), rgba(128,208,199,.8)"></v-img>
                 </template>
                 <template v-slot:append>
-                    <v-btn icon="mdi-clipboard-edit-outline" @click="isAddPopup = true"></v-btn>
+                    <v-btn icon="mdi-clipboard-edit-outline" @click="openAddPopup()"></v-btn>
                 </template>
                 <v-app-bar-title><v-icon>mdi-car-wrench</v-icon> 차계부</v-app-bar-title>
             </v-app-bar>
@@ -204,11 +226,11 @@ onMounted(async () => {
                 <v-tab value="SORENTO">SORENTO</v-tab>
                 <v-tab value="SM6">SM6</v-tab>
             </v-tabs>
-            <v-sheet>
-                <v-text-field v-model="mileage" label="주행거리"></v-text-field>
-                <v-progress-linear :location="null" :color="getProgressColor(oilMileage / oilChangeMileage * 100)"
-                    height="20" :max="oilChangeMileage" v-model="oilMileage"
-                    :style="{ color: getProgressTextColor(oilMileage / oilChangeMileage * 100) }" rounded>{{ oilMileage
+            <v-sheet class="pa-2">
+                <v-text-field v-model="mileage" label="주행거리" variant="outlined" class="mx-3 mt-2"></v-text-field>
+                <v-progress-linear class="mx-2" :color="getProgressColor(oilMileage / oilChangeMileage * 100)"
+                    height="12" :max="oilChangeMileage" v-model="oilMileage"
+                    :style="{ color: getProgressTextColor(oilMileage / oilChangeMileage * 100), fontSize:'9px'}" rounded>{{ oilMileage
                     }}</v-progress-linear>
             </v-sheet>
             <v-data-table :headers="headers" :items="list" no-data-text="조회중입니다." loading-text="조회중입니다."
@@ -220,6 +242,7 @@ onMounted(async () => {
                 <v-card-title>정비내역 등록</v-card-title>
                 <v-text-field label="날짜" v-model="addData.date" type="date" />
                 <v-combobox v-model="addData.category" label="항목" :items="comboList"></v-combobox>
+                <v-text-field v-model="addData.mileage" label="주행거리" type="number" clearable />
                 <v-text-field v-model="addData.cost" label="비용" type="number" clearable />
                 <v-text-field v-model="addData.remark" label="비고" clearable />
                 <v-card-actions>
