@@ -79,7 +79,7 @@ onMounted(async () => {
       <h1>도구 목록</h1>
       <v-container>
         <v-row>
-          <v-col v-for="route in filteredRoutes" :key="route.path" cols="6" md="3" class="d-flex justify-center">
+          <v-col v-for="route in filteredRoutes" :key="route.path" cols="6" sm="3" class="d-flex justify-center">
             <div class="icon-item" @click="navigateTo(route.path)">
               <v-icon size="36">{{ route.icon }}</v-icon>
               <small>{{ route.comment }}</small>
