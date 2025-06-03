@@ -19,6 +19,10 @@ const listSORENTO = ref([]);
 const listSM6 = ref([]);
 const list = ref([]);
 
+const isAddPopup = ref(false);
+const comboList = ['엔진오일', '주행거리'];
+const addData = ref({});
+
 const headers = [
     { title: '날짜', align: 'center', key: 'date', value: 'date' },
     { title: '항목', align: 'start', key: 'category', value: 'category' },
@@ -60,10 +64,10 @@ async function selectData() {
 }
 
 function parseDate(dateStr) {
-    const year = parseInt(dateStr.slice(0, 4))
-    const month = parseInt(dateStr.slice(4, 6)) - 1
-    const day = parseInt(dateStr.slice(6, 8))
-    return new Date(year, month, day)
+    const year = parseInt(dateStr.slice(0, 4));
+    const month = parseInt(dateStr.slice(4, 6)) - 1;
+    const day = parseInt(dateStr.slice(6, 8));
+    return new Date(year, month, day);
 }
 
 function sortData(data) {
@@ -156,6 +160,27 @@ function getProgressColor(value) {
     }
 }
 
+function addAction() {
+    const key = carBook.value[tab.value].length;
+
+    const data = {
+        [key]: addData.value
+    }
+
+    console.log("save data", data);
+
+    // try {
+    //     const dbRef = firebaseRef(database, "car-book/" + tab.value);
+    //     await update(dbRef, data); // 데이터를 저장
+    // } catch (err) {
+    //     console.error("Error saving data:", err);
+    // }
+
+    isAddPopup.value = false;
+    selectData();
+
+}
+
 onMounted(async () => {
     await selectData();
     changeTab(tab.value);
@@ -170,6 +195,9 @@ onMounted(async () => {
                 <template v-slot:image>
                     <v-img gradient="to top right, rgba(19,84,122,.8), rgba(128,208,199,.8)"></v-img>
                 </template>
+                <template v-slot:append>
+                    <v-btn icon="mdi-clipboard-edit-outline" @click="isAddPopup = true"></v-btn>
+                </template>
                 <v-app-bar-title><v-icon>mdi-car-wrench</v-icon> 차계부</v-app-bar-title>
             </v-app-bar>
             <v-tabs v-model="tab" bg-color="#202020">
@@ -179,13 +207,27 @@ onMounted(async () => {
             <v-sheet>
                 <v-text-field v-model="mileage" label="주행거리"></v-text-field>
                 <v-progress-linear :location="null" :color="getProgressColor(oilMileage / oilChangeMileage * 100)"
-                    height="20" :max="oilChangeMileage" v-model="oilMileage" rounded>{{ oilMileage
+                    height="20" :max="oilChangeMileage" v-model="oilMileage"
+                    :style="{ color: getProgressTextColor(oilMileage / oilChangeMileage * 100) }" rounded>{{ oilMileage
                     }}</v-progress-linear>
             </v-sheet>
             <v-data-table :headers="headers" :items="list" no-data-text="조회중입니다." loading-text="조회중입니다."
                 hide-default-footer items-per-page="-1" :show-items-per-page="false">
             </v-data-table>
         </v-main>
+        <v-dialog v-model="isAddPopup" max-width="380px">
+            <v-card>
+                <v-card-title>정비내역 등록</v-card-title>
+                <v-text-field label="날짜" v-model="addData.date" type="date" />
+                <v-combobox v-model="addData.category" label="항목" :items="comboList"></v-combobox>
+                <v-text-field v-model="addData.cost" label="비용" type="number" clearable />
+                <v-text-field v-model="addData.remark" label="비고" clearable />
+                <v-card-actions>
+                    <v-btn @click="addAction()" icon="mdi-check-bold"></v-btn>
+                    <v-btn @click="isAddPopup = false" icon="mdi-close-thick"></v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
     </v-app>
 </template>
 
