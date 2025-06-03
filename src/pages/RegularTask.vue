@@ -120,6 +120,14 @@ function openPopup(param) {
     isOpenPopup.value = true;
 }
 
+    function getProgressTextColor(value) {
+    // value: 퍼센트 (0~100)
+    if (value <= 80) {
+        return 'white'; // 어두운 배경에 흰 글씨
+    } else {
+        return 'black'; // 밝은 배경에 검정 글씨
+    }
+    }
 async function addAction() {
     const key = regularTask.value.task[selectTask.value].length;
 
@@ -187,10 +195,17 @@ onMounted(async () => {
                     <v-sheet class="d-flex align-center mx-2 px-2 py-3" color="#f4f4f4" rounded="lg"
                         @click="openPopup(key)">
 
-                        <v-progress-linear :location="null"
-                            :color="getProgressColor(value.diffDays / regularTask.duration[key] * 100)" height="20"
-                            :max="regularTask.duration[key]" v-model="value.diffDays" rounded>{{ value.diffDays
-                            }}</v-progress-linear>
+                       <v-progress-linear
+    :location="null"
+    :color="getProgressColor(value.diffDays / regularTask.duration[key] * 100)"
+    height="20"
+    :max="regularTask.duration[key]"
+    v-model="value.diffDays"
+    :style="{ color: getProgressTextColor(value.diffDays / regularTask.duration[key] * 100) }"
+    rounded
+>
+    {{ value.diffDays }}
+</v-progress-linear>
                         <div class="ms-4" style="font-size: 10px;">{{ regularTask.duration[key] }}</div>
                     </v-sheet>
                 </v-col>
