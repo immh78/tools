@@ -87,7 +87,7 @@ onMounted(async () => {
           </v-col>
 
           <!-- Firebase 버튼 -->
-          <v-col cols="6" md="3" class="d-flex justify-center">
+          <v-col cols="6" sm="3" class="d-flex justify-center">
             <div class="icon-item">
               <v-btn icon
                 :href="'https://console.firebase.google.com/u/0/project/my-firebase-9450e/database/my-firebase-9450e-default-rtdb/data'"
@@ -131,7 +131,7 @@ onMounted(async () => {
   </v-dialog>
 
   <div class="visitor-id-overlay">
-    <span @click="isUserInputPopup = true">{{ visitorId }}</span>
+    <span @click="isUserInputPopup = visitorTable[visitorId] ? false :  true">{{ visitorTable[visitorId] ? visitorTable[visitorId].name : visitorId }}</span>
   </div>
 </template>
 
