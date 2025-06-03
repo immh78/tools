@@ -11,7 +11,8 @@ const ALLOWED_IDS = [
   '5067475d1c7a690eb128aa0806366f71',
   'bc0f8e17b63badde366f133fe707f57f',
   '91cb2a05340782fc6626678fce9f9e31',
-  '7f6ae5b56dbdeef4bda8080a2882e221' //사무실 dev모드
+  '7f6ae5b56dbdeef4bda8080a2882e221', //사무실 dev모드
+  'a063076051e74e11fc092822b3b64557'
 ];
 
 // 라우트 배열에서 메인 페이지(`/`)를 제외한 라우트만 필터링
@@ -33,26 +34,33 @@ onMounted(async () => {
 </script>
 
 <template>
-    <!-- visitorId 일치할 때만 전체 UI 렌더링 -->
-    <template v-if="isAllowed">
-      <div class="main-page">
-        <h1>도구 목록</h1>
-        <div class="button-container">
-          <v-btn v-for="route in filteredRoutes" :key="route.path" class="nav-button" @click="navigateTo(route.path)">
-            {{ route.comment }}
+  <template v-if="isAllowed">
+    <div class="main-page">
+      <h1>도구 목록</h1>
+      <div class="icon-grid">
+        <div v-for="route in filteredRoutes" :key="route.path" class="icon-item" @click="navigateTo(route.path)">
+          <v-icon size="36">{{ route.icon }}</v-icon>
+          <small>{{ route.comment }}</small>
+        </div>
+        <div class="icon-item">
+          <v-btn icon :href="'https://console.firebase.google.com/u/0/project/my-firebase-9450e/database/my-firebase-9450e-default-rtdb/data'" target="_blank">
+            <v-icon>mdi-fire</v-icon>
           </v-btn>
-          <v-btn href="https://console.firebase.google.com/u/0/project/my-firebase-9450e/database/my-firebase-9450e-default-rtdb/data">Firebase</v-btn>
-          <v-btn href="https://github.com/immh78/vite-project">github</v-btn>
-
-        
+          <small>Firebase</small>
+        </div>
+        <div class="icon-item">
+          <v-btn icon :href="'https://github.com/immh78/vite-project'" target="_blank">
+            <v-icon>mdi-github</v-icon>
+          </v-btn>
+          <small>GitHub</small>
         </div>
       </div>
-    </template>
-
-    <!-- 그 외 visitorId만 표시 -->
-    <div class="visitor-id-overlay">
-      {{ visitorId }}
     </div>
+  </template>
+
+  <div class="visitor-id-overlay">
+    {{ visitorId }}
+  </div>
 </template>
 
 <style scoped>
@@ -84,5 +92,34 @@ onMounted(async () => {
   font-size: 9px;
   color: #888;
   z-index: 999;
+
+ .icon-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 30px;
+  justify-items: center;
+  margin-top: 30px;
+}
+
+.icon-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  width: 100px;
+  text-align: center;
+  transition: transform 0.2s;
+}
+
+.icon-item:hover {
+  transform: scale(1.1);
+}
+
+.icon-item small {
+  margin-top: 5px;
+  font-size: 13px;
+  color: #666;
+}
+ 
 }
 </style>

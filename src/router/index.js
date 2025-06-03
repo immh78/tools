@@ -2,7 +2,7 @@
 import { createRouter, createWebHashHistory } from 'vue-router';
 import Main from '../pages/Main.vue';
 import DuesList from '../pages/DuesList.vue';
-import EnqQuizChapterAdj from '../pages/EngQuizChapterAdj.vue';
+//import EnqQuizChapterAdj from '../pages/EngQuizChapterAdj.vue';
 //import TljSMS from '../pages/TljSMS.vue';
 import TljResv from '../pages/TljResv.vue';
 import LogView from '../pages/LogView.vue';
@@ -13,15 +13,15 @@ import Test from '../pages/Test.vue';
 
 const routes = [
   { path: '/', component: Main, comment: '메인 페이지' },
-  { path: '/dues-list', component: DuesList, comment: '우미린 가족여행 회비 목록' },
-  { path: '/engquiz-adj', component: EnqQuizChapterAdj, comment: '영어 퀴즈 DB 오류 조정' },
+  { path: '/dues-list', component: DuesList, comment: '우미린 가족여행 회비 목록', icon:'mdi-umbrella-beach' },
+  //{ path: '/engquiz-adj', component: EnqQuizChapterAdj, comment: '영어 퀴즈 DB 오류 조정' },
   //{ path: '/tlj-sms', component: TljResv, comment: '뚜레쥬르 선입금 문자발송' },
-  { path: '/tlj-sms', component: TljResv, comment: '뚜레쥬르 식권대장 예약' },
-  { path: '/log-view', component: LogView, comment: '로그 조회' },
-  { path: '/work-time', component: WorkTime, comment: '근무 시간' },
-  { path: '/regular-task', component: RegularTask, comment: '정기적인 할일' },
-  { path: '/car-book', component: CarBook, comment: '차계부' },
-  { path: '/test', component: Test, comment: '테스트' },  
+  { path: '/tlj-sms', component: TljResv, comment: '뚜레쥬르 식권대장 예약', icon:'mdi-cupcake' },
+  { path: '/log-view', component: LogView, comment: '로그 조회', icon:'mdi-note-search-outline' },
+  { path: '/work-time', component: WorkTime, comment: '근무 시간', icon:'mdi-clipboard-text-clock'},
+  { path: '/regular-task', component: RegularTask, comment: '정기적으로 할 일', icon:'mdi-clipboard-check-outline' },
+  { path: '/car-book', component: CarBook, comment: '차계부', icon:'mdi-car-wrench' },
+  { path: '/test', component: Test, comment: '테스트', icon:'mdi-flask'},  
 ]
 
 const router = createRouter({

@@ -187,7 +187,7 @@ onMounted(async () => {
                 <template v-slot:image>
                     <v-img gradient="to top right, rgba(19,84,122,.8), rgba(128,208,199,.8)"></v-img>
                 </template>
-                <v-app-bar-title><v-icon>mdi-clipboard-check-outline</v-icon> 정기적으로 할일</v-app-bar-title>
+                <v-app-bar-title><v-icon>mdi-clipboard-check-outline</v-icon> 정기적으로 할 일</v-app-bar-title>
             </v-app-bar>
             <v-row v-for="(value, key) in taskList">
                 <v-col>
