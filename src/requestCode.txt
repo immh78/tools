@@ -32,158 +32,301 @@ const router = createRouter({
 
 export default router
 
-* Main.vue
+* CarBook.vue
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import { useRouter } from 'vue-router';
-import FingerprintJS from '@fingerprintjs/fingerprintjs';
-import { database, ref as firebaseRef, get } from "../config/firebase";
+import { ref, onMounted, watch, setBlockTracking } from 'vue'
 import { useLogger } from '../composables/useLogger';
+import { database, ref as firebaseRef, get, update, remove } from "../config/firebase";
 
 useLogger();
 
-const visitorId = ref('');
-const router = useRouter();
-const visitorTable = ref([]);
+const carBook = ref({});
+const tab = ref("SORENTO");
+const mileageSORENTO = ref(0);
+const mileageSM6 = ref(0);
+const mileage = ref(0);
+const lastChangeOilSORENTO = ref(0);
+const lastChangeOilSM6 = ref(0);
+const oilMileage = ref(0);
+const oilChangeMileage = 15000;
+const listSORENTO = ref([]);
+const listSM6 = ref([]);
+const list = ref([]);
 
-// 라우트 배열에서 메인 페이지(`/`)를 제외한 라우트만 필터링
-const filteredRoutes = router.options.routes.filter(route => route.path !== '/');
+const isPopup = ref(false);
+const isPopupKind = ref("");
+const comboList = ['엔진오일', '주행거리'];
+const addData = ref({});
 
-function navigateTo(path) {
-  router.push(path);
+const headers = [
+    { title: '날짜', align: 'start', key: 'date', value: 'date', width: 140 },
+    { title: '항목', align: 'start', key: 'category', value: 'category', nowrap:true },
+    { title: '주행거리', align: 'end', key: 'mileage', value: 'mileage', width: 120 },
+];
+const currentPage = ref(1); 
+
+async function selectData() {
+    const dbRef = firebaseRef(database, "car-book");
+    await get(dbRef)
+        .then(snapshot => {
+            if (snapshot.exists()) {
+                carBook.value = snapshot.val();
+            }
+        })
+        .catch(err => {
+            //console.error("Error fetching data:", err);
+        });
+
+    //console.log("* carBook", carBook.value);
+
+    listSORENTO.value = sortData(carBook.value.SORENTO);
+    listSM6.value = sortData(carBook.value.SM6);
+
+    //console.log("listSORENTO", listSORENTO.value);
+    //console.log("listSM6", listSM6.value);
+
+    mileageSORENTO.value = calcEstimatedMileage(listSORENTO.value);
+    mileageSM6.value = calcEstimatedMileage(listSM6.value);
+
+    //console.log("mileageSORENTO", mileageSORENTO.value);
+    //console.log("mileageSM6", mileageSM6.value);
+
+    lastChangeOilSORENTO.value = getLastChangeOilMileage(listSORENTO.value);
+    lastChangeOilSM6.value = getLastChangeOilMileage(listSM6.value);
+
+    //console.log("lastChangeOilSORENTO", lastChangeOilSORENTO.value);
+    //console.log("lastChangeOilSM6", lastChangeOilSM6.value);
 }
 
-
-async function getVisitors() {
-  const dbRef = firebaseRef(database, "visitors");
-  await get(dbRef)
-    .then(snapshot => {
-      if (snapshot.exists()) {
-        visitorTable.value = snapshot.val();
-        //console.log("Fetched logs:", logs.value);
-      } else {
-        console.log("No data available");
-      }
-    })
-    .catch(err => {
-      console.error("Error fetching data:", err);
-    });
+function parseDate(dateStr) {
+    const year = parseInt(dateStr.slice(0, 4));
+    const month = parseInt(dateStr.slice(4, 6)) - 1;
+    const day = parseInt(dateStr.slice(6, 8));
+    return new Date(year, month, day);
 }
 
-// visitorId가 허용된 ID인지 여부 판단
-const isAllowed = ref(false);
+function sortData(data) {
+    return [...data].sort((a, b) => parseDate(b.date) - parseDate(a.date));
+}
+
+function calcEstimatedMileage(data) {
+    // 마지막 두 항목을 날짜 순으로 정렬 후 가져오기
+    const sortedData = data;
+    const latest = sortedData[0];
+    let previous = {};
+
+    for (let i = 1; i < sortedData.length; i++) {
+        if (latest.date > sortedData[i].date) {
+            previous = sortedData[i];
+            break;
+        }
+    }
+
+    //console.log("parseDate", previous.date, latest.date)
+    const date1 = parseDate(previous.date)
+    const date2 = parseDate(latest.date)
+
+    const mileage1 = previous.mileage
+    const mileage2 = latest.mileage
+
+    const daysDiff = (date2 - date1) / (1000 * 60 * 60 * 24)
+    const mileageDiff = mileage2 - mileage1
+
+    const avgPerDay = mileageDiff / daysDiff
+
+    const today = new Date()
+    const daysSinceLast = (today - date2) / (1000 * 60 * 60 * 24)
+
+    return mileage2 + Math.round(avgPerDay * daysSinceLast)
+}
+
+function getLastChangeOilMileage(data) {
+    //console.log("filter data", data.filter(item => item.category === '엔진오일'))
+
+    const latest = (data.filter(item => item.category === '엔진오일').reduce((latest, current) => {
+        const latestDate = Number(latest.date);
+        const currentDate = Number(current.date);
+        return currentDate > latestDate ? current : latest;
+    }));
+
+    return latest.mileage;
+}
+
+watch(() => tab.value, (newTab) => {
+    changeTab(newTab);
+});
+
+function changeTab(newTab) {
+    currentPage.value = 1; // 페이지 초기화
+
+    if (newTab === "SORENTO") {
+        mileage.value = mileageSORENTO.value;
+        oilMileage.value = mileageSORENTO.value - lastChangeOilSORENTO.value;
+        list.value = listSORENTO.value;
+
+    } else {
+        mileage.value = mileageSM6.value;
+        oilMileage.value = mileageSM6.value - lastChangeOilSM6.value;
+        list.value = listSM6.value;
+    }
+}
+
+function getProgressTextColor(value) {
+    // value: 퍼센트 (0~100)
+    if (value <= 55) {
+        return 'black'; // 어두운 배경에 흰 글씨
+    } else {
+        return 'white'; // 밝은 배경에 검정 글씨
+    }
+}
+
+function getProgressColor(value) {
+    if (value <= 80) {
+        return 'blue';
+    } else {
+        // 50~100 사이를 red 쪽으로 점점 변화시킴
+        // 0: blue, 1: red
+        const ratio = (value - 80) / 50;
+        const red = Math.round(0 + (255 - 0) * ratio);
+        const green = Math.round(0 + (0 - 0) * ratio);
+        const blue = Math.round(255 - (255 - 0) * ratio);
+
+        return `rgb(${red}, ${green}, ${blue})`;
+    }
+}
+
+function getToday() {
+    const today = new Date();
+
+    const year = today.getFullYear();
+
+    // 월은 0부터 시작하므로 1을 더함, padStart로 두 자리수 맞춤
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+
+    // 일도 두 자리수 맞춤
+    const day = String(today.getDate()).padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
+}
+
+function openAddPopup() {
+    addData.value = {
+        "date": getToday(),
+        "mileage": mileage.value
+    }
+    isPopupKind.value = "ADD";
+    isPopup.value = true;
+}
+
+function openDetailPopup(item) {
+    addData.value = {
+        "date": item.date.slice(0, 4) + '-' + item.date.slice(4, 6) + '-' + item.date.slice(6, 8),
+        "category": item.category,
+        "mileage": item.mileage,
+        "cost": item.cost,
+        "remark": item.remark
+    }
+    isPopupKind.value = "VIEW";
+    isPopup.value = true;
+}
+
+async function addAction() {
+    const key = carBook.value[tab.value].length;
+    addData.value.date = addData.value.date.replaceAll('-', '');    
+    addData.value.cost = addData.value.cost ? Number(addData.value.cost) : -1;
+    addData.value.category = addData.value.category || "주행거리";
+    addData.value.remark = addData.value.remark || "";
+    addData.value.mileage = Number(addData.value.mileage);
+    
+
+    const data = {
+        [key]: addData.value
+    }
+
+    console.log("save data", tab.value, data);
+
+    try {
+        const dbRef = firebaseRef(database, "car-book/" + tab.value);
+        await update(dbRef, data); // 데이터를 저장
+    } catch (err) {
+        console.error("Error saving data:", err);
+    }
+
+    isPopup.value = false;
+    selectData();
+    changeTab(tab.value);
+}
 
 onMounted(async () => {
-  const fp = await FingerprintJS.load();
-  const result = await fp.get();
-  await getVisitors();
-  visitorId.value = result.visitorId;
+    await selectData();
+    changeTab(tab.value);
 
-  if (visitorTable.value[visitorId.value]) {
-    isAllowed.value = visitorTable.value[visitorId.value].isHost;
-  }
 });
 </script>
 
 <template>
-  <template v-if="isAllowed">
-    <div class="main-page">
-      <h1>도구 목록</h1>
-      <div class="icon-grid">
-        <div v-for="route in filteredRoutes" :key="route.path" class="icon-item" @click="navigateTo(route.path)">
-          <v-icon size="36">{{ route.icon }}</v-icon>
-          <small>{{ route.comment }}</small>
-        </div>
-        <div class="icon-item">
-          <v-btn icon
-            :href="'https://console.firebase.google.com/u/0/project/my-firebase-9450e/database/my-firebase-9450e-default-rtdb/data'"
-            target="_blank"
-             variant="flat">
-            <v-icon>mdi-fire</v-icon>
-          </v-btn>
-          <small>Firebase</small>
-        </div>
-        <div class="icon-item">
-          <v-btn icon :href="'https://github.com/immh78/vite-project'" target="_blank"  variant="flat">
-            <v-icon>mdi-github</v-icon>
-          </v-btn>
-          <small>GitHub</small>
-        </div>
-      </div>
-    </div>
-  </template>
-
-  <div class="visitor-id-overlay">
-    {{ visitorId }}
-  </div>
+    <v-app>
+        <v-main>
+            <v-app-bar color="teal-darken-4">
+                <template v-slot:image>
+                    <v-img gradient="to top right, rgba(19,84,122,.8), rgba(128,208,199,.8)"></v-img>
+                </template>
+                <template v-slot:append>
+                    <v-btn icon="mdi-clipboard-edit-outline" @click="openAddPopup()"></v-btn>
+                </template>
+                <v-app-bar-title><v-icon>mdi-car-wrench</v-icon> 차계부</v-app-bar-title>
+            </v-app-bar>
+            <v-tabs v-model="tab" bg-color="#202020">
+                <v-tab value="SORENTO">SORENTO</v-tab>
+                <v-tab value="SM6">SM6</v-tab>
+            </v-tabs>
+            <v-card class="mt-2 mx-4" variant="flat">
+                <v-text-field v-model="mileage" label="주행거리" variant="outlined" class="mt-2"></v-text-field>
+                <v-progress-linear :color="getProgressColor(oilMileage / oilChangeMileage * 100)" height="12"
+                    :max="oilChangeMileage" v-model="oilMileage"
+                    :style="{ color: getProgressTextColor(oilMileage / oilChangeMileage * 100), fontSize: '9px' }"
+                    rounded>{{
+                        oilMileage.toLocaleString()
+                    }}</v-progress-linear>
+            </v-card>
+            <v-data-table :headers="headers" :items="list.filter(item => item.category !== '주행거리')" no-data-text="조회중입니다." loading-text="조회중입니다."
+                items-per-page=5 v-model:page="currentPage">
+                <template v-slot:item.date="{ item }">
+                    <span @click="openDetailPopup(item)">
+                   {{ item.date.slice(0, 4) }}. {{ Number(item.date.slice(4, 6)) }}. {{ Number(item.date.slice(6, 8)) }}
+                   </span>
+                </template>
+                <template v-slot:item.category="{ item }" @click="openDetailPopup(item)">
+                    <span @click="openDetailPopup(item)">
+                    {{ item.category.length > 12 ? item.category.substring(0, 12) + "..." : item.category }}
+                   </span>
+                </template>
+                <template v-slot:item.mileage="{ item }" @click="openDetailPopup(item)">
+                    <span @click="openDetailPopup(item)">
+                    {{ item.mileage.toLocaleString() }}     
+                   </span>
+                 </template>
+            </v-data-table>
+        </v-main>
+        <v-dialog v-model="isPopup" max-width="380px">
+            <v-card>
+                <v-card-title>정비내역{{ isPopupKind === 'ADD' ? ' 등록' : '' }}</v-card-title>
+                <v-text-field label="날짜" v-model="addData.date" type="date" />
+                <v-combobox v-model="addData.category" label="항목" :items="comboList"></v-combobox>
+                <v-text-field v-model="addData.mileage" label="주행거리" type="number" clearable />
+                <v-text-field v-model="addData.cost" label="비용" type="number" clearable />
+                <v-text-field v-model="addData.remark" label="비고" clearable />
+                <v-card-actions>
+                    <v-btn v-if="isPopupKind === 'ADD'" @click="addAction()" icon="mdi-check-bold"></v-btn>
+                    <v-btn @click="isPopup = false" icon="mdi-close-thick"></v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+    </v-app>
 </template>
 
-<style scoped>
-.main-page {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-}
-
-.button-container {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  margin-top: 20px;
-}
-
-.nav-button {
-  width: 300px;
-  font-size: 16px;
-}
-
-.visitor-id-overlay {
-  position: fixed;
-  bottom: 5px;
-  right: 10px;
-  font-size: 9px;
-  color: #888;
-  z-index: 999;
-}
-
-.icon-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  /* 두 열로 설정 */
-  gap: 30px;
-  justify-items: center;
-  margin-top: 30px;
-}
-
-.icon-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  /* 아이콘과 텍스트 수직 정렬 */
-  cursor: pointer;
-  width: 100%;
-  /* 너비를 100%로 설정하여 부모의 너비에 맞추기 */
-  text-align: center;
-  max-width: 120px;
-  /* 최대 너비를 설정해 균등한 열 배치를 보장 */
-  transition: transform 0.2s;
-}
-
-.icon-item:hover {
-  transform: scale(1.1);
-}
-
-.icon-item small {
-  margin-top: 5px;
-  font-size: 13px;
-  color: #666;
-}
-</style>
+<style scoped></style>
 
 
 * 요청내용
-main page의 아이콘을 <v-row>, <v-col>로 처리한다.
-모바일에서 세로는 2열, 가로는 4열로 나타낸다.
+<v-app-bar-title><v-icon>mdi-car-wrench</v-icon> 차계부</v-app-bar-title>의 내용을 router/index.js의 값을 참고하여 자동으로 구성되도록 한다.

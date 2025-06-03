@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useLogger } from '../composables/useLogger';
+import { AppBarTitle } from '../composables/getRouteInfo';
 
 useLogger();
 
@@ -76,7 +77,7 @@ onMounted(async () => {
                 <template v-slot:append>
                     <v-btn icon="mdi-calculator" @click="openSumPopup()"></v-btn>
                 </template>
-                <v-app-bar-title><v-icon>mdi-umbrella-beach</v-icon> 우미린 가족여행 경비목록</v-app-bar-title>
+                <AppBarTitle />
             </v-app-bar>
 
             <v-data-table :headers="headers" :items="rows" class="elevation-1" no-data-text="조회중입니다."

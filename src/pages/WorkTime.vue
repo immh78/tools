@@ -2,6 +2,7 @@
 import { database, ref as firebaseRef, get, update } from "../config/firebase";
 import { ref, onMounted } from 'vue';
 import { useLogger } from '../composables/useLogger';
+import { AppBarTitle } from '../composables/getRouteInfo';
 useLogger();
 
 const workTimeInfo = ref({});
@@ -164,7 +165,7 @@ onMounted(async () => {
             <template v-slot:append>
                 <v-btn icon="mdi-content-save" @click="saveWorkInfo()"></v-btn>
             </template>
-            <v-app-bar-title><v-icon>mdi-clipboard-text-clock</v-icon> 근무 시간 계산기</v-app-bar-title>
+            <AppBarTitle />
         </v-app-bar>
         <v-main>
             <v-card class="mt-2 ml-2 mr-2" variant="flat">

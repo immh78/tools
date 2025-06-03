@@ -1,7 +1,8 @@
 <script setup>
-import { ref, onMounted, watch, setBlockTracking } from 'vue'
-import { useLogger } from '../composables/useLogger';
+import { ref, onMounted, watch } from 'vue'
 import { database, ref as firebaseRef, get, update, remove } from "../config/firebase";
+import { useLogger } from '../composables/useLogger';
+import { AppBarTitle } from '../composables/getRouteInfo';
 
 useLogger();
 
@@ -239,7 +240,7 @@ onMounted(async () => {
                 <template v-slot:append>
                     <v-btn icon="mdi-clipboard-edit-outline" @click="openAddPopup()"></v-btn>
                 </template>
-                <v-app-bar-title><v-icon>mdi-car-wrench</v-icon> 차계부</v-app-bar-title>
+                <AppBarTitle />
             </v-app-bar>
             <v-tabs v-model="tab" bg-color="#202020">
                 <v-tab value="SORENTO">SORENTO</v-tab>

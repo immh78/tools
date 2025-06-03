@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router';
 import FingerprintJS from '@fingerprintjs/fingerprintjs';
 import { database, ref as firebaseRef, get, update } from "../config/firebase";
 import { useLogger } from '../composables/useLogger';
+import { AppBarTitle } from '../composables/getRouteInfo';
 
 useLogger();
 
@@ -74,65 +75,74 @@ onMounted(async () => {
 </script>
 
 <template>
-  <template v-if="isAllowed">
-    <div class="main-page">
-      <h1>도구 목록</h1>
-      <v-container>
-        <v-row>
-          <v-col v-for="route in filteredRoutes" :key="route.path" cols="6" sm="3" class="d-flex justify-center">
-            <div class="icon-item" @click="navigateTo(route.path)">
-              <v-icon size="36">{{ route.icon }}</v-icon>
-              <small>{{ route.comment }}</small>
-            </div>
-          </v-col>
+  <v-app>
+    <v-app-bar color="teal-darken-4">
+      <template v-slot:image>
+        <v-img gradient="to top right, rgba(19,84,122,.8), rgba(128,208,199,.8)"></v-img>
+      </template>
+      <AppBarTitle />
+    </v-app-bar>
+    <v-main>
+      <template v-if="isAllowed">
+        <div class="main-page">
+          <v-container>
+            <v-row>
+              <v-col v-for="route in filteredRoutes" :key="route.path" cols="6" sm="3" class="d-flex justify-center">
+                <div class="icon-item" @click="navigateTo(route.path)">
+                  <v-icon size="36">{{ route.icon }}</v-icon>
+                  <small>{{ route.comment }}</small>
+                </div>
+              </v-col>
 
-          <!-- Firebase 버튼 -->
-          <v-col cols="6" sm="3" class="d-flex justify-center">
-            <div class="icon-item">
-              <v-btn icon
-                :href="'https://console.firebase.google.com/u/0/project/my-firebase-9450e/database/my-firebase-9450e-default-rtdb/data'"
-                target="_blank" variant="flat">
-                <v-icon>mdi-fire</v-icon>
-              </v-btn>
-              <small>Firebase</small>
-            </div>
-          </v-col>
+              <!-- Firebase 버튼 -->
+              <v-col cols="6" sm="3" class="d-flex justify-center">
+                <div class="icon-item">
+                  <v-btn icon
+                    :href="'https://console.firebase.google.com/u/0/project/my-firebase-9450e/database/my-firebase-9450e-default-rtdb/data'"
+                    target="_blank" variant="flat">
+                    <v-icon>mdi-fire</v-icon>
+                  </v-btn>
+                  <small>Firebase</small>
+                </div>
+              </v-col>
 
-          <!-- GitHub 버튼 -->
-          <v-col cols="6" sm="3" class="d-flex justify-center">
-            <div class="icon-item">
-              <v-btn icon :href="'https://github.com/immh78/vite-project'" target="_blank" variant="flat">
-                <v-icon>mdi-github</v-icon>
-              </v-btn>
-              <small>GitHub</small>
-            </div>
-          </v-col>
-        </v-row>
-      </v-container>
+              <!-- GitHub 버튼 -->
+              <v-col cols="6" sm="3" class="d-flex justify-center">
+                <div class="icon-item">
+                  <v-btn icon :href="'https://github.com/immh78/vite-project'" target="_blank" variant="flat">
+                    <v-icon>mdi-github</v-icon>
+                  </v-btn>
+                  <small>GitHub</small>
+                </div>
+              </v-col>
+            </v-row>
+          </v-container>
+        </div>
+      </template>
+
+      <!-- 권한 없을 경우 -->
+      <div v-else class="d-flex align-center justify-center fill-height">
+        <h2>{{ visitorTable[visitorId] ? visitorTable[visitorId].name + '님 안녕하세요.' : '' }}</h2>
+      </div>
+    </v-main>
+    <v-dialog v-model="isUserInputPopup" max-width="600px">
+      <v-card>
+        <v-card-title>사용자명 등록</v-card-title>
+        <v-card-text>
+          <v-text-field :label="visitorId" v-model="visitorName" autofocus clearable />
+        </v-card-text>
+        <v-card-actions>
+          <v-btn @click="inputVisitorInfo()" icon="mdi-check-bold"></v-btn>
+          <v-btn @click="isUserInputPopup = false" icon="mdi-close-thick"></v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <div class="visitor-id-overlay">
+      <span @click="isUserInputPopup = visitorTable[visitorId] ? false : true">{{ visitorTable[visitorId] ?
+        visitorTable[visitorId].name : visitorId }}</span>
     </div>
-  </template>
-
-  <!-- 권한 없을 경우 -->
-  <div v-else class="d-flex align-center justify-center fill-height">
-    <h2>{{ visitorTable[visitorId] ? visitorTable[visitorId].name + '님 안녕하세요.': '' }}</h2>
-  </div>
-
-  <v-dialog v-model="isUserInputPopup" max-width="600px">
-    <v-card>
-      <v-card-title>사용자명 등록</v-card-title>
-      <v-card-text>
-        <v-text-field :label="visitorId" v-model="visitorName" autofocus clearable />
-      </v-card-text>
-      <v-card-actions>
-        <v-btn @click="inputVisitorInfo()" icon="mdi-check-bold"></v-btn>
-        <v-btn @click="isUserInputPopup = false" icon="mdi-close-thick"></v-btn>
-      </v-card-actions>
-    </v-card>
-  </v-dialog>
-
-  <div class="visitor-id-overlay">
-    <span @click="isUserInputPopup = visitorTable[visitorId] ? false :  true">{{ visitorTable[visitorId] ? visitorTable[visitorId].name : visitorId }}</span>
-  </div>
+  </v-app>
 </template>
 
 <style scoped>
