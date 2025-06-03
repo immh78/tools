@@ -99,7 +99,7 @@ onMounted(async () => {
           </v-col>
 
           <!-- GitHub 버튼 -->
-          <v-col cols="6" md="3" class="d-flex justify-center">
+          <v-col cols="6" sm="3" class="d-flex justify-center">
             <div class="icon-item">
               <v-btn icon :href="'https://github.com/immh78/vite-project'" target="_blank" variant="flat">
                 <v-icon>mdi-github</v-icon>
