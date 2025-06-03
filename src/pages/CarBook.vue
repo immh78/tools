@@ -15,7 +15,16 @@ const lastChangeOilSORENTO = ref(0);
 const lastChangeOilSM6 = ref(0);
 const oilMileage = ref(0);
 const oilChangeMileage = 15000;
+const listSORENTO = ref([]);
+const listSM6 = ref([]);
+const list = ref([]);
 
+const headers = [
+    { title: '날짜', align: 'center', key: 'date', value: 'date' },
+    { title: '항목', align: 'start', key: 'category', value: 'category' },
+    { title: '비용', align: 'end', key: 'cost', value: 'cost' },
+    { title: '비고', align: 'start', key: 'remark', value: 'remark' },
+];
 
 async function selectData() {
     const dbRef = firebaseRef(database, "car-book");
@@ -31,31 +40,39 @@ async function selectData() {
 
     console.log("* carBook", carBook.value);
 
-    mileageSORENTO.value = calcEstimatedMileage(carBook.value.SORENTO);
-    mileageSM6.value = calcEstimatedMileage(carBook.value.SM6);
+    listSORENTO.value = sortData(carBook.value.SORENTO);
+    listSM6.value = sortData(carBook.value.SM6);
 
-    lastChangeOilSORENTO.value = getLastChangeOilMileage(carBook.value.SORENTO);
-    lastChangeOilSM6.value = getLastChangeOilMileage(carBook.value.SM6);
+    console.log("listSORENTO", listSORENTO.value);
+    console.log("listSM6", listSM6.value);
 
+    mileageSORENTO.value = calcEstimatedMileage(listSORENTO.value);
+    mileageSM6.value = calcEstimatedMileage(listSM6.value);
 
     console.log("mileageSORENTO", mileageSORENTO.value);
     console.log("mileageSM6", mileageSM6.value);
+
+    lastChangeOilSORENTO.value = getLastChangeOilMileage(listSORENTO.value);
+    lastChangeOilSM6.value = getLastChangeOilMileage(listSM6.value);
+
     console.log("lastChangeOilSORENTO", lastChangeOilSORENTO.value);
     console.log("lastChangeOilSM6", lastChangeOilSM6.value);
 }
 
+function parseDate(dateStr) {
+    const year = parseInt(dateStr.slice(0, 4))
+    const month = parseInt(dateStr.slice(4, 6)) - 1
+    const day = parseInt(dateStr.slice(6, 8))
+    return new Date(year, month, day)
+}
+
+function sortData(data) {
+    return [...data].sort((a, b) => parseDate(b.date) - parseDate(a.date));
+}
+
 function calcEstimatedMileage(data) {
-    // 날짜를 Date 객체로 변환
-    const parseDate = (dateStr) => {
-        const year = parseInt(dateStr.slice(0, 4))
-        const month = parseInt(dateStr.slice(4, 6)) - 1
-        const day = parseInt(dateStr.slice(6, 8))
-        return new Date(year, month, day)
-    }
-
     // 마지막 두 항목을 날짜 순으로 정렬 후 가져오기
-    const sortedData = [...data].sort((a, b) => parseDate(b.date) - parseDate(a.date));
-
+    const sortedData = data;
     const latest = sortedData[0];
     let previous = {};
 
@@ -65,6 +82,8 @@ function calcEstimatedMileage(data) {
             break;
         }
     }
+
+    console.log("parseDate", previous.date, latest.date)
     const date1 = parseDate(previous.date)
     const date2 = parseDate(latest.date)
 
@@ -95,36 +114,6 @@ function getLastChangeOilMileage(data) {
     return latest.mileage;
 }
 
-function daysBetweenToday(dateString) {
-    //console.log("dateString", dateString)
-
-    const today = new Date()
-    const targetDate = new Date(
-        parseInt(dateString.slice(0, 4)),
-        parseInt(dateString.slice(4, 6)) - 1,
-        parseInt(dateString.slice(6, 8))
-    )
-
-    // 밀리초 단위 차이 → 일수
-    const diffTime = today - targetDate;
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) - 1;
-    return diffDays
-}
-
-function getToday() {
-    const today = new Date();
-
-    const year = today.getFullYear();
-
-    // 월은 0부터 시작하므로 1을 더함, padStart로 두 자리수 맞춤
-    const month = String(today.getMonth() + 1).padStart(2, '0');
-
-    // 일도 두 자리수 맞춤
-    const day = String(today.getDate()).padStart(2, '0');
-
-    return `${year}-${month}-${day}`;
-}
-
 watch(() => tab.value, (newTab) => {
     changeTab(newTab);
 });
@@ -133,11 +122,22 @@ function changeTab(newTab) {
     if (newTab === "SORENTO") {
         mileage.value = mileageSORENTO.value;
         oilMileage.value = mileageSORENTO.value - lastChangeOilSORENTO.value;
+        list.value = listSORENTO.value;
 
 
     } else {
         mileage.value = mileageSM6.value;
         oilMileage.value = mileageSM6.value - lastChangeOilSM6.value;
+        list.value = listSM6.value;
+    }
+}
+
+function getProgressTextColor(value) {
+    // value: 퍼센트 (0~100)
+    if (value <= 55) {
+        return 'black'; // 어두운 배경에 흰 글씨
+    } else {
+        return 'white'; // 밝은 배경에 검정 글씨
     }
 }
 
@@ -182,6 +182,9 @@ onMounted(async () => {
                     height="20" :max="oilChangeMileage" v-model="oilMileage" rounded>{{ oilMileage
                     }}</v-progress-linear>
             </v-sheet>
+            <v-data-table :headers="headers" :items="list" no-data-text="조회중입니다." loading-text="조회중입니다."
+                hide-default-footer items-per-page="-1" :show-items-per-page="false">
+            </v-data-table>
         </v-main>
     </v-app>
 </template>
