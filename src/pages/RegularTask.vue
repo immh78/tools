@@ -10,8 +10,6 @@ const regularTask = ref({});
 const taskList = ref({});
 const isOpenPopup = ref(false);
 const selectTask = ref("");
-const haircutPlace = ref([]);
-const dentistPlace = ref([]);
 const date = ref("");
 const place = ref("");
 const cost = ref(0);
@@ -60,25 +58,6 @@ async function selectData() {
         }
     }
 
-    //console.log("taskList", taskList.value);
-
-    // place만 추출하고 중복 제거
-    haircutPlace.value = [
-        ...new Set(
-            regularTask.value.task['이발']
-                .map(entry => entry.place)
-                .filter(place => place !== undefined && place !== null && place !== "")
-        )
-    ];
-
-    // place만 추출하고 중복 제거
-    dentistPlace.value = [
-        ...new Set(
-            regularTask.value.task['스케일링']
-                .map(entry => entry.place)
-                .filter(place => place !== undefined && place !== null && place !== "")
-        )
-    ];
 }
 
 function daysBetweenToday(dateString) {
@@ -212,8 +191,7 @@ onMounted(async () => {
             <v-card>
                 <v-card-title>{{ selectTask }}</v-card-title>
                 <v-text-field label="날짜" v-model="date" type="date" />
-                <v-combobox v-if="taskList[selectTask].place" v-model="place" label="장소"
-                    :items="selectTask === '이발' ? haircutPlace : dentistPlace"></v-combobox>
+                <v-text-field v-if="taskList[selectTask].place" v-model="place" label="장소" clearable/>
                 <v-text-field v-if="taskList[selectTask].cost >= 0" v-model="cost" label="금액" type="number" clearable
                     autofocus />
                 <v-card-actions>
