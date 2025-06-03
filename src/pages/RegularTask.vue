@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import { useLogger } from '../composables/useLogger';
-import { database, ref as firebaseRef, get, update, remove } from "../config/firebase";
+import { database, ref as firebaseRef, get, update } from "../config/firebase";
 
 useLogger();
 

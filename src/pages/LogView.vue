@@ -6,7 +6,7 @@ import { useLogger } from '../composables/useLogger';
 useLogger();
 
 const logTable = ref(null);
-const visitorTable = ref(null);
+const visitorTable = ref([]);
 const error = ref(null);
 const tableData = ref([])
 const headers = ref([

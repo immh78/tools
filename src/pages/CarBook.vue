@@ -3,7 +3,7 @@ import { ref, onMounted, watch, setBlockTracking } from 'vue'
 import { useLogger } from '../composables/useLogger';
 import { database, ref as firebaseRef, get, update, remove } from "../config/firebase";
 
-//useLogger();
+useLogger();
 
 const carBook = ref({});
 const tab = ref("SORENTO");
@@ -18,16 +18,17 @@ const listSORENTO = ref([]);
 const listSM6 = ref([]);
 const list = ref([]);
 
-const isAddPopup = ref(false);
+const isPopup = ref(false);
+const isPopupKind = ref("");
 const comboList = ['엔진오일', '주행거리'];
 const addData = ref({});
 
 const headers = [
-    { title: '날짜', align: 'center', key: 'date', value: 'date' },
-    { title: '항목', align: 'start', key: 'category', value: 'category' },
-    { title: '비용', align: 'end', key: 'cost', value: 'cost' },
-    { title: '비고', align: 'start', key: 'remark', value: 'remark' },
+    { title: '날짜', align: 'start', key: 'date', value: 'date', width: 130 },
+    { title: '항목', align: 'start', key: 'category', value: 'category', nowrap:true },
+    { title: '주행거리', align: 'end', key: 'mileage', value: 'mileage', width: 120 },
 ];
+const currentPage = ref(1); 
 
 async function selectData() {
     const dbRef = firebaseRef(database, "car-book");
@@ -121,6 +122,8 @@ watch(() => tab.value, (newTab) => {
 });
 
 function changeTab(newTab) {
+    currentPage.value = 1; // 페이지 초기화
+
     if (newTab === "SORENTO") {
         mileage.value = mileageSORENTO.value;
         oilMileage.value = mileageSORENTO.value - lastChangeOilSORENTO.value;
@@ -173,23 +176,39 @@ function getToday() {
 
 function openAddPopup() {
     addData.value = {
-        "date":getToday(),
-        "mileage":mileage.value
+        "date": getToday(),
+        "mileage": mileage.value
     }
-    isAddPopup.value = true;
+    isPopupKind.value = "ADD";
+    isPopup.value = true;
+}
+
+function openDetailPopup(item) {
+    addData.value = {
+        "date": item.date.slice(0, 4) + '-' + item.date.slice(4, 6) + '-' + item.date.slice(6, 8),
+        "category": item.category,
+        "mileage": item.mileage,
+        "cost": item.cost,
+        "remark": item.remark
+    }
+    isPopupKind.value = "VIEW";
+    isPopup.value = true;
 }
 
 async function addAction() {
     const key = carBook.value[tab.value].length;
-    addData.value.date = addData.value.date.replaceAll('-', '');
-    addData.value.cost = Number(addData.value.cost);
+    addData.value.date = addData.value.date.replaceAll('-', '');    
+    addData.value.cost = addData.value.cost ? Number(addData.value.cost) : -1;
+    addData.value.category = addData.value.category || "주행거리";
+    addData.value.remark = addData.value.remark || "";
     addData.value.mileage = Number(addData.value.mileage);
+    
 
     const data = {
         [key]: addData.value
     }
 
-    //console.log("save data", data);
+    console.log("save data", tab.value, data);
 
     try {
         const dbRef = firebaseRef(database, "car-book/" + tab.value);
@@ -198,9 +217,9 @@ async function addAction() {
         console.error("Error saving data:", err);
     }
 
-    isAddPopup.value = false;
+    isPopup.value = false;
     selectData();
-
+    changeTab(tab.value);
 }
 
 onMounted(async () => {
@@ -226,28 +245,45 @@ onMounted(async () => {
                 <v-tab value="SORENTO">SORENTO</v-tab>
                 <v-tab value="SM6">SM6</v-tab>
             </v-tabs>
-            <v-sheet class="pa-2">
-                <v-text-field v-model="mileage" label="주행거리" variant="outlined" class="mx-3 mt-2"></v-text-field>
-                <v-progress-linear class="mx-2" :color="getProgressColor(oilMileage / oilChangeMileage * 100)"
-                    height="12" :max="oilChangeMileage" v-model="oilMileage"
-                    :style="{ color: getProgressTextColor(oilMileage / oilChangeMileage * 100), fontSize:'9px'}" rounded>{{ oilMileage
+            <v-card class="mt-2 mx-4" variant="flat">
+                <v-text-field v-model="mileage" label="주행거리" variant="outlined" class="mt-2"></v-text-field>
+                <v-progress-linear :color="getProgressColor(oilMileage / oilChangeMileage * 100)" height="12"
+                    :max="oilChangeMileage" v-model="oilMileage"
+                    :style="{ color: getProgressTextColor(oilMileage / oilChangeMileage * 100), fontSize: '9px' }"
+                    rounded>{{
+                        oilMileage.toLocaleString()
                     }}</v-progress-linear>
-            </v-sheet>
-            <v-data-table :headers="headers" :items="list" no-data-text="조회중입니다." loading-text="조회중입니다."
-                hide-default-footer items-per-page="-1" :show-items-per-page="false">
+            </v-card>
+            <v-data-table :headers="headers" :items="list.filter(item => item.category !== '주행거리')" no-data-text="조회중입니다." loading-text="조회중입니다."
+                items-per-page=5 v-model:page="currentPage">
+                <template v-slot:item.date="{ item }">
+                    <span @click="openDetailPopup(item)">
+                   {{ item.date.slice(0, 4) }}. {{ Number(item.date.slice(4, 6)) }}. {{ Number(item.date.slice(6, 8)) }}
+                   </span>
+                </template>
+                <template v-slot:item.category="{ item }" @click="openDetailPopup(item)">
+                    <span @click="openDetailPopup(item)">
+                    {{ item.category.length > 12 ? item.category.substring(0, 12) + "..." : item.category }}
+                   </span>
+                </template>
+                <template v-slot:item.mileage="{ item }" @click="openDetailPopup(item)">
+                    <span @click="openDetailPopup(item)">
+                    {{ item.mileage.toLocaleString() }}     
+                   </span>
+                 </template>
             </v-data-table>
         </v-main>
-        <v-dialog v-model="isAddPopup" max-width="380px">
+        <v-dialog v-model="isPopup" max-width="380px">
             <v-card>
-                <v-card-title>정비내역 등록</v-card-title>
+                <v-card-title>정비내역{{ isPopupKind === 'ADD' ? ' 등록' : '' }}</v-card-title>
                 <v-text-field label="날짜" v-model="addData.date" type="date" />
                 <v-combobox v-model="addData.category" label="항목" :items="comboList"></v-combobox>
                 <v-text-field v-model="addData.mileage" label="주행거리" type="number" clearable />
                 <v-text-field v-model="addData.cost" label="비용" type="number" clearable />
                 <v-text-field v-model="addData.remark" label="비고" clearable />
                 <v-card-actions>
-                    <v-btn @click="addAction()" icon="mdi-check-bold"></v-btn>
-                    <v-btn @click="isAddPopup = false" icon="mdi-close-thick"></v-btn>
+                    <v-btn v-if="isPopupKind === 'ADD'" @click="addAction()" icon="mdi-check-bold"></v-btn>
+                    <v-btn @click="isPopup = false" icon="mdi-close-thick"></v-btn>
                 </v-card-actions>
             </v-card>
         </v-dialog>

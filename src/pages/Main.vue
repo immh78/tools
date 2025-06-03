@@ -2,18 +2,14 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router';
 import FingerprintJS from '@fingerprintjs/fingerprintjs';
+import { database, ref as firebaseRef, get } from "../config/firebase";
+import { useLogger } from '../composables/useLogger';
+
+useLogger();
 
 const visitorId = ref('');
 const router = useRouter();
-// 허용된 visitorId 목록
-const ALLOWED_IDS = [
-  '0c07db1e97c10dd364d0c7c97d8ebf5e',
-  '5067475d1c7a690eb128aa0806366f71',
-  'bc0f8e17b63badde366f133fe707f57f',
-  '91cb2a05340782fc6626678fce9f9e31',
-  '7f6ae5b56dbdeef4bda8080a2882e221', //사무실 dev모드
-  'a063076051e74e11fc092822b3b64557'
-];
+const visitorTable = ref([]);
 
 // 라우트 배열에서 메인 페이지(`/`)를 제외한 라우트만 필터링
 const filteredRoutes = router.options.routes.filter(route => route.path !== '/');
@@ -23,13 +19,34 @@ function navigateTo(path) {
 }
 
 
+async function getVisitors() {
+  const dbRef = firebaseRef(database, "visitors");
+  await get(dbRef)
+    .then(snapshot => {
+      if (snapshot.exists()) {
+        visitorTable.value = snapshot.val();
+        //console.log("Fetched logs:", logs.value);
+      } else {
+        console.log("No data available");
+      }
+    })
+    .catch(err => {
+      console.error("Error fetching data:", err);
+    });
+}
+
 // visitorId가 허용된 ID인지 여부 판단
-const isAllowed = computed(() => ALLOWED_IDS.includes(visitorId.value));
+const isAllowed = ref(false);
 
 onMounted(async () => {
   const fp = await FingerprintJS.load();
   const result = await fp.get();
+  await getVisitors();
   visitorId.value = result.visitorId;
+
+  if (visitorTable.value[visitorId.value]) {
+    isAllowed.value = visitorTable.value[visitorId.value].isHost;
+  }
 });
 </script>
 
@@ -43,13 +60,16 @@ onMounted(async () => {
           <small>{{ route.comment }}</small>
         </div>
         <div class="icon-item">
-          <v-btn icon :href="'https://console.firebase.google.com/u/0/project/my-firebase-9450e/database/my-firebase-9450e-default-rtdb/data'" target="_blank">
+          <v-btn icon
+            :href="'https://console.firebase.google.com/u/0/project/my-firebase-9450e/database/my-firebase-9450e-default-rtdb/data'"
+            target="_blank"
+             variant="flat">
             <v-icon>mdi-fire</v-icon>
           </v-btn>
           <small>Firebase</small>
         </div>
         <div class="icon-item">
-          <v-btn icon :href="'https://github.com/immh78/vite-project'" target="_blank">
+          <v-btn icon :href="'https://github.com/immh78/vite-project'" target="_blank"  variant="flat">
             <v-icon>mdi-github</v-icon>
           </v-btn>
           <small>GitHub</small>
@@ -92,10 +112,12 @@ onMounted(async () => {
   font-size: 9px;
   color: #888;
   z-index: 999;
+}
 
- .icon-grid {
+.icon-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
+  /* 두 열로 설정 */
   gap: 30px;
   justify-items: center;
   margin-top: 30px;
@@ -105,9 +127,14 @@ onMounted(async () => {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
+  /* 아이콘과 텍스트 수직 정렬 */
   cursor: pointer;
-  width: 100px;
+  width: 100%;
+  /* 너비를 100%로 설정하여 부모의 너비에 맞추기 */
   text-align: center;
+  max-width: 120px;
+  /* 최대 너비를 설정해 균등한 열 배치를 보장 */
   transition: transform 0.2s;
 }
 
@@ -119,7 +146,5 @@ onMounted(async () => {
   margin-top: 5px;
   font-size: 13px;
   color: #666;
-}
- 
 }
 </style>
