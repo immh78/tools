@@ -1,0 +1,189 @@
+* router/index.js
+// src/router/index.js 또는 main.js
+import { createRouter, createWebHashHistory } from 'vue-router';
+import Main from '../pages/Main.vue';
+import DuesList from '../pages/DuesList.vue';
+//import EnqQuizChapterAdj from '../pages/EngQuizChapterAdj.vue';
+//import TljSMS from '../pages/TljSMS.vue';
+import TljResv from '../pages/TljResv.vue';
+import LogView from '../pages/LogView.vue';
+import WorkTime from '../pages/WorkTime.vue';
+import RegularTask from '../pages/RegularTask.vue';
+import CarBook from '../pages/CarBook.vue';
+import Test from '../pages/Test.vue';
+
+const routes = [
+  { path: '/', component: Main, comment: '메인 페이지' },
+  { path: '/dues-list', component: DuesList, comment: '우미린 가족여행 회비 목록', icon:'mdi-umbrella-beach' },
+  //{ path: '/engquiz-adj', component: EnqQuizChapterAdj, comment: '영어 퀴즈 DB 오류 조정' },
+  //{ path: '/tlj-sms', component: TljResv, comment: '뚜레쥬르 선입금 문자발송' },
+  { path: '/tlj-sms', component: TljResv, comment: '뚜레쥬르 식권대장 예약', icon:'mdi-cupcake' },
+  { path: '/log-view', component: LogView, comment: '로그 조회', icon:'mdi-note-search-outline' },
+  { path: '/work-time', component: WorkTime, comment: '근무 시간', icon:'mdi-clipboard-text-clock'},
+  { path: '/regular-task', component: RegularTask, comment: '정기적으로 할 일', icon:'mdi-clipboard-check-outline' },
+  { path: '/car-book', component: CarBook, comment: '차계부', icon:'mdi-car-wrench' },
+  { path: '/test', component: Test, comment: '테스트', icon:'mdi-flask'},  
+]
+
+const router = createRouter({
+  history: createWebHashHistory('/vite-project/'), // hash 모드 사용
+  routes
+})
+
+export default router
+
+* Main.vue
+<script setup>
+import { ref, computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router';
+import FingerprintJS from '@fingerprintjs/fingerprintjs';
+import { database, ref as firebaseRef, get } from "../config/firebase";
+import { useLogger } from '../composables/useLogger';
+
+useLogger();
+
+const visitorId = ref('');
+const router = useRouter();
+const visitorTable = ref([]);
+
+// 라우트 배열에서 메인 페이지(`/`)를 제외한 라우트만 필터링
+const filteredRoutes = router.options.routes.filter(route => route.path !== '/');
+
+function navigateTo(path) {
+  router.push(path);
+}
+
+
+async function getVisitors() {
+  const dbRef = firebaseRef(database, "visitors");
+  await get(dbRef)
+    .then(snapshot => {
+      if (snapshot.exists()) {
+        visitorTable.value = snapshot.val();
+        //console.log("Fetched logs:", logs.value);
+      } else {
+        console.log("No data available");
+      }
+    })
+    .catch(err => {
+      console.error("Error fetching data:", err);
+    });
+}
+
+// visitorId가 허용된 ID인지 여부 판단
+const isAllowed = ref(false);
+
+onMounted(async () => {
+  const fp = await FingerprintJS.load();
+  const result = await fp.get();
+  await getVisitors();
+  visitorId.value = result.visitorId;
+
+  if (visitorTable.value[visitorId.value]) {
+    isAllowed.value = visitorTable.value[visitorId.value].isHost;
+  }
+});
+</script>
+
+<template>
+  <template v-if="isAllowed">
+    <div class="main-page">
+      <h1>도구 목록</h1>
+      <div class="icon-grid">
+        <div v-for="route in filteredRoutes" :key="route.path" class="icon-item" @click="navigateTo(route.path)">
+          <v-icon size="36">{{ route.icon }}</v-icon>
+          <small>{{ route.comment }}</small>
+        </div>
+        <div class="icon-item">
+          <v-btn icon
+            :href="'https://console.firebase.google.com/u/0/project/my-firebase-9450e/database/my-firebase-9450e-default-rtdb/data'"
+            target="_blank"
+             variant="flat">
+            <v-icon>mdi-fire</v-icon>
+          </v-btn>
+          <small>Firebase</small>
+        </div>
+        <div class="icon-item">
+          <v-btn icon :href="'https://github.com/immh78/vite-project'" target="_blank"  variant="flat">
+            <v-icon>mdi-github</v-icon>
+          </v-btn>
+          <small>GitHub</small>
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <div class="visitor-id-overlay">
+    {{ visitorId }}
+  </div>
+</template>
+
+<style scoped>
+.main-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.button-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.nav-button {
+  width: 300px;
+  font-size: 16px;
+}
+
+.visitor-id-overlay {
+  position: fixed;
+  bottom: 5px;
+  right: 10px;
+  font-size: 9px;
+  color: #888;
+  z-index: 999;
+}
+
+.icon-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  /* 두 열로 설정 */
+  gap: 30px;
+  justify-items: center;
+  margin-top: 30px;
+}
+
+.icon-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  /* 아이콘과 텍스트 수직 정렬 */
+  cursor: pointer;
+  width: 100%;
+  /* 너비를 100%로 설정하여 부모의 너비에 맞추기 */
+  text-align: center;
+  max-width: 120px;
+  /* 최대 너비를 설정해 균등한 열 배치를 보장 */
+  transition: transform 0.2s;
+}
+
+.icon-item:hover {
+  transform: scale(1.1);
+}
+
+.icon-item small {
+  margin-top: 5px;
+  font-size: 13px;
+  color: #666;
+}
+</style>
+
+
+* 요청내용
+main page의 아이콘을 <v-row>, <v-col>로 처리한다.
+모바일에서 세로는 2열, 가로는 4열로 나타낸다.
