@@ -10,6 +10,7 @@ dotenv.config({ path: `.env.${process.env.NODE_ENV}` });
 export default defineConfig({
   plugins: [vue(),
    VitePWA({
+      registerType: 'autoUpdate',
       manifest: '/vite-project/manifests/manifest.json',  // 기본 manifest 파일      
     }),
 
