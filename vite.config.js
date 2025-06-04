@@ -12,9 +12,9 @@ export default defineConfig({
   VitePWA({
     registerType: 'autoUpdate',
     manifest: {
-      name: 'Default App',
-      short_name: 'Default',
-      start_url: '/',
+      name: 'My Tools',
+      short_name: '도구모음',
+      start_url: '/vite-project/',
       display: 'standalone',
       background_color: '#ffffff',
       theme_color: '#42b983',

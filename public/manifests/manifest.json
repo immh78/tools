@@ -1,6 +1,6 @@
 {
-  "name": "My App",
-  "short_name": "MyApp",
+  "name": "My Tools App",
+  "short_name": "도구모음",
   "start_url": "/vite-project/#/",
   "display": "standalone",
   "background_color": "#ffffff",
