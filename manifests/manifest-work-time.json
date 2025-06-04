@@ -1,0 +1,20 @@
+{
+    "name": "근무 시간",
+    "short_name": "근무 시간",
+    "start_url": "/vite-project/#/work-time",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "icons": [
+      {
+        "src": "/vite-project/checklist.png",
+        "sizes": "192x192",
+        "type": "image/png"
+      },
+      {
+        "src": "/vite-project/checklist.png",
+        "sizes": "512x512",
+        "type": "image/png"
+      }
+    ]
+  }
+  
