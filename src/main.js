@@ -18,5 +18,24 @@ const vuetify = createVuetify({
     directives,
 })
 
-createApp(App).use(vuetify).use(router).mount('#app');
 
+router.isReady().then(() => {
+    watch(
+        () => router.currentRoute.value.path,
+        (newPath) => {
+            const manifest = document.querySelector('link[rel="manifest"]')
+            if (!manifest) return
+
+            if (newPath.startsWith('/car-book')) {
+                manifest.href = '/manifests/manifest-car-book.json?v=' + Date.now()
+            } else if (newPath.startsWith('/dues-list')) {
+                manifest.href = '/manifests/manifest-dues-list.json?v=' + Date.now()
+            } else {
+                manifest.href = '/manifest.webmanifest?v=' + Date.now()
+            }
+        },
+        { immediate: true }
+    )
+})
+
+createApp(App).use(vuetify).use(router).mount('#app');

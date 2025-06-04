@@ -1,0 +1,21 @@
+{
+    "name": "우미린 가족여행 회비 목록",
+    "short_name": "DuesList",
+    "start_url": "/dues-list",
+    "display": "standalone",
+    "theme_color": "#1976d2",
+    "background_color": "#ffffff",
+    "icons": [
+      {
+        "src": "/vacations.png",
+        "sizes": "192x192",
+        "type": "image/png"
+      },
+      {
+        "src": "/vacations.png",
+        "sizes": "512x512",
+        "type": "image/png"
+      }
+    ]
+  }
+  
