@@ -1,0 +1,20 @@
+{
+  "name": "My App",
+  "short_name": "MyApp",
+  "start_url": "/vite-project/#/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#42b983",
+  "icons": [
+    {
+      "src": "/diy.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/diy.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

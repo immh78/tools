@@ -1,7 +1,7 @@
 {
     "name": "차계부",
     "short_name": "CarBook",
-    "start_url": "/car-book",
+    "start_url": "/vite-project/#/car-book",
     "display": "standalone",
     "theme_color": "#1976d2",
     "background_color": "#ffffff",
