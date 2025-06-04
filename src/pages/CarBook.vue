@@ -21,7 +21,7 @@ const list = ref([]);
 
 const isPopup = ref(false);
 const isPopupKind = ref("");
-const comboList = ['엔진오일', '주행거리'];
+const comboList = ['기름', '엔진오일', '주행거리'];
 const addData = ref({});
 
 const headers = [
