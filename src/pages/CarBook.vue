@@ -256,7 +256,7 @@ onMounted(async () => {
                     }}</v-progress-linear>
             </v-card>
             <v-data-table :headers="headers" :items="list.filter(item => item.category !== '주행거리')" no-data-text="조회중입니다." loading-text="조회중입니다."
-                items-per-page=5 v-model:page="currentPage">
+                items-per-page=8 v-model:page="currentPage">
                 <template v-slot:item.date="{ item }">
                     <span @click="openDetailPopup(item)">
                    {{ item.date.slice(0, 4) }}. {{ Number(item.date.slice(4, 6)) }}. {{ Number(item.date.slice(6, 8)) }}
