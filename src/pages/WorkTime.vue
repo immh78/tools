@@ -178,7 +178,10 @@ onMounted(async () => {
             <v-card class="mt-2 ml-2 mr-2" variant="flat">
                 <v-text-field :label="'의무 근무시간 | 잔여 근무시간 :' + (workTimeInfo.planTime - workTimeInfo.actTime - todayWorkTime)" v-model="workTimeInfo.planTime" variant="outlined"
                     class="mt-2"></v-text-field>
-                <v-text-field label="누적 근무시간" v-model="workTimeInfo.actTime" variant="outlined"></v-text-field>
+                <v-text-field label="누적 근무시간" 
+                    mask="##:##"
+                    v-model="workTimeInfo.actTime" 
+                    variant="outlined"/>
                 <v-text-field label="금일 근무시간" v-model="todayWorkTime"
                     :style="{ color: workTimeInfo.start === '' ? 'white' : 'black' }" variant="outlined"
                     readonly></v-text-field>

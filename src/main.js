@@ -36,7 +36,7 @@ router.isReady().then(() => {
             manifest.href = "";
 
             for (const tool of tools) {
-                if (newPath.startsWith(`/${tool}`)) {
+                if (newPath.includes(`/${tool}`)) {
                     manifest.href = `/vite-project/manifests/manifest-${tool}.json?v=` + Date.now();
                     break;
                 }
