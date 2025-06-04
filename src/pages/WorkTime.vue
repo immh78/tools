@@ -64,15 +64,14 @@ function refreshCalcTime() {
        todayWorkTime.value = getHourMinute(calctodayWorkTime(start.value));
     }
 
-    console.log("todayWorkTime", todayWorkTime.value);
-
+    
     if (todayWorkTime.value.hour >= 9) {
         todayWorkTime.value.hour -= 1;
     } else if (todayWorkTime.value.hour >= 4 && todayWorkTime.value.minute >= 30) {
         todayWorkTime.value = getHourMinute(getTime(todayWorkTime.value) - 0.5);
     }
 
-    console.log("todayWorkTime", todayWorkTime.value);
+    //console.log("todayWorkTime", todayWorkTime.value);
 
     // workTimeInfo.value.actTime = 162;
     prog.value = workTimeInfo.value.actTime + getTime(todayWorkTime.value);
@@ -92,7 +91,7 @@ function refreshCalcTime() {
     }
 
     remainTime.value = getHourMinute(workTimeInfo.value.planTime - workTimeInfo.value.actTime - getTime(todayWorkTime.value));
-    console.log("remainTime", remainTime.value);
+    //console.log("remainTime", remainTime.value);
 
     const d = getNow();;
     lastRefreshTime.value = d.slice(0, 2) + ":" + d.slice(2);

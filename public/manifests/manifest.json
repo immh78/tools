@@ -4,7 +4,7 @@
   "start_url": "/vite-project/",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#ffffff",
+  "theme_color": "#000000",
   "icons": [
     {
       "src": "/vite-project/diy.png",
