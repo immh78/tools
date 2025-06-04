@@ -20,7 +20,7 @@ const routes = [
   { path: '/log-view', component: LogView, comment: '로그 조회', icon:'mdi-note-search-outline' },
   { path: '/work-time', component: WorkTime, comment: '근무 시간', icon:'mdi-clipboard-text-clock'},
   { path: '/regular-task', component: RegularTask, comment: '정기적으로 할 일', icon:'mdi-clipboard-check-outline' },
-  { path: '/car-book', component: CarBook, comment: '차계부', icon:'mdi-car-wrench' },
+  { path: '/car-book', component: CarBook, comment: '차계부', icon:'mdi-car-wrench'},
   { path: '/test', component: Test, comment: '테스트', icon:'mdi-flask'},  
 ]
 
