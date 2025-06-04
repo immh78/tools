@@ -1,6 +1,6 @@
-import { createApp, watch } from 'vue'
+import { createApp, watch } from 'vue';
 //import './style.css'
-import App from './App.vue'
+import App from './App.vue';
 import router from './router';
 
 // Vuetify 관련 import

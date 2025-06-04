@@ -10,7 +10,7 @@ const start = ref("");
 const isOver = ref(false);
 const isOverPay = ref(false);
 const overTimePay = ref(0);
-const todayWorkTime = ref(0);
+const todayWorkTime = ref({});
 const isSnackbar = ref(false);
 const startTime = ref("");
 const lastRefreshTime = ref("");
@@ -43,21 +43,35 @@ async function getWorkTimeInfo() {
     refreshCalcTime();
 }
 
+function getHourMinute(time) {
+    const hour = Math.floor(time);
+    const minute = Math.round((time - hour) * 60);
+    return { hour, minute };
+}
+
+function getTime({hour, minute}) {
+    return hour + (minute / 60);
+}
+
 function refreshCalcTime() {
     if (start.value === "") {
         todayWorkTime.value = 0;
     } else {
-        todayWorkTime.value = calctodayWorkTime(start.value);
+       todayWorkTime.value = getHourMinute(calctodayWorkTime(start.value));
     }
 
-    if (todayWorkTime.value > 8) {
-        todayWorkTime.value -= 1;
-    } else if (todayWorkTime.value > 4) {
-        todayWorkTime.value -= 0.5;
+    console.log("todayWorkTime", todayWorkTime.value);
+
+    if (todayWorkTime.value.hour >= 9) {
+        todayWorkTime.value.hour -= 1;
+    } else if (todayWorkTime.value.hour >= 4 && todayWorkTime.value.minute >= 30) {
+        todayWorkTime.value = getHourMinute(getTime(todayWorkTime.value) - 0.5);
     }
+
+    console.log("todayWorkTime", todayWorkTime.value);
 
     // workTimeInfo.value.actTime = 162;
-    prog.value = workTimeInfo.value.actTime + todayWorkTime.value;
+    prog.value = workTimeInfo.value.actTime + getTime(todayWorkTime.value);
     //console.log(prog.value);
 
     if (prog.value > workTimeInfo.value.planTime) {
@@ -65,11 +79,11 @@ function refreshCalcTime() {
         base.value = prog.value;
         prog.value = workTimeInfo.value.planTime;
 
-        console.log("over", workTimeInfo.value.actTime + todayWorkTime.value - workTimeInfo.value.planTime - 16.5);
+        //console.log("over", workTimeInfo.value.actTime + todayWorkTime.value - workTimeInfo.value.planTime - 16.5);
 
-        if (workTimeInfo.value.actTime + todayWorkTime.value - workTimeInfo.value.planTime > 16.5) {
+        if (workTimeInfo.value.actTime + getTime(todayWorkTime.value) - workTimeInfo.value.planTime > 16.5) {
             isOverPay.value = true;
-            overTimePay.value = Math.round(workTimeInfo.value.salary / 240 * 1.5 * (workTimeInfo.value.actTime + todayWorkTime.value - workTimeInfo.value.planTime - 16.5)).toLocaleString();
+            overTimePay.value = Math.round(workTimeInfo.value.salary / 240 * 1.5 * (workTimeInfo.value.actTime + getTime(todayWorkTime.value) - workTimeInfo.value.planTime - 16.5)).toLocaleString();
         }
     }
 
@@ -96,7 +110,7 @@ function calctodayWorkTime(pStart) {
     const diffInMinutes = nowTotalMinutes - startTotalMinutes;
     const diffInHours = diffInMinutes / 60;
 
-    return Number(diffInHours.toFixed(2));
+    return diffInHours;
 }
 
 function getNow() {
@@ -104,7 +118,7 @@ function getNow() {
     return String(d.getHours()).padStart(2, '0') + String(d.getMinutes()).padStart(2, '0');
 }
 
-async function saveTodayWorkTime() {
+async function savetodayWorkTime() {
     const time = workTimeInfo.value.actTime + todayWorkTime.value;
     const data = { "actTime": Number(time.toFixed(2)), "start": "" };
 
@@ -152,7 +166,7 @@ async function saveData(data) {
 }
 
 onMounted(async () => {
-    getWorkTimeInfo();
+    getWorkTimeInfo();    
 });
 </script>
 
@@ -176,22 +190,41 @@ onMounted(async () => {
             </v-card>
 
             <v-card class="mt-2 ml-2 mr-2" variant="flat">
-                <v-text-field :label="'의무 근무시간 | 잔여 근무시간 :' + (workTimeInfo.planTime - workTimeInfo.actTime - todayWorkTime)" v-model="workTimeInfo.planTime" variant="outlined"
-                    class="mt-2"></v-text-field>
-                <v-text-field label="누적 근무시간" 
-                    mask="##:##"
-                    v-model="workTimeInfo.actTime" 
-                    variant="outlined"/>
-                <v-text-field label="금일 근무시간" v-model="todayWorkTime"
-                    :style="{ color: workTimeInfo.start === '' ? 'white' : 'black' }" variant="outlined"
-                    readonly></v-text-field>
+                <v-row>
+                    <v-col cols="12">
+                        <v-text-field
+                            :label="'의무 근무시간 | 잔여 근무시간 :' + (workTimeInfo.planTime - workTimeInfo.actTime - todayWorkTime)"
+                            v-model="workTimeInfo.planTime" variant="outlined" class="mt-2" />
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col cols="6">
+                        <v-text-field label="누적 근무시간" :v-model="getHourMinute(workTimeInfo.actTime).hour" variant="outlined" />
+                    </v-col>
+                    <v-col cols="6">
+                        <v-text-field label="분" :v-model="getHourMinute(workTimeInfo.actTime).minute" variant="outlined" />
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col cols="6">
+                        <v-text-field label="금일 근무시간" v-model="todayWorkTime"
+                            :style="{ color: workTimeInfo.start === '' ? 'white' : 'black' }" variant="outlined"
+                            readonly></v-text-field> </v-col>
+                    <v-col cols="6">
+                        <v-text-field label="분" v-model="todayWorkTimeMinute"
+                            :style="{ color: workTimeInfo.start === '' ? 'white' : 'black' }" variant="outlined"
+                            readonly></v-text-field> </v-col>
+                </v-row>
+
+
             </v-card>
             <div style="display: flex; justify-content: center; align-items: center;">
                 <v-btn class="ma-2" @click="openStartPopup()"><v-icon>mdi-home-import-outline</v-icon> 출근</v-btn>
-                <v-btn class="ma-2" @click="saveTodayWorkTime()"
+                <v-btn class="ma-2" @click="savetodayWorkTime()"
                     :disabled="workTimeInfo.start === ''"><v-icon>mdi-home-export-outline</v-icon> 퇴근</v-btn>
-                <v-btn prepend-icon="mdi-reload" class="ma-2" @click="refreshCalcTime()" :disabled="workTimeInfo.start === ''"
-                    variant="flat"><span style="font-size:11px;">({{lastRefreshTime}})</span></v-btn>
+                <v-btn prepend-icon="mdi-reload" class="ma-2" @click="refreshCalcTime()"
+                    :disabled="workTimeInfo.start === ''" variant="flat"><span style="font-size:11px;">({{
+                        lastRefreshTime }})</span></v-btn>
             </div>
             <v-card class="ma-2" v-if="isOverPay" variant="flat" color="indigo-darken-3"
                 style="position: fixed; bottom: 20px; right: 20px; display: flex; align-items: center; justify-content: center; width: auto; padding: 10px;">
