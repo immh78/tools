@@ -7,12 +7,12 @@
     "background_color": "#ffffff",
     "icons": [
       {
-        "src": "/vacations.png",
+        "src": "/vite-project/src/assets/vacations.png",
         "sizes": "192x192",
         "type": "image/png"
       },
       {
-        "src": "/vacations.png",
+        "src": "/vite-project/src/assets/vacations.png",
         "sizes": "512x512",
         "type": "image/png"
       }
