@@ -9,29 +9,10 @@ dotenv.config({ path: `.env.${process.env.NODE_ENV}` });
 
 export default defineConfig({
   plugins: [vue(),
-  VitePWA({
-    registerType: 'autoUpdate',
-    manifest: {
-      name: 'My Tools',
-      short_name: '도구모음',
-      start_url: '/vite-project/',
-      display: 'standalone',
-      background_color: '#ffffff',
-      theme_color: '#42b983',
-      icons: [
-        {
-          src: '/diy.png',
-          sizes: '192x192',
-          type: 'image/png',
-        },
-        {
-          src: '/diy.png',
-          sizes: '512x512',
-          type: 'image/png',
-        },
-      ],
-    },
-  }),
+   VitePWA({
+      manifest: '/vite-project/manifests/manifest.json',  // 기본 manifest 파일
+      strategies: 'injectManifest',
+    }),
 
   ],
   base: '/vite-project/',

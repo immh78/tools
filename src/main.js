@@ -26,10 +26,10 @@ router.isReady().then(() => {
             const manifest = document.querySelector('link[rel="manifest"]')
             if (!manifest) return
 
-            if (newPath.includes('/car-book')) {
-                manifest.href = '/manifests/manifest-car-book.json?v=' + Date.now()
+            if (newPath.startsWith('/car-book')) {
+                manifest.href = '/vite-project/manifests/manifest-car-book.json?v=' + Date.now()
             } else if (newPath.includes('/dues-list')) {
-                manifest.href = '/manifests/manifest-dues-list.json?v=' + Date.now()
+                manifest.href = '/vite-project/manifests/manifest-dues-list.json?v=' + Date.now()
             } else {
                 manifest.href = '/manifest.webmanifest?v=' + Date.now()
             }
