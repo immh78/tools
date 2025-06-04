@@ -1,0 +1,20 @@
+{
+    "name": "뚜레쥬르 식권대장 예약",
+    "short_name": "뚜레쥬르 식권대장 예약",
+    "start_url": "/vite-project/#/tlj-sms",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "icons": [
+      {
+        "src": "/vite-project/cupcake.png",
+        "sizes": "192x192",
+        "type": "image/png"
+      },
+      {
+        "src": "/vite-project/cupcake.png",
+        "sizes": "512x512",
+        "type": "image/png"
+      }
+    ]
+  }
+  

@@ -3,8 +3,6 @@ import { createApp, watch } from 'vue'
 import App from './App.vue'
 import router from './router';
 
-
-
 // Vuetify 관련 import
 import { createVuetify } from 'vuetify';
 import * as components from "vuetify/components";
@@ -25,13 +23,29 @@ router.isReady().then(() => {
             const manifest = document.querySelector('link[rel="manifest"]')
             if (!manifest) return
 
-            if (newPath.startsWith('/car-book')) {
-                manifest.href = '/vite-project/manifests/manifest-car-book.json?v=' + Date.now()
-            } else if (newPath.includes('/dues-list')) {
-                manifest.href = '/vite-project/manifests/manifest-dues-list.json?v=' + Date.now()
-            } else {
-                manifest.href = '/vite-project/manifests/manifest.json?v=' + Date.now()
+            const tools = [
+                'dues-list',
+                'car-book',
+                'tlj-sms',
+                'log-view',
+                'work-time',
+                'regular-task',
+                'test'
+            ];
+
+            manifest.href = "";
+
+            for (const tool of tools) {
+                if (newPath.startsWith(`/${tool}`)) {
+                    manifest.href = `/vite-project/manifests/manifest-${tool}.json?v=` + Date.now();
+                    break;
+                }
             }
+
+            if (manifest.href === "") {
+                manifest.href = '/vite-project/manifests/manifest.json?v=' + Date.now();
+            }
+
         },
         { immediate: true }
     )
