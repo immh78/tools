@@ -10,8 +10,7 @@ dotenv.config({ path: `.env.${process.env.NODE_ENV}` });
 export default defineConfig({
   plugins: [vue(),
    VitePWA({
-      manifest: '/vite-project/manifests/manifest.json',  // 기본 manifest 파일
-      strategies: 'injectManifest',
+      manifest: '/vite-project/manifests/manifest.json',  // 기본 manifest 파일      
     }),
 
   ],

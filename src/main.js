@@ -30,7 +30,7 @@ router.isReady().then(() => {
             } else if (newPath.includes('/dues-list')) {
                 manifest.href = '/vite-project/manifests/manifest-dues-list.json?v=' + Date.now()
             } else {
-                manifest.href = '/manifest.webmanifest?v=' + Date.now()
+                manifest.href = '/vite-project/manifests/manifest.json?v=' + Date.now()
             }
         },
         { immediate: true }
