@@ -18,7 +18,6 @@ const vuetify = createVuetify({
     directives,
 })
 
-
 router.isReady().then(() => {
     watch(
         () => router.currentRoute.value.path,
