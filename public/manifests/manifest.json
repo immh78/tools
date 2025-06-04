@@ -7,12 +7,12 @@
   "theme_color": "#42b983",
   "icons": [
     {
-      "src": "/vite-project/src/assets/diy.png",
+      "src": "/vite-project/diy.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "/vite-project/src/assets/diy.png",
+      "src": "/vite-project/diy.png",
       "sizes": "512x512",
       "type": "image/png"
     }
