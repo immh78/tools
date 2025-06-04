@@ -3,6 +3,7 @@
     "short_name": "뚜레쥬르 식권대장 예약",
     "start_url": "/vite-project/#/tlj-sms",
     "display": "standalone",
+    "theme_color": "#000000",
     "background_color": "#ffffff",
     "icons": [
       {

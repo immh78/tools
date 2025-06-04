@@ -11,6 +11,8 @@ const isOver = ref(false);
 const isOverPay = ref(false);
 const overTimePay = ref(0);
 const todayWorkTime = ref({});
+const actTime = ref({});
+const remainTime = ref({hour:'-', minute:'-'});
 const isSnackbar = ref(false);
 const startTime = ref("");
 const lastRefreshTime = ref("");
@@ -40,6 +42,8 @@ async function getWorkTimeInfo() {
     base.value = workTimeInfo.value.planTime;
     start.value = workTimeInfo.value.start;
 
+    actTime.value = getHourMinute(workTimeInfo.value.actTime);
+
     refreshCalcTime();
 }
 
@@ -50,7 +54,7 @@ function getHourMinute(time) {
 }
 
 function getTime({hour, minute}) {
-    return hour + (minute / 60);
+    return Number(hour) + (Number(minute) / 60);
 }
 
 function refreshCalcTime() {
@@ -87,8 +91,10 @@ function refreshCalcTime() {
         }
     }
 
-    const d = getNow();;
+    remainTime.value = getHourMinute(workTimeInfo.value.planTime - workTimeInfo.value.actTime - getTime(todayWorkTime.value));
+    console.log("remainTime", remainTime.value);
 
+    const d = getNow();;
     lastRefreshTime.value = d.slice(0, 2) + ":" + d.slice(2);
 }
 
@@ -119,15 +125,15 @@ function getNow() {
 }
 
 async function savetodayWorkTime() {
-    const time = workTimeInfo.value.actTime + todayWorkTime.value;
-    const data = { "actTime": Number(time.toFixed(2)), "start": "" };
+    const time = workTimeInfo.value.actTime + getTime(todayWorkTime.value);
+    const data = { "actTime": Number(time), "start": "" };
 
     saveData(data)
     getWorkTimeInfo();
 }
 
 async function saveWorkInfo() {
-    const data = { "actTime": Number(workTimeInfo.value.actTime), "planTime": Number(workTimeInfo.value.planTime) };
+    const data = { "actTime": Number(getTime(actTime.value)), "planTime": Number(workTimeInfo.value.planTime) };
     saveData(data);
     getWorkTimeInfo();
 }
@@ -193,32 +199,32 @@ onMounted(async () => {
                 <v-row>
                     <v-col cols="12">
                         <v-text-field
-                            :label="'의무 근무시간 | 잔여 근무시간 :' + (workTimeInfo.planTime - workTimeInfo.actTime - todayWorkTime)"
-                            v-model="workTimeInfo.planTime" variant="outlined" class="mt-2" />
+                            :label="'의무 근무시간 | 잔여 근무시간 :' + remainTime.hour + '시간 ' + remainTime.minute + '분'"
+                            v-model="workTimeInfo.planTime" variant="outlined" type="number" class="mt-2" />
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col cols="6">
-                        <v-text-field label="누적 근무시간" :v-model="getHourMinute(workTimeInfo.actTime).hour" variant="outlined" />
+                        <v-text-field label="누적 근무시간" v-model="actTime.hour" type="number" variant="outlined" />
                     </v-col>
                     <v-col cols="6">
-                        <v-text-field label="분" :v-model="getHourMinute(workTimeInfo.actTime).minute" variant="outlined" />
+                        <v-text-field label="분" v-model="actTime.minute" type="number" variant="outlined" />
                     </v-col>
                 </v-row>
                 <v-row>
                     <v-col cols="6">
-                        <v-text-field label="금일 근무시간" v-model="todayWorkTime"
-                            :style="{ color: workTimeInfo.start === '' ? 'white' : 'black' }" variant="outlined"
+                        <v-text-field label="금일 근무시간" v-model="todayWorkTime.hour"
+                            :style="{ color: workTimeInfo.start === '' ? 'white' : 'black' }" variant="outlined" type="number"
                             readonly></v-text-field> </v-col>
                     <v-col cols="6">
-                        <v-text-field label="분" v-model="todayWorkTimeMinute"
-                            :style="{ color: workTimeInfo.start === '' ? 'white' : 'black' }" variant="outlined"
+                        <v-text-field label="분" v-model="todayWorkTime.minute"
+                            :style="{ color: workTimeInfo.start === '' ? 'white' : 'black' }" variant="outlined" type="number"
                             readonly></v-text-field> </v-col>
                 </v-row>
 
 
             </v-card>
-            <div style="display: flex; justify-content: center; align-items: center;">
+            <div class="mt-4" style="display: flex; justify-content: center; align-items: center;">
                 <v-btn class="ma-2" @click="openStartPopup()"><v-icon>mdi-home-import-outline</v-icon> 출근</v-btn>
                 <v-btn class="ma-2" @click="savetodayWorkTime()"
                     :disabled="workTimeInfo.start === ''"><v-icon>mdi-home-export-outline</v-icon> 퇴근</v-btn>

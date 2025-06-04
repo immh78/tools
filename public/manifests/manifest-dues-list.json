@@ -3,7 +3,7 @@
     "short_name": "우미린 가족여행 회비 목록",
     "start_url": "/vite-project/#/dues-list",
     "display": "standalone",
-    "theme_color": "#1976d2",
+    "theme_color": "#000000",    
     "background_color": "#ffffff",
     "icons": [
       {
