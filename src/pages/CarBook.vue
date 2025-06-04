@@ -137,6 +137,21 @@ function changeTab(newTab) {
     }
 }
 
+watch(() => addData.value.category, (newVal) => {
+    let findedItem = {};
+
+    if (tab.value === 'SORENTO') {
+        findedItem = listSORENTO.value.find(item => item.category === newVal);
+
+    } else {
+        findedItem = listSM6.value.find(item => item.category === newVal);
+    }
+
+    addData.value.remark = findedItem ? findedItem.remark : '';
+    addData.value.cost = findedItem ? findedItem.cost : '';
+
+})
+
 function getProgressTextColor(value) {
     // value: 퍼센트 (0~100)
     if (value <= 55) {
@@ -178,7 +193,10 @@ function getToday() {
 function openAddPopup() {
     addData.value = {
         "date": getToday(),
-        "mileage": mileage.value
+        "mileage": mileage.value,
+        "category": '',
+        "cost": 0,
+        "remark": ''
     }
     isPopupKind.value = "ADD";
     isPopup.value = true;
@@ -209,7 +227,7 @@ async function addAction() {
         [key]: addData.value
     }
 
-    console.log("save data", tab.value, data);
+    //console.log("save data", tab.value, data);
 
     try {
         const dbRef = firebaseRef(database, "car-book/" + tab.value);
