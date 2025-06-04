@@ -3,7 +3,7 @@
     "short_name": "차계부",
     "start_url": "/vite-project/#/car-book",
     "display": "standalone",
-    "theme_color": "#1976d2",
+    "theme_color": "#000000",
     "background_color": "#ffffff",
     "icons": [
       {

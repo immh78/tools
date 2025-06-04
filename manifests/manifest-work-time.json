@@ -3,6 +3,7 @@
     "short_name": "근무 시간",
     "start_url": "/vite-project/#/work-time",
     "display": "standalone",
+    "theme_color": "#000000",
     "background_color": "#ffffff",
     "icons": [
       {
