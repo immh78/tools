@@ -100,7 +100,9 @@ function calcEstimatedMileage(data) {
 
     const avgPerDay = mileageDiff / daysDiff
 
-    const today = new Date()
+    const today = new Date().setHours(0, 0, 0, 0);
+
+    console.log("today", today, "date2", date2, "diff", (today - date2)/ (1000 * 60 * 60 * 24));
     const daysSinceLast = (today - date2) / (1000 * 60 * 60 * 24)
 
     return mileage2 + Math.round(avgPerDay * daysSinceLast)
