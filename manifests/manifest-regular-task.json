@@ -1,18 +1,18 @@
 {
   "name": "정기적으로 할 일",
   "short_name": "정기적으로 할 일",
-  "start_url": "/vite-project/#/regular-task",
+  "start_url": "/tools/#/regular-task",
   "display": "standalone",
   "theme_color": "#000000",
   "background_color": "#ffffff",
   "icons": [
     {
-      "src": "/vite-project/list.png",
+      "src": "/tools/list.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "/vite-project/list.png",
+      "src": "/tools/list.png",
       "sizes": "512x512",
       "type": "image/png"
     }

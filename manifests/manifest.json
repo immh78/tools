@@ -1,18 +1,18 @@
 {
   "name": "My Tools App",
   "short_name": "도구모음",
-  "start_url": "/vite-project/",
+  "start_url": "/tools/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#000000",
   "icons": [
     {
-      "src": "/vite-project/diy.png",
+      "src": "/tools/diy.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "/vite-project/diy.png",
+      "src": "/tools/diy.png",
       "sizes": "512x512",
       "type": "image/png"
     }

@@ -1,18 +1,18 @@
 {
     "name": "차계부",
     "short_name": "차계부",
-    "start_url": "/vite-project/#/car-book",
+    "start_url": "/tools/#/car-book",
     "display": "standalone",
     "theme_color": "#000000",
     "background_color": "#ffffff",
     "icons": [
       {
-        "src": "/vite-project/car-checklist.png",
+        "src": "/tools/car-checklist.png",
         "sizes": "192x192",
         "type": "image/png"
       },
       {
-        "src": "/vite-project/car-checklist.png",
+        "src": "/tools/car-checklist.png",
         "sizes": "512x512",
         "type": "image/png"
       }
