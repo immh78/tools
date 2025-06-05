@@ -169,32 +169,34 @@ onMounted(async () => {
                 </template>
                 <AppBarTitle />
             </v-app-bar>
-             <div class="mt-4"></div>
-            <v-row v-for="(value, key) in taskList">
-                <v-col>
-                    <h5 class="text-black mt-0 ml-2">{{ key }}</h5>
-                    <v-sheet class="d-flex align-center mx-2 px-2 py-3" color="#f4f4f4" rounded="lg"
-                        @click="openPopup(key)">
+            <div class="mt-4"></div>
+            <v-container>
+                <v-row v-for="(value, key) in taskList">
+                    <v-col>
+                        <h5 class="text-black mt-0 ml-2">{{ key }}</h5>
+                        <v-sheet class="d-flex align-center mx-2 px-2 py-3" color="#f4f4f4" rounded="lg"
+                            @click="openPopup(key)">
 
-                        <v-progress-linear
-                            :color="getProgressColor(value.diffDays / regularTask.duration[key] * 100)" height="14"
-                            :max="regularTask.duration[key]" v-model="value.diffDays"
-                            :style="{ color: getProgressTextColor(value.diffDays / regularTask.duration[key] * 100), fontSize: '11px' }"
-                            rounded>
-                            {{ value.diffDays }}
-                        </v-progress-linear>
-                        <div class="ms-4" style="font-size: 10px;">{{ regularTask.duration[key] }}</div>
-                    </v-sheet>
-                </v-col>
-            </v-row>
+                            <v-progress-linear
+                                :color="getProgressColor(value.diffDays / regularTask.duration[key] * 100)" height="14"
+                                :max="regularTask.duration[key]" v-model="value.diffDays"
+                                :style="{ color: getProgressTextColor(value.diffDays / regularTask.duration[key] * 100), fontSize: '11px' }"
+                                rounded>
+                                {{ value.diffDays }}
+                            </v-progress-linear>
+                            <div class="ms-4" style="font-size: 10px;">{{ regularTask.duration[key] }}</div>
+                        </v-sheet>
+                    </v-col>
+                </v-row>
+            </v-container>
         </v-main>
 
         <v-dialog v-model="isOpenPopup" max-width="380px">
             <v-card>
                 <v-card-title>{{ selectTask }}</v-card-title>
                 <v-text-field label="날짜" v-model="date" type="date" />
-                <v-text-field v-if="taskList[selectTask].place" v-model="place" label="장소" clearable/>
-                <v-text-field v-if="taskList[selectTask].cost" v-model="cost" label="금액" type="number" clearable/>
+                <v-text-field v-if="taskList[selectTask].place" v-model="place" label="장소" clearable />
+                <v-text-field v-if="taskList[selectTask].cost" v-model="cost" label="금액" type="number" clearable />
                 <v-card-actions>
                     <v-btn @click="addAction()" icon="mdi-check-bold"></v-btn>
                     <v-btn @click="isOpenPopup = false" icon="mdi-close-thick"></v-btn>
