@@ -32,6 +32,8 @@ const resvKey = ref("");
 const isConfirmPopup = ref(false);
 const confirmAction = ref("");
 
+const tempImagePosition = ref("");
+
 const prepayHeaders = [
     { title: '날짜', align: 'start', key: 'date', value: 'date', width: 200 },
     { title: '금액', align: 'end', sortable: false, key: 'amount', value: 'amount' },
@@ -161,6 +163,7 @@ async function shareTableAsImage() {
 
             //console.log("imageX:", imageX, "imageY:", imageY, "iconSize:", iconSize);
             //console.log("canvas width:", canvas.width /2, "canvas height:", canvas.height /2);
+            tempImagePosition.value = `imageX: ${imageX}, imageY: ${imageY}, iconSize: ${iconSize}, canvas width: ${canvas.width}, canvas height: ${canvas.height}`;
 
             // 투명도 및 이미지 그리기
             context.globalAlpha = 0.15;
@@ -532,6 +535,7 @@ onMounted(async () => {
                 </v-card-actions>
             </v-card>
         </v-dialog>
+        {{ tempImagePosition }}
 
         <v-dialog v-model="isResvPopup" max-width="600px">
             <v-card>
