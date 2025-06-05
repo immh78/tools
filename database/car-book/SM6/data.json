@@ -1,0 +1,86 @@
+[
+    {
+        "date": "20200328",
+        "mileage": 59495,
+        "category": "차량구매",
+        "cost": -1,
+        "remark": ""
+    },
+    {
+        "date": "20200426",
+        "mileage": 61000,
+        "category": "타이어(오른쪽 뒤에) 펑크 수리",
+        "cost": -1,
+        "remark": ""
+    },
+    {
+        "date": "20210116",
+        "mileage": 67914,
+        "category": "앞뒤 브레이크 패드",
+        "cost": 323000,
+        "remark": ""
+    },
+    {
+        "date": "20210529",
+        "mileage": 71929,
+        "category": "엔진오일",
+        "cost": -1,
+        "remark": ""
+    },
+    {
+        "date": "20220421",
+        "mileage": 82400,
+        "category": "엔진오일",
+        "cost": -1,
+        "remark": ""
+    },
+    {
+        "date": "20220701",
+        "mileage": 87184,
+        "category": "타이어, 접촉사고 수리",
+        "cost": -1,
+        "remark": ""
+    },
+    {
+        "date": "20230127",
+        "mileage": 90000,
+        "category": "앞타이어 브레이크 디스크, 패드, 캘러퍼 교체",
+        "cost": 210000,
+        "remark": ""
+    },
+    {
+        "date": "20230127",
+        "mileage": 90000,
+        "category": "안개등 교체",
+        "cost": 40000,
+        "remark": ""
+    },
+    {
+        "date": "20230208",
+        "mileage": 97789,
+        "category": "엔진오일",
+        "cost": 48000,
+        "remark": "2만원쿠폰"
+    },
+    {
+        "date": "20231023",
+        "mileage": 108092,
+        "category": "엔진오일",
+        "cost": 48750,
+        "remark": "쿠폰사용"
+    },
+    {
+        "date": "20240919",
+        "mileage": 119903,
+        "category": "엔진오일",
+        "cost": 60000,
+        "remark": ""
+    },
+    {
+        "date": "20250517",
+        "mileage": 131543,
+        "category": "엔진오일",
+        "cost": 60000,
+        "remark": "T스테이션 수동점점"
+    }
+]

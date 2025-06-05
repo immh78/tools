@@ -121,7 +121,7 @@ async function addAction() {
         data[key].place = place.value;
     }
 
-    if (taskList.value[selectTask.value].cost >= 0) {
+    if (taskList.value[selectTask.value].cost) {
         data[key].cost = Number(cost.value);
     }
 
@@ -193,8 +193,7 @@ onMounted(async () => {
                 <v-card-title>{{ selectTask }}</v-card-title>
                 <v-text-field label="날짜" v-model="date" type="date" />
                 <v-text-field v-if="taskList[selectTask].place" v-model="place" label="장소" clearable/>
-                <v-text-field v-if="taskList[selectTask].cost >= 0" v-model="cost" label="금액" type="number" clearable
-                    autofocus />
+                <v-text-field v-if="taskList[selectTask].cost" v-model="cost" label="금액" type="number" clearable/>
                 <v-card-actions>
                     <v-btn @click="addAction()" icon="mdi-check-bold"></v-btn>
                     <v-btn @click="isOpenPopup = false" icon="mdi-close-thick"></v-btn>
