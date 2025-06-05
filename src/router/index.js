@@ -23,7 +23,7 @@ const routes = [
 ]
 
 const router = createRouter({
-  history: createWebHashHistory('/vite-project/'), // hash 모드 사용
+  history: createWebHashHistory('/tools/'), // hash 모드 사용
   routes
 })
 

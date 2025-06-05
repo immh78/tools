@@ -37,13 +37,13 @@ router.isReady().then(() => {
 
             for (const tool of tools) {
                 if (newPath.includes(`/${tool}`)) {
-                    manifest.href = `/vite-project/manifests/manifest-${tool}.json?v=` + Date.now();
+                    manifest.href = `/tools/manifests/manifest-${tool}.json?v=` + Date.now();
                     break;
                 }
             }
 
             if (manifest.href === "") {
-                manifest.href = '/vite-project/manifests/manifest.json?v=' + Date.now();
+                manifest.href = '/tools/manifests/manifest.json?v=' + Date.now();
             }
 
         },
