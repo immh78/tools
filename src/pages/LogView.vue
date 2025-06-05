@@ -1,5 +1,5 @@
 <script setup>
-import { database, ref as firebaseRef, get, update } from "../config/firebase";
+import { database, ref as firebaseRef, get, update, set } from "../config/firebase";
 import { ref, computed, onMounted } from 'vue';
 import { useLogger } from '../composables/useLogger';
 import { AppBarTitle } from '../composables/getRouteInfo';
@@ -143,6 +143,38 @@ async function dataLoding() {
     processLogs(logTable.value, visitorTable.value);
 }
 
+function clearLog() {
+    //console.log(visitorTable.value) //.filter(v => !v.isHost)); // 호스트가 아닌 방문자만 남김
+    const filteredVisitors =  Object.fromEntries(
+        Object.entries(visitorTable.value).filter(([key, value]) => key === '5067475d1c7a690eb128aa0806366f71' || value.isHost === false )
+    );
+
+    const allowedVisitorIds = Object.keys(filteredVisitors);
+
+    const filteredLogs = {};
+
+    // 2. logs 중에서 allowedVisitorIds에 포함된 visitorId만 유지
+    for (const page in logTable.value) {
+        const pageLogs = logTable.value[page];
+        const filteredPageLogs = pageLogs.filter(log => allowedVisitorIds.includes(log.visitorId));
+
+        if (filteredPageLogs.length > 0) {
+            filteredLogs[page] = filteredPageLogs;
+        }
+    }
+
+    //console.log("Filtered logs:", filteredLogs);
+
+    
+    const dbRefLogs = firebaseRef(database, "logs");
+    set(dbRefLogs, filteredLogs); // 모든 로그 데이터를 삭제
+
+    const dbRefVisitors = firebaseRef(database, "visitors");
+    set(dbRefVisitors, filteredVisitors); // 호스트가 아닌 방문자만 남김
+
+    dataLoding();
+}   
+
 onMounted(async () => {
     dataLoding();
 });
@@ -156,13 +188,17 @@ onMounted(async () => {
             </template>
             <AppBarTitle />
             <v-switch v-model="isHostView" color="yellow" label="전체조회" class="v-switch-centered"></v-switch>
+            <template v-slot:append>
+                <v-btn icon="mdi-broom" @click="clearLog()"></v-btn>
+            </template>
         </v-app-bar>
         <v-main>
             <v-data-table :headers="headers" :items="filteredTableData" class="elevation-1" no-data-text="조회중입니다."
                 hide-default-footer items-per-page="-1" :show-items-per-page="false">
                 <template v-slot:item.visitor="{ item }">
-                    <span @click="item.visitor.endsWith('...') ? openUserInputPopup(item.visitorId) : ''">{{ item.visitor
-                        }}</span>
+                    <span @click="item.visitor.endsWith('...') ? openUserInputPopup(item.visitorId) : ''">{{
+                        item.visitor
+                    }}</span>
                 </template>
             </v-data-table>
         </v-main>
