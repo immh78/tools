@@ -59,7 +59,7 @@ function getTime({hour, minute}) {
 
 function refreshCalcTime() {
     if (start.value === "") {
-        todayWorkTime.value = 0;
+        todayWorkTime.value = { hour: 0, minute: 0 };
     } else {
        todayWorkTime.value = getHourMinute(calctodayWorkTime(start.value));
     }
