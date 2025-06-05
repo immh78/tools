@@ -5,6 +5,7 @@ import html2canvas from 'html2canvas';
 import { database, ref as firebaseRef, get, update, remove } from "../config/firebase";
 import { AppBarTitle } from '../composables/getRouteInfo';
 
+
 useLogger();
 
 
@@ -110,34 +111,28 @@ async function selectData() {
 
 async function shareTableAsImage() {
 
+
     let title = "";
-    let textX = 0;
-    let textY = 0;
+    let image = "";
 
     switch (tab.value) {
         case 'prepayment':
             title = '선결제 내역';
-            textX = -70;
-            textY = 340;
+            image = "piggy-bank";
             break;
-
         case 'summary':
             title = '사용 내역';
-            textX = -20;
-            textY = 300;
+            image = "calculator";
             break;
-
         case 'reservation':
             title = '구매 희망 제품';
-            textX = -110;
-            textY = 360;
+            image = "notes"
             break;
-
         default:
             break;
     }
 
-    const tableElement = document.getElementById(tab.value + "Table"); // v-data-table 요소 선택
+    const tableElement = document.getElementById(tab.value + "Table");
 
     if (!tableElement) {
         console.error('Table element not found');
@@ -145,39 +140,54 @@ async function shareTableAsImage() {
     }
 
     try {
-        // html2canvas로 테이블 캡처
         const canvas = await html2canvas(tableElement);
         const context = canvas.getContext('2d');
 
-        // 텍스트 추가
-        const fontSize = 60; // 텍스트 폰트 크기
-        //console.log(textX, textY);
-        // 반투명 텍스트 설정
-        context.globalAlpha = 0.05; // 투명도 설정 (0.0 ~ 1.0)
-        context.font = `bold ${fontSize}px Arial`;
-        context.fillStyle = "#000000"; // 검은색 텍스트
-        context.textAlign = "left";
-        // 텍스트를 대각선으로 회전 (45도)
-        context.rotate(-0.4);
-        context.fillText(title, textX, textY);
+        const iconImage = new Image();
+        iconImage.src = new URL(`../assets/${image}.png`, import.meta.url).href;
+        //iconImage.src = piggyBankImg;
+        
+        iconImage.onload = async () => {
+            // 높이 60%에 맞춰 정사각형으로 아이콘 크기 설정
+            const baseLength = Math.min(canvas.width, canvas.height) / 2;
+            const iconSize = baseLength * 0.6;
+            //const mobileWidth = window.innerWidth;
 
-        // 이미지 변환
-        const image = canvas.toDataURL('image/png');
+            //console.log("mobileWith", mobileWidth, canvas.width);
 
-        // 공유 API 사용
-        if (navigator.share) {
-            await navigator.share({
-                title: '선결제 내역',
-                text: '아래 이미지를 확인하세요.',
-                files: [new File([await (await fetch(image)).blob()], 'table.png', { type: 'image/png' })],
-            });
-        } else {
-            alert('공유 API를 지원하지 않는 브라우저입니다.');
-        }
+            // canvas 중앙 위치 계산
+            const imageX = (canvas.width / 2 - iconSize) / 2;
+            const imageY = 170; //canvas.height / 3.5;
+
+            //console.log("imageX:", imageX, "imageY:", imageY, "iconSize:", iconSize);
+            //console.log("canvas width:", canvas.width /2, "canvas height:", canvas.height /2);
+
+            // 투명도 및 이미지 그리기
+            context.globalAlpha = 0.15;
+            context.drawImage(iconImage, imageX, imageY, iconSize, iconSize);
+
+            const image = canvas.toDataURL('image/png');
+
+            if (navigator.share) {
+                await navigator.share({
+                    title: title,
+                    text: '아래 이미지를 확인하세요.',
+                    files: [new File([await (await fetch(image)).blob()], 'table.png', { type: 'image/png' })],
+                });
+            } else {
+                alert('공유 API를 지원하지 않는 브라우저입니다.');
+            }
+        };
+
+        iconImage.onerror = () => {
+            console.error('아이콘 이미지 로드 실패');
+        };
+
     } catch (error) {
         console.error('Error sharing table as image:', error);
     }
 }
+
 
 function openPrepayPopup(item) {
     //console.log("* item:", item);
