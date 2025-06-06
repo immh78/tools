@@ -2,7 +2,7 @@
 import { database, ref as firebaseRef, get, update } from "../config/firebase";
 import { ref, onMounted } from 'vue';
 import { useLogger } from '../composables/useLogger';
-import { AppBarTitle } from '../composables/getRouteInfo';
+import { AppBarTitle, usePageMeta } from '../composables/getRouteInfo';
 useLogger();
 
 const workTimeInfo = ref({});
@@ -21,6 +21,20 @@ const base = ref(0);
 const prog = ref(0);
 
 const isPopup = ref(false);
+
+// AppBarTitle 컴포넌트에서 사용하는 아이콘
+const { icon } = usePageMeta();
+const defaultIcon = ref(icon.value);
+const refreshIcon = ref('');
+
+function setLoadingIcon() {
+  refreshIcon.value = 'mdi-refresh';
+}
+
+function resetIcon() {
+  refreshIcon.value = defaultIcon.value; // 복원
+}
+
 
 async function getWorkTimeInfo() {
     isOver.value = false;
@@ -57,6 +71,7 @@ function getTime({hour, minute}) {
 }
 
 function refreshCalcTime() {
+    setLoadingIcon();
     if (start.value === "") {
         todayWorkTime.value = { hour: 0, minute: 0 };
     } else {
@@ -94,6 +109,7 @@ function refreshCalcTime() {
 
     const d = getNow();;
     lastRefreshTime.value = d.slice(0, 2) + ":" + d.slice(2);
+    resetIcon();
 }
 
 function calctodayWorkTime(pStart) {
@@ -183,9 +199,10 @@ onMounted(async () => {
             <template v-slot:append>
                 <v-btn icon="mdi-content-save" @click="saveWorkInfo()"></v-btn>
             </template>
-            <AppBarTitle />
+            <AppBarTitle :onIconClick="refreshCalcTime" :refreshIcon="refreshIcon" />
         </v-app-bar>
         <v-main>
+            <span class="mt-2" style="display: flex; font-size:11px; justify-content: end; align-items: center;"><v-icon size="12px">mdi-clock-outline</v-icon> {{ lastRefreshTime }}</span>
             <v-card class="mt-2 ml-2 mr-2" variant="flat">
                 <v-progress-linear v-model="prog" color="blue"
                     :bg-color="isOver ? isOverPay ? 'red-darken-1' : 'yellow-darken-3' : 'blue-lighten-5'"
@@ -225,10 +242,7 @@ onMounted(async () => {
             <div class="mt-4" style="display: flex; justify-content: center; align-items: center;">
                 <v-btn class="ma-2" @click="openStartPopup()"><v-icon>mdi-home-import-outline</v-icon> 출근</v-btn>
                 <v-btn class="ma-2" @click="savetodayWorkTime()"
-                    :disabled="workTimeInfo.start === ''"><v-icon>mdi-home-export-outline</v-icon> 퇴근</v-btn>
-                <v-btn prepend-icon="mdi-reload" class="ma-2" @click="refreshCalcTime()"
-                    :disabled="workTimeInfo.start === ''" variant="flat"><span style="font-size:11px;">({{
-                        lastRefreshTime }})</span></v-btn>
+                    :disabled="workTimeInfo.start === ''"><v-icon>mdi-home-export-outline</v-icon> 퇴근</v-btn>                    
             </div>
             <v-card class="ma-2" v-if="isOverPay" variant="flat" color="indigo-darken-3"
                 style="position: fixed; bottom: 20px; right: 20px; display: flex; align-items: center; justify-content: center; width: auto; padding: 10px;">
