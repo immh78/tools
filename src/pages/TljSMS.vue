@@ -32,7 +32,7 @@ const resvKey = ref("");
 const isConfirmPopup = ref(false);
 const confirmAction = ref("");
 
-const tempImagePosition = ref("");
+//const tempImagePosition = ref("");
 
 const prepayHeaders = [
     { title: '날짜', align: 'start', key: 'date', value: 'date', width: 200 },
@@ -159,11 +159,11 @@ async function shareTableAsImage() {
 
             // canvas 중앙 위치 계산
             const imageX = (mobileWidth - iconSize) / 2;
-            const imageY = (canvas.height * 0.266 - iconSize) / 2;
+            const imageY = 170;
 
             //console.log("imageX:", imageX, "imageY:", imageY, "iconSize:", iconSize);
             //console.log("canvas width:", canvas.width /2, "canvas height:", canvas.height /2);
-            tempImagePosition.value = `v6 // imageX: ${imageX}, imageY: ${imageY}, iconSize: ${iconSize}, canvas width: ${canvas.width}, canvas height: ${canvas.height}, window width: ${window.innerWidth}`;
+            //tempImagePosition.value = `v6 // imageX: ${imageX}, imageY: ${imageY}, iconSize: ${iconSize}, canvas width: ${canvas.width}, canvas height: ${canvas.height}, window width: ${window.innerWidth}`;
 
             // 투명도 및 이미지 그리기
             context.globalAlpha = 0.15;
@@ -535,8 +535,6 @@ onMounted(async () => {
                 </v-card-actions>
             </v-card>
         </v-dialog>
-        {{ tempImagePosition }}
-
         <v-dialog v-model="isResvPopup" max-width="600px">
             <v-card>
                 <v-card-title>예약</v-card-title>
