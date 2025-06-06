@@ -9,6 +9,7 @@ import WorkTime from '../pages/WorkTime.vue';
 import RegularTask from '../pages/RegularTask.vue';
 import CarBook from '../pages/CarBook.vue';
 import Test from '../pages/Test.vue';
+import Offering from '../pages/Offering.vue'; 
 
 const routes = [
   { path: '/', component: Main, comment: '도구 모음', icon: 'mdi-tools' },
@@ -19,6 +20,7 @@ const routes = [
   { path: '/work-time', component: WorkTime, comment: '근무 시간', icon: 'mdi-clipboard-text-clock' },
   { path: '/regular-task', component: RegularTask, comment: '정기적으로 할 일', icon: 'mdi-clipboard-check-outline' },
   { path: '/car-book', component: CarBook, comment: '차계부', icon: 'mdi-car-wrench' },
+  { path: '/offering', component: Offering, comment: '헌금', icon: 'mdi-offer' },
   { path: '/test', component: Test, comment: '테스트', icon: 'mdi-flask' },
 ]
 
