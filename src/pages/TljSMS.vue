@@ -96,6 +96,7 @@ async function selectData() {
 
     resvTab.value.push({
         "amount": summary.value.reservation,
+        "qty":  summary.value.prepayment - summary.value.reservation,
         "product": "합계"
     });
 
@@ -502,12 +503,10 @@ onMounted(async () => {
                             <tr :style="item.product === '합계' ? 'background-color: #fffad4 !important;' : ''"
                                 @click="item.product === '합계' ? '' : openResvPopup(item)">
                                 <td>{{ item.product }}</td>
-                                <td style="text-align: center;">{{ item.qty }}</td>
-                                <td :style="{
-                                    textAlign: 'right',
-                                    fontWeight: item.date === '합계' ? 'bold' : 'normal',
-                                    color: item.date === '합계' ? 'blue' : 'black'
-                                }">
+                                <td :style="{ textAlign: 'center',
+                                              fontSize: item.product === '합계' ? '18px' : '28px'
+                                }">{{ item.product === '합계' ? '(' + item.qty.toLocaleString() + ')' : item.qty.toLocaleString() }}</td>
+                                <td :style="{textAlign: 'right'}">
                                     {{ item.amount.toLocaleString() }}
                                 </td>
                             </tr>
