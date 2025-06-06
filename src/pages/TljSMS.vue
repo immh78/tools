@@ -158,7 +158,7 @@ async function shareTableAsImage() {
             //console.log("mobileWith", mobileWidth, canvas.width);
 
             // canvas 중앙 위치 계산
-            const imageX = (mobileWidth / 2 - iconSize) / 2;
+            const imageX = (mobileWidth - iconSize) / 2;
             const imageY = 170; //canvas.height / 3.5;
 
             //console.log("imageX:", imageX, "imageY:", imageY, "iconSize:", iconSize);
