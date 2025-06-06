@@ -374,7 +374,7 @@ async function resvUpdate() {
 }
 
 async function productUpdate() {
-    const data = { [productItem.value.product]: productItem.value.cost };
+    const data = { [productItem.value.product]: Number(productItem.value.cost) };
 
     try {
         const dbRef = firebaseRef(database, "tlj-resv/product");
