@@ -9,6 +9,7 @@ useLogger();
 
 const tljResv = ref({});
 const tab = ref("");
+const isSendButton = ref(true);
 const summary = ref({
     prepayment: 0,
     reservation: 0
@@ -27,6 +28,10 @@ const productTab = ref([]);
 const resvItem = ref({});
 const resvKey = ref("");
 
+const isProductPopup = ref(false);
+const isProductAdd = ref(false);
+const productItem = ref({});
+
 const isConfirmPopup = ref(false);
 const confirmAction = ref("");
 
@@ -36,11 +41,11 @@ const defaultIcon = ref(icon.value);
 const refreshIcon = ref('');
 
 function setLoadingIcon() {
-  refreshIcon.value = 'mdi-refresh';
+    refreshIcon.value = 'mdi-refresh';
 }
 
 function resetIcon() {
-  refreshIcon.value = defaultIcon.value; // 복원
+    refreshIcon.value = defaultIcon.value; // 복원
 }
 
 
@@ -53,6 +58,11 @@ const resvHeaders = [
     { title: '제품', align: 'start', key: 'product', value: 'product' },
     { title: '수량', align: 'center', sortable: false, key: 'qty', value: 'qty' },
     { title: '금액', align: 'end', sortable: false, key: 'amount', value: 'amount' },
+];
+
+const productHeaders = [
+    { title: '제품', align: 'start', key: 'product', value: 'product' },
+    { title: '금액', align: 'end', sortable: false, key: 'cost', value: 'cost' },
 ];
 
 async function selectData() {
@@ -107,13 +117,20 @@ async function selectData() {
 
     resvTab.value.push({
         "amount": summary.value.reservation,
-        "qty":  summary.value.prepayment - summary.value.reservation,
+        "qty": summary.value.prepayment - summary.value.reservation,
         "product": "합계"
     });
 
     // 상품명 리스트
-    productTab.value = Object.keys(tljResv.value.product);
+    const productKeys = Object.keys(tljResv.value.product || {});
 
+    if (productKeys.length === 0) {
+        productTab.value = [];
+    } else {
+        productTab.value = productKeys.map(key => {
+            return { "product": key, "cost": tljResv.value.product[key] };
+        });
+    }
 
     //console.log("* Prepayment:", prepayTab.value);
     //console.log("* Reservation:", resvTab.value);
@@ -162,7 +179,7 @@ async function shareTableAsImage() {
         const iconImage = new Image();
         iconImage.src = new URL(`../assets/${image}.png`, import.meta.url).href;
         //iconImage.src = piggyBankImg;
-        
+
         iconImage.onload = async () => {
             // 높이 60%에 맞춰 정사각형으로 아이콘 크기 설정
             const baseLength = Math.min(canvas.width, canvas.height) * 0.266;
@@ -322,6 +339,19 @@ function openResvPopup(item) {
     isResvPopup.value = true;
 }
 
+function openProductPopup(item) {
+    if (item == null) {
+        productItem.value = { "product": "", "cost": 0 };
+        isProductAdd.value = true;
+    } else {
+        productItem.value = { "product": item.product, "cost": item.cost };
+        isProductAdd.value = false;
+    }
+
+    isProductPopup.value = true;
+
+}
+
 async function resvUpdate() {
     const data = {
         [resvKey.value]: {
@@ -342,6 +372,22 @@ async function resvUpdate() {
 
     selectData();
 }
+
+async function productUpdate() {
+    const data = { [productItem.value.product]: productItem.value.cost };
+
+    try {
+        const dbRef = firebaseRef(database, "tlj-resv/product");
+        await update(dbRef, data); // 데이터를 저장
+    } catch (err) {
+        console.error("Error saving data:", err);
+    }
+
+    isProductPopup.value = false;
+
+    selectData();
+}
+
 
 async function resvDelete(target) {
     let key = "";
@@ -364,6 +410,26 @@ async function resvDelete(target) {
     selectData();
 }
 
+async function productDelete(target) {
+    let key = "";
+
+    if (target != null) {
+        key = "/" + target;
+    }
+
+    //console.log("delete key", "tlj-resv/prepayment"+ key);
+
+    try {
+        const dbRef = firebaseRef(database, "tlj-resv/product" + key);
+        await remove(dbRef); // 데이터를 저장
+    } catch (err) {
+        console.error("Error saving data:", err);
+    }
+
+    isProductPopup.value = false;
+
+    selectData();
+}
 
 
 function getToday() {
@@ -413,7 +479,7 @@ function action() {
         case 'DEL_PREPAY':
             prepayDelete();
             break;
-        case 'DEL_RESV' :
+        case 'DEL_RESV':
             resvDelete();
             break;
         case 'REMAIN_APPLY':
@@ -443,6 +509,15 @@ watch(() => resvItem.value.product, (newProduct) => {
     }
 });
 
+watch(() => tab.value, (newTab) => {
+    if (newTab === 'production') {
+        isSendButton.value = false;
+    } else {
+        isSendButton.value = true;
+    }
+
+});
+
 onMounted(async () => {
     selectData();
 });
@@ -456,14 +531,16 @@ onMounted(async () => {
                     <v-img gradient="to top right, rgba(19,84,122,.8), rgba(128,208,199,.8)"></v-img>
                 </template>
                 <template v-slot:append>
-                    <v-btn icon="mdi-send" @click="shareTableAsImage()"></v-btn>
+                    <v-btn icon="mdi-send" @click="shareTableAsImage()" :disabled="!isSendButton"></v-btn>
                 </template>
                 <AppBarTitle :onIconClick="selectData" :refreshIcon="refreshIcon" />
             </v-app-bar>
             <v-tabs v-model="tab" bg-color="#202020">
                 <v-tab value="prepayment">선결제 내역</v-tab>
                 <v-tab value="summary">사용내역</v-tab>
-                <v-tab value="reservation">사용상세내역</v-tab>
+                <v-tab value="reservation">예약</v-tab>
+                <v-tab value="production">제품</v-tab>
+
             </v-tabs>
             <v-tabs-window v-model="tab">
                 <v-tabs-window-item value="prepayment">
@@ -516,10 +593,12 @@ onMounted(async () => {
                             <tr :style="item.product === '합계' ? 'background-color: #fffad4 !important;' : ''"
                                 @click="item.product === '합계' ? '' : openResvPopup(item)">
                                 <td>{{ item.product }}</td>
-                                <td :style="{ textAlign: 'center',
-                                              fontSize: item.product === '합계' ? '18px' : '28px'
-                                }">{{ item.product === '합계' ? '(' + item.qty.toLocaleString() + ')' : item.qty.toLocaleString() }}</td>
-                                <td :style="{textAlign: 'right'}">
+                                <td :style="{
+                                    textAlign: 'center',
+                                    fontSize: item.product === '합계' ? '18px' : '28px'
+                                }">{{ item.product === '합계' ? '(' + item.qty.toLocaleString() + ')' :
+                                    item.qty.toLocaleString() }}</td>
+                                <td :style="{ textAlign: 'right' }">
                                     {{ item.amount.toLocaleString() }}
                                 </td>
                             </tr>
@@ -528,6 +607,20 @@ onMounted(async () => {
                     <v-container style="text-align: center;">
                         <v-btn class="ma-1" @click="openResvPopup()">추가</v-btn>
                         <v-btn class="ma-1" @click="openConfirmPopup('DEL_RESV')">전체삭제</v-btn>
+                    </v-container>
+                </v-tabs-window-item>
+                <v-tabs-window-item value="production">
+                    <v-data-table id="productTable" :headers="productHeaders" :items="productTab" hide-default-footer
+                        items-per-page="-1" :show-items-per-page="false">
+                        <template v-slot:item="{ item, index }">
+                            <tr @click="openProductPopup(item)">
+                                <td>{{ item.product }}</td>
+                                <td :style="{ textAlign: 'right' }">{{ item.cost.toLocaleString() }}</td>
+                            </tr>
+                        </template>
+                    </v-data-table>
+                    <v-container style="text-align: center;">
+                        <v-btn class="ma-1" @click="openProductPopup()">추가</v-btn>
                     </v-container>
                 </v-tabs-window-item>
             </v-tabs-window>
@@ -551,7 +644,8 @@ onMounted(async () => {
             <v-card>
                 <v-card-title>예약</v-card-title>
                 <v-card-text>
-                    <v-combobox v-model="resvItem.product" label="제품" :items="productTab"></v-combobox>
+                    <v-combobox v-model="resvItem.product" label="제품"
+                        :items="productTab.map(item => item.product)"></v-combobox>
                     <v-number-input v-model="resvItem.qty" controlVariant="default" label="수량" :min="1"
                         inset></v-number-input>
                     <v-text-field label="금액" v-model="resvItem.amount" type="number" autofocus clearable />
@@ -563,10 +657,28 @@ onMounted(async () => {
                 </v-card-actions>
             </v-card>
         </v-dialog>
+        <v-dialog v-model="isProductPopup" max-width="600px">
+            <v-card>
+                <v-card-title>제품</v-card-title>
+                <v-card-text>
+                    <v-text-field v-model="productItem.product" label="제품" :readonly="!isProductAdd"
+                        :autofocus="isProductAdd"></v-text-field>
+                    <v-text-field label="금액" v-model="productItem.cost" type="number" :autofocus="!isProductAdd"
+                        clearable />
+                </v-card-text>
+                <v-card-actions>
+                    <v-btn @click="productUpdate()" icon="mdi-check-bold"></v-btn>
+                    <v-btn @click="productDelete(productItem.product)" :disabled="isProductAdd"
+                        icon="mdi-delete"></v-btn>
+                    <v-btn @click="isProductPopup = false" icon="mdi-close-thick"></v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
         <v-dialog v-model="isConfirmPopup" max-width="600px">
             <v-card>
-                <v-card-title>{{ confirmAction === 'DEL_PREPAY' ? '선행결제내역 삭제' : confirmAction === 'DEL_RESV' ? '예약상품내역 삭제' : '잔액 선결제 반영' }}</v-card-title>
-                <v-card-actions> 
+                <v-card-title>{{ confirmAction === 'DEL_PREPAY' ? '선행결제내역 삭제' : confirmAction === 'DEL_RESV' ?
+                    '예약상품내역 삭제' : '잔액 선결제 반영' }}</v-card-title>
+                <v-card-actions>
                     <v-btn @click="action()" icon="mdi-check-bold"></v-btn>
                     <v-btn @click="isConfirmPopup = false" icon="mdi-close-thick"></v-btn>
                 </v-card-actions>
