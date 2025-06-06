@@ -2,7 +2,7 @@
 import { database, ref as firebaseRef, get, update, set } from "../config/firebase";
 import { ref, computed, onMounted } from 'vue';
 import { useLogger } from '../composables/useLogger';
-import { AppBarTitle } from '../composables/getRouteInfo';
+import { AppBarTitle, usePageMeta } from '../composables/getRouteInfo';
 
 useLogger();
 
@@ -21,6 +21,20 @@ const isHostView = ref(false);
 const isUserInputPopup = ref(false);
 const visitorId = ref("");
 const visitorName = ref("");
+
+// AppBarTitle 컴포넌트에서 사용하는 아이콘
+const { icon } = usePageMeta();
+const defaultIcon = ref(icon.value);
+const refreshIcon = ref('');
+
+function setLoadingIcon() {
+  refreshIcon.value = 'mdi-refresh';
+}
+
+function resetIcon() {
+  refreshIcon.value = defaultIcon.value; // 복원
+}
+
 
 async function getLogs() {
     const dbRef = firebaseRef(database, "logs");
@@ -137,10 +151,12 @@ async function inputVisitorInfo() {
 }
 
 async function dataLoding() {
+    setLoadingIcon();
     await getLogs();
     await getVisitors()
 
     processLogs(logTable.value, visitorTable.value);
+    resetIcon();
 }
 
 function clearLog() {
@@ -186,7 +202,7 @@ onMounted(async () => {
             <template v-slot:image>
                 <v-img gradient="to top right, rgba(19,84,122,.8), rgba(128,208,199,.8)"></v-img>
             </template>
-            <AppBarTitle />
+            <AppBarTitle :onIconClick="dataLoding" :refreshIcon="refreshIcon" />
             <v-switch v-model="isHostView" color="yellow" label="전체조회" class="v-switch-centered"></v-switch>
             <template v-slot:append>
                 <v-btn icon="mdi-broom" @click="clearLog()"></v-btn>

@@ -1,13 +1,27 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useLogger } from '../composables/useLogger';
-import { AppBarTitle } from '../composables/getRouteInfo';
+import { AppBarTitle, usePageMeta} from '../composables/getRouteInfo';
 
 useLogger();
 
 const API_KEY = 'AIzaSyAjcEIdV46fa6Kw3Hdyzf3No_3cXtScRLc'; // 본인의 Google API Key 입력
 const SHEET_ID = '1-NlBFmwdIZop6pDvasfBtT7sn1jdwIfuCTq4bcHvN0s'; // 본인의 Sheet ID 입력
 const RANGE = '시트1'; // 원하는 범위 지정
+
+// AppBarTitle 컴포넌트에서 사용하는 아이콘
+const { icon } = usePageMeta();
+const defaultIcon = ref(icon.value);
+const refreshIcon = ref('');
+
+function setLoadingIcon() {
+  refreshIcon.value = 'mdi-refresh';
+}
+
+function resetIcon() {
+  refreshIcon.value = defaultIcon.value; // 복원
+}
+
 
 const headers = ref([
     { title: '날짜', align: 'start', key: 'date', value: 'date', width: 110 },
@@ -35,7 +49,8 @@ function openSumPopup() {
     totalUnadjustedAmount.value = new Intl.NumberFormat('ko-KR').format(total) + '원';
 }
 
-onMounted(async () => {
+async function selectData() {
+    setLoadingIcon();
     const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${RANGE}?key=${API_KEY}`;
 
     try {
@@ -64,6 +79,11 @@ onMounted(async () => {
     } catch (error) {
         console.error('Error fetching data:', error);
     }
+
+    resetIcon();
+}
+onMounted(async () => {
+    await selectData();
 });
 </script>
 
@@ -77,7 +97,7 @@ onMounted(async () => {
                 <template v-slot:append>
                     <v-btn icon="mdi-calculator" @click="openSumPopup()"></v-btn>
                 </template>
-                <AppBarTitle />
+                <AppBarTitle :onIconClick="selectData" :refreshIcon="refreshIcon" />
             </v-app-bar>
 
             <v-data-table :headers="headers" :items="rows" class="elevation-1" no-data-text="조회중입니다."

@@ -3,11 +3,9 @@ import { ref, onMounted, watch } from 'vue'
 import { useLogger } from '../composables/useLogger';
 import html2canvas from 'html2canvas';
 import { database, ref as firebaseRef, get, update, remove } from "../config/firebase";
-import { AppBarTitle } from '../composables/getRouteInfo';
-
+import { AppBarTitle, usePageMeta } from '../composables/getRouteInfo';
 
 useLogger();
-
 
 const tljResv = ref({});
 const tab = ref("");
@@ -32,7 +30,19 @@ const resvKey = ref("");
 const isConfirmPopup = ref(false);
 const confirmAction = ref("");
 
-//const tempImagePosition = ref("");
+// AppBarTitle 컴포넌트에서 사용하는 아이콘
+const { icon } = usePageMeta();
+const defaultIcon = ref(icon.value);
+const refreshIcon = ref('');
+
+function setLoadingIcon() {
+  refreshIcon.value = 'mdi-refresh';
+}
+
+function resetIcon() {
+  refreshIcon.value = defaultIcon.value; // 복원
+}
+
 
 const prepayHeaders = [
     { title: '날짜', align: 'start', key: 'date', value: 'date', width: 200 },
@@ -46,6 +56,7 @@ const resvHeaders = [
 ];
 
 async function selectData() {
+    setLoadingIcon();
     const dbRef = firebaseRef(database, "tlj-resv");
     await get(dbRef)
         .then(snapshot => {
@@ -109,6 +120,8 @@ async function selectData() {
     //console.log("* Summary:", summary.value);
     //console.log("* product:", productTab.value);
     //console.log("* tljResv:", tljResv.value);
+
+    resetIcon();
 
 }
 
@@ -445,7 +458,7 @@ onMounted(async () => {
                 <template v-slot:append>
                     <v-btn icon="mdi-send" @click="shareTableAsImage()"></v-btn>
                 </template>
-                <AppBarTitle />
+                <AppBarTitle :onIconClick="selectData" :refreshIcon="refreshIcon" />
             </v-app-bar>
             <v-tabs v-model="tab" bg-color="#202020">
                 <v-tab value="prepayment">선결제 내역</v-tab>

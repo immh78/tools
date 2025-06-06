@@ -22,7 +22,6 @@ const prog = ref(0);
 
 const isPopup = ref(false);
 
-
 async function getWorkTimeInfo() {
     isOver.value = false;
     isOverPay.value = false;

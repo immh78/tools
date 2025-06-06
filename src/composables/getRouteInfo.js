@@ -24,8 +24,17 @@ export function usePageMeta() {
  */
 export const AppBarTitle = defineComponent({
   name: 'AppBarTitle',
-  setup() {
+  props: {
+    onIconClick: Function,
+    refreshIcon: {
+      type: String,
+      default: '',
+    },
+  },
+  setup(props) {
     const { comment, icon } = usePageMeta();
+
+    const computedIcon = computed(() => props.refreshIcon || icon.value);
 
     return () =>
       h(
@@ -33,10 +42,17 @@ export const AppBarTitle = defineComponent({
         {},
         {
           default: () => [
-            h(VIcon, {}, () => icon.value),
-            ' ',
-            comment.value
-          ]
+            h(
+              VIcon,
+              {
+                onClick: props.onIconClick,
+                class: 'me-2',
+                style: { cursor: 'pointer' },
+              },
+              () => computedIcon.value
+            ),
+            comment.value,
+          ],
         }
       );
   }

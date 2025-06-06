@@ -2,7 +2,7 @@
 import { ref, onMounted, computed } from 'vue'
 import { useLogger } from '../composables/useLogger';
 import { database, ref as firebaseRef, get, update } from "../config/firebase";
-import { AppBarTitle } from '../composables/getRouteInfo';
+import { AppBarTitle, usePageMeta } from '../composables/getRouteInfo';
 
 useLogger();
 
@@ -15,7 +15,22 @@ const date = ref("");
 const place = ref("");
 const cost = ref(0);
 
+// AppBarTitle 컴포넌트에서 사용하는 아이콘
+const { icon } = usePageMeta();
+const defaultIcon = ref(icon.value);
+const refreshIcon = ref('');
+
+function setLoadingIcon() {
+    refreshIcon.value = 'mdi-refresh';
+}
+
+function resetIcon() {
+    refreshIcon.value = defaultIcon.value; // 복원
+}
+
+
 async function selectData() {
+    setLoadingIcon();
     const dbRef = firebaseRef(database, "regular-task");
     await get(dbRef)
         .then(snapshot => {
@@ -59,6 +74,7 @@ async function selectData() {
         }
     }
 
+    resetIcon();
 }
 
 function daysBetweenToday(dateString) {
@@ -167,7 +183,7 @@ onMounted(async () => {
                 <template v-slot:image>
                     <v-img gradient="to top right, rgba(19,84,122,.8), rgba(128,208,199,.8)"></v-img>
                 </template>
-                <AppBarTitle />
+                <AppBarTitle :onIconClick="selectData" :refreshIcon="refreshIcon" />
             </v-app-bar>
             <div class="mt-4"></div>
             <v-container>

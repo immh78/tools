@@ -2,7 +2,7 @@
 import { ref, onMounted, watch } from 'vue'
 import { database, ref as firebaseRef, get, update, remove } from "../config/firebase";
 import { useLogger } from '../composables/useLogger';
-import { AppBarTitle } from '../composables/getRouteInfo';
+import { AppBarTitle, usePageMeta} from '../composables/getRouteInfo';
 
 useLogger();
 
@@ -24,6 +24,19 @@ const isPopupKind = ref("");
 const comboList = ['기름', '엔진오일', '주행거리'];
 const addData = ref({});
 
+// AppBarTitle 컴포넌트에서 사용하는 아이콘
+const { icon } = usePageMeta();
+const defaultIcon = ref(icon.value);
+const refreshIcon = ref('');
+
+function setLoadingIcon() {
+  refreshIcon.value = 'mdi-refresh';
+}
+
+function resetIcon() {
+  refreshIcon.value = defaultIcon.value; // 복원
+}
+
 const headers = [
     { title: '날짜', align: 'start', key: 'date', value: 'date', width: 140 },
     { title: '항목', align: 'start', key: 'category', value: 'category', nowrap:true },
@@ -32,6 +45,7 @@ const headers = [
 const currentPage = ref(1); 
 
 async function selectData() {
+    setLoadingIcon();
     const dbRef = firebaseRef(database, "car-book");
     await get(dbRef)
         .then(snapshot => {
@@ -62,6 +76,7 @@ async function selectData() {
 
     //console.log("lastChangeOilSORENTO", lastChangeOilSORENTO.value);
     //console.log("lastChangeOilSM6", lastChangeOilSM6.value);
+    resetIcon();
 }
 
 function parseDate(dateStr) {
@@ -102,7 +117,7 @@ function calcEstimatedMileage(data) {
 
     const today = new Date().setHours(0, 0, 0, 0);
 
-    console.log("today", today, "date2", date2, "diff", (today - date2)/ (1000 * 60 * 60 * 24));
+    //console.log("today", today, "date2", date2, "diff", (today - date2)/ (1000 * 60 * 60 * 24));
     const daysSinceLast = (today - date2) / (1000 * 60 * 60 * 24)
 
     return mileage2 + Math.round(avgPerDay * daysSinceLast)
@@ -260,7 +275,7 @@ onMounted(async () => {
                 <template v-slot:append>
                     <v-btn icon="mdi-clipboard-edit-outline" @click="openAddPopup()"></v-btn>
                 </template>
-                <AppBarTitle />
+                <AppBarTitle :onIconClick="selectData" :refreshIcon="refreshIcon" />
             </v-app-bar>
             <v-tabs v-model="tab" bg-color="#202020">
                 <v-tab value="SORENTO">SORENTO</v-tab>
