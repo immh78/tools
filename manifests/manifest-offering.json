@@ -1,0 +1,21 @@
+{
+    "name": "헌금",
+    "short_name": "헌금",
+    "start_url": "/tools/#/offering",
+    "display": "standalone",
+    "theme_color": "#000000",
+    "background_color": "#ffffff",
+    "icons": [
+      {
+        "src": "/tools/passion.png",
+        "sizes": "192x192",
+        "type": "image/png"
+      },
+      {
+        "src": "/tools/passion.png",
+        "sizes": "512x512",
+        "type": "image/png"
+      }
+    ]
+  }
+  
