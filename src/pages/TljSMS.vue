@@ -306,12 +306,14 @@ async function prepayDelete(target) {
     selectData();
 }
 
-function openResvPopup(item) {
+function openResvPopup(item, productParams) {
     //console.log("* item:", item);
     let key = 0;
     let product = "";
     let amount = 0;
     let qty = 1;
+
+     //console.log("* productParams:", productParams, item);
 
     if (item == null) {
         isResvAdd.value = true;
@@ -323,7 +325,12 @@ function openResvPopup(item) {
             }
         } else {
             key = 0;
-        }
+        }       
+
+        if (productParams != null) {
+            product = productParams.product;
+            amount = productParams.cost;
+        } 
     } else {
         isResvAdd.value = false;
         key = item.key;
@@ -613,9 +620,9 @@ onMounted(async () => {
                     <v-data-table id="productTable" :headers="productHeaders" :items="productTab" hide-default-footer
                         items-per-page="-1" :show-items-per-page="false">
                         <template v-slot:item="{ item, index }">
-                            <tr @click="openProductPopup(item)">
-                                <td>{{ item.product }}</td>
-                                <td :style="{ textAlign: 'right' }">{{ item.cost.toLocaleString() }}</td>
+                            <tr>
+                                <td @click="openResvPopup( null, item)">{{ item.product }}</td>
+                                <td :style="{ textAlign: 'right' }" @click="openProductPopup(item)">{{ item.cost.toLocaleString() }}</td>
                             </tr>
                         </template>
                     </v-data-table>
