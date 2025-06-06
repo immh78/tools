@@ -163,7 +163,7 @@ async function shareTableAsImage() {
 
             //console.log("imageX:", imageX, "imageY:", imageY, "iconSize:", iconSize);
             //console.log("canvas width:", canvas.width /2, "canvas height:", canvas.height /2);
-            tempImagePosition.value = `imageX: ${imageX}, imageY: ${imageY}, iconSize: ${iconSize}, canvas width: ${canvas.width}, canvas height: ${canvas.height}`;
+            tempImagePosition.value = `imageX: ${imageX}, imageY: ${imageY}, iconSize: ${iconSize}, canvas width: ${canvas.width}, canvas height: ${canvas.height}, window width: ${window.innerWidth}`;
 
             // 투명도 및 이미지 그리기
             context.globalAlpha = 0.15;
