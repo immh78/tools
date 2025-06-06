@@ -151,7 +151,7 @@ async function shareTableAsImage() {
         
         iconImage.onload = async () => {
             // 높이 60%에 맞춰 정사각형으로 아이콘 크기 설정
-            const baseLength = Math.min(canvas.width, canvas.height) / 2;
+            const baseLength = Math.min(canvas.width, canvas.height) * 0.266;
             const iconSize = baseLength * 0.6;
             //const mobileWidth = window.innerWidth;
 
