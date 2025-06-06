@@ -166,7 +166,7 @@ async function shareTableAsImage() {
             //tempImagePosition.value = `v6 // imageX: ${imageX}, imageY: ${imageY}, iconSize: ${iconSize}, canvas width: ${canvas.width}, canvas height: ${canvas.height}, window width: ${window.innerWidth}`;
 
             // 투명도 및 이미지 그리기
-            context.globalAlpha = 0.15;
+            context.globalAlpha = 0.08;
             context.drawImage(iconImage, imageX, imageY, iconSize, iconSize);
 
             const image = canvas.toDataURL('image/png');
