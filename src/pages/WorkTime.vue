@@ -202,7 +202,7 @@ onMounted(async () => {
             <AppBarTitle :onIconClick="refreshCalcTime" :refreshIcon="refreshIcon" />
         </v-app-bar>
         <v-main>
-            <span class="mt-2" style="display: flex; font-size:11px; justify-content: end; align-items: center;"><v-icon size="12px">mdi-clock-outline</v-icon> {{ lastRefreshTime }}</span>
+            <span class="mt-2 mr-2" style="display: flex; font-size:11px; justify-content: end; align-items: center;"><v-icon size="12px">mdi-clock-outline</v-icon> {{ lastRefreshTime }}</span>
             <v-card class="mt-2 ml-2 mr-2" variant="flat">
                 <v-progress-linear v-model="prog" color="blue"
                     :bg-color="isOver ? isOverPay ? 'red-darken-1' : 'yellow-darken-3' : 'blue-lighten-5'"
