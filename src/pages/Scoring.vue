@@ -133,7 +133,7 @@ onMounted(async () => {
                 <span>주관식</span>
                 <v-row class="mt-2" no-gutters>
                     <v-col v-for="(score, key) in answerList" cols="4">
-                        <v-number-input v-model="answerList[key]" :label="(key + 1) + '번'" :min="0" :max="10"
+                        <v-number-input class="custom-font-size"  v-model="answerList[key]" :label="(key + 1) + '번'" :min="0" :max="10"
                             variant="outlined" />
                     </v-col>
                 </v-row>
@@ -176,4 +176,9 @@ onMounted(async () => {
 
 </template>
 
-<style scoped></style>
+<style scoped>
+::v-deep(.custom-font-size input) {
+  font-size: 12px;
+}
+
+</style>
