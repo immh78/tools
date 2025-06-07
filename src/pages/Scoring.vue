@@ -82,7 +82,7 @@ function setInit() {
 
     for (let i = 0; i < scoring.value.answerQuestion; i++) {
         answerList.value[i] = 0; // 초기화
-    }     
+    }
 }
 
 watch([choiceList, answerList], ([newChoice, newAnswer]) => {
@@ -113,35 +113,36 @@ onMounted(async () => {
                     <v-btn icon="mdi-cog" @click="isDistPopup = true"></v-btn>
                 </template>
             </v-app-bar>
-            <v-sheet class="ma-2 pa-2" color="#f4f4f4" rounded="lg">
+            <v-sheet class="ma-2 pa-2" color="#e0e0e0" rounded="lg">
                 <span>객관식</span>
-                <v-row class="mt-2" no-gutters>
-                    <v-col v-for="(score, key) in scoring.choiceQuestion" cols="3">
-                        <span class="ma-0 pa-0 text-caption">{{ key + 1 }}</span><br />
-                        <v-btn-toggle v-model="choiceList[key]" :mandatory=true divided variant="outlined">
-                            <v-btn style="width: 30px; height: 30px; min-width: 30px;" color="primary"
-                                :value="score"><v-icon color="blue">mdi-circle-outline</v-icon></v-btn>
-                            <v-btn style="width: 30px; height: 30px; min-width: 30px;" color="error" :value=0><v-icon
-                                    color="red">mdi-close</v-icon></v-btn>
+                <v-row class="mt-2" >
+                    <v-col v-for="(score, key) in scoring.choiceQuestion" cols="2">
+                        <span class="ma-0 pa-0 text-h7">{{ key + 1 }}</span><br />
+                        <v-btn-toggle v-model="choiceList[key]" :mandatory=true divided >
+                            <v-btn style="width: 50px; height: 50px; min-width: 50px;" color="primary"
+                                :value="score" icon="mdi-circle-outline"></v-btn>
+                            <v-btn style="width: 50px; height: 50px; min-width: 50px;" color="error" :value=0 icon="mdi-close"></v-btn>
                         </v-btn-toggle>
 
                     </v-col>
                 </v-row>
 
             </v-sheet>
-            <v-sheet class="ma-2 pa-2" color="#f4f4f4" rounded="lg">
+            <v-sheet v-if="scoring.answerQuestion > 0" class="ma-2 pa-2" color="#e0e0e0" rounded="lg">
                 <span>주관식</span>
                 <v-row class="mt-2" no-gutters>
-                    <v-col v-for="(score, key) in answerList" cols="4">
-                        <v-number-input class="custom-font-size"  v-model="answerList[key]" :label="(key + 1) + '번'" :min="0" :max="10"
-                            variant="outlined" />
+                    <v-col v-for="(score, key) in answerList" cols="2" class="pa-3">
+                        <v-number-input bg-color="white" class="custom-font-size" v-model="answerList[key]" :label="(key + 1) + '번'"
+                            :min="0" :max="10" variant="outlined" />
                     </v-col>
                 </v-row>
             </v-sheet>
 
-            <v-bottom-navigation color="primary" active><h1>{{ totalScore }}</h1></v-bottom-navigation>
+            <v-bottom-navigation color="primary" active>
+                <h1>{{ totalScore }}</h1>
+            </v-bottom-navigation>
         </v-main>
-        <v-dialog v-model="isDistPopup" max-width="380px">
+        <v-dialog v-model="isDistPopup" max-width="1000px">
             <v-sheet>
                 <div class="d-flex justify-space-between align-center">
                     <!-- 좌측 텍스트 -->
@@ -156,14 +157,14 @@ onMounted(async () => {
                     </div>
                 </div>
                 <v-row class="mt-2 mx-2">
-                    <v-col v-for="(_, key) in scoring.choiceQuestion" cols="3" xs="3" sm="3" md="3" lg="3">
-                        <v-text-field v-model="scoring.choiceQuestion[key]" :label="String(key + 1)" type="number"
-                            variant="outlined">
+                    <v-col v-for="(_, key) in scoring.choiceQuestion" cols="2" xs="3" sm="3" md="2" lg="1">
+                        <v-text-field class="centered-input" v-model="scoring.choiceQuestion[key]"
+                            :label="String(key + 1) + '번'"  variant="outlined">
                         </v-text-field>
                     </v-col>
                 </v-row>
                 <v-divider></v-divider>
-                <v-number-input class="mx-5 mt-4" v-model="scoring.answerQuestion" label="주관식 문항수" variant="outlined"
+                <v-number-input class="custom-font-size mx-5 mt-4" v-model="scoring.answerQuestion" label="주관식 문항수" variant="outlined"
                     :min="0" :max="10" />
 
                 <v-card-actions class="d-flex justify-end">
@@ -178,7 +179,12 @@ onMounted(async () => {
 
 <style scoped>
 ::v-deep(.custom-font-size input) {
-  font-size: 12px;
+    font-size: 20px;
+}
+
+::v-deep(.centered-input input) {
+  text-align: center;
+  font-size:20px;
 }
 
 </style>
