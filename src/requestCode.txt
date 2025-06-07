@@ -1,39 +1,11 @@
-list = [
-    {
-        "amount": 700000,
-        "category": "십일조",
-        "date": "20250202",
-        "remark": "1월",
-        "key": "0"
-    },
-    {
-        "amount": 600000,
-        "category": "십일조",
-        "date": "20250323",
-        "remark": "2월",
-        "key": "1"
-    },
-    {
-        "amount": 700000,
-        "category": "십일조",
-        "date": "20250525",
-        "remark": "4월",
-        "key": "2"
-    },
-    {
-        "amount": 700000,
-        "category": "십일조",
-        "date": "20250525",
-        "remark": "5월",
-        "key": "3"
-    },
-    {
-        "amount": 100000,
-        "category": "십일조",
-        "date": "20250602",
-        "remark": "6월",
-        "key": "5"
-    }
-]
+list = {
+    "anserQuestion": 5,
+    "choiceQuestion": [
+        10,
+        20,
+        20,
+        5
+    ]
+}
 
-list에서 key의 max값 추출
+list.choiceQuestion를 {0:10, 1:20, 2:20, 3:5}로 변환
