@@ -30,6 +30,7 @@ router.isReady().then(() => {
                 'log-view',
                 'work-time',
                 'regular-task',
+                'offering',
                 'test'
             ];
 
