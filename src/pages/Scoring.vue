@@ -4,7 +4,7 @@ import { useLogger } from '../composables/useLogger';
 import { database, ref as firebaseRef, get, update, set } from "../config/firebase";
 import { AppBarTitle, usePageMeta } from '../composables/getRouteInfo';
 
-//useLogger();
+useLogger();
 
 const scoring = ref({});
 const totalScore = ref(0);
@@ -44,7 +44,7 @@ async function selectData() {
 
     setInit();
 
-    console.log("* choiceQuestionTotalScore", totalScore.value);
+    //console.log("* choiceQuestionTotalScore", totalScore.value);
     resetIcon();
 }
 
@@ -90,7 +90,7 @@ watch([choiceList, answerList], ([newChoice, newAnswer]) => {
         newChoice.reduce((sum, score) => sum + score, 0) +
         newAnswer.reduce((sum, score) => sum + Number(score), 0);
 
-    console.log("total score", totalScore.value);
+    //console.log("total score", totalScore.value);
 }, { deep: true });
 
 onMounted(async () => {
