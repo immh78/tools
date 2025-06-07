@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'
 import { useLogger } from '../composables/useLogger';
-import { database, ref as firebaseRef, get, update, remove } from "../config/firebase";
+import { database, ref as firebaseRef, get, update, set } from "../config/firebase";
 import { AppBarTitle, usePageMeta } from '../composables/getRouteInfo';
 
 //useLogger();
@@ -42,23 +42,47 @@ async function selectData() {
             //console.error("Error fetching data:", err);
         });
 
-    console.log("* scoring", scoring.value);
+    setInit();
+
+    console.log("* choiceQuestionTotalScore", totalScore.value);
+    resetIcon();
+}
+
+async function saveSetting() {
+
+    scoring.value.choiceQuestion = scoring.value.choiceQuestion.map(Number);
+    const answerData = { "answerQuestion": Number(scoring.value.answerQuestion) };
+
+    const dbRefChoice = firebaseRef(database, "scoring/choiceQuestion");
+    await set(dbRefChoice, scoring.value.choiceQuestion)
+        .then(() => {
+            console.log("Data updated successfully.");
+        })
+        .catch(err => {
+            console.error("Error updating data:", err);
+        });
+
+    const dbRefAnswer = firebaseRef(database, "scoring");
+    await update(dbRefAnswer, answerData)
+        .then(() => {
+            console.log("Data updated successfully.");
+        })
+        .catch(err => {
+            console.error("Error updating data:", err);
+        });
+
+    selectData();
+    isDistPopup.value = false;
+}
+
+function setInit() {
     scoring.value.choiceQuestion.forEach((item, index) => {
         choiceList.value[index] = item;
     });
 
     for (let i = 0; i < scoring.value.answerQuestion; i++) {
         answerList.value[i] = 0; // 초기화
-    }
-
-    console.log("choiceList", choiceList.value);
-    console.log("answerList", answerList.value);
-
-    //choiceList.value = new Array(scoring.value.choiceQuestion.length).fill(0);
-
-
-    console.log("* choiceQuestionTotalScore", totalScore.value);
-    resetIcon();
+    }     
 }
 
 watch([choiceList, answerList], ([newChoice, newAnswer]) => {
@@ -85,57 +109,69 @@ onMounted(async () => {
                 </template>
                 <AppBarTitle :onIconClick="selectData" :refreshIcon="refreshIcon" />
                 <template v-slot:append>
+                    <v-btn icon="mdi-eraser" @click="setInit()"></v-btn>
                     <v-btn icon="mdi-cog" @click="isDistPopup = true"></v-btn>
                 </template>
             </v-app-bar>
             <v-sheet class="ma-2 pa-2" color="#f4f4f4" rounded="lg">
-                 <span>객관식</span>
-            <v-row class="mt-2">
-                <v-col v-for="(score, key) in scoring.choiceQuestion" cols="6" xs="6" sm="6" md="3" lg="3">
-                    <div class="d-flex align-center">
-                        <span class="mx-2">{{ key + 1 }}번</span>
-                        <v-btn-toggle v-model="choiceList[key]" :mandatory=true  divided variant="outlined">
-                            <v-btn color="primary" :value="score"   ><v-icon
-                                    color="blue">mdi-circle-outline</v-icon></v-btn>
-                            <v-btn color="primary" :value=0><v-icon color="red">mdi-close</v-icon></v-btn>
+                <span>객관식</span>
+                <v-row class="mt-2" no-gutters>
+                    <v-col v-for="(score, key) in scoring.choiceQuestion" cols="3">
+                        <span class="ma-0 pa-0 text-caption">{{ key + 1 }}</span><br />
+                        <v-btn-toggle v-model="choiceList[key]" :mandatory=true divided variant="outlined">
+                            <v-btn style="width: 30px; height: 30px; min-width: 30px;" color="primary"
+                                :value="score"><v-icon color="blue">mdi-circle-outline</v-icon></v-btn>
+                            <v-btn style="width: 30px; height: 30px; min-width: 30px;" color="error" :value=0><v-icon
+                                    color="red">mdi-close</v-icon></v-btn>
                         </v-btn-toggle>
-                    </div>
-                </v-col>
-            </v-row>
+
+                    </v-col>
+                </v-row>
+
             </v-sheet>
             <v-sheet class="ma-2 pa-2" color="#f4f4f4" rounded="lg">
                 <span>주관식</span>
-                <v-row class="mt-2">
-                    <v-col v-for="(score, key) in answerList" cols="6">
-                        <v-number-input v-model="answerList[key]" :label="(key + 1) + '번'" :min="0" :max="10" variant="outlined" />
+                <v-row class="mt-2" no-gutters>
+                    <v-col v-for="(score, key) in answerList" cols="4">
+                        <v-number-input v-model="answerList[key]" :label="(key + 1) + '번'" :min="0" :max="10"
+                            variant="outlined" />
                     </v-col>
                 </v-row>
             </v-sheet>
 
-            <v-bottom-navigation color="primary" active>총점 : {{ totalScore }}점</v-bottom-navigation>
-
+            <v-bottom-navigation color="primary" active><h1>{{ totalScore }}</h1></v-bottom-navigation>
         </v-main>
-
         <v-dialog v-model="isDistPopup" max-width="380px">
-            <v-card>
-                <v-row class="mt-2">
-                    <v-col v-for="(_, key) in scoring.choiceQuestion" cols="6" xs="6" sm="6" md="3" lg="3">
-                        <v-number-input v-model="scoring.choiceQuestion[key]" :label="(key + 1) + '번'" :min="0"
-                            :max="10">
-                        </v-number-input>
+            <v-sheet>
+                <div class="d-flex justify-space-between align-center">
+                    <!-- 좌측 텍스트 -->
+                    <span class="ml-4">객관식 배점</span>
+
+                    <!-- 우측 버튼 그룹 -->
+                    <div class="d-flex">
+                        <v-btn icon="mdi-plus-box-outline" variant="flat"
+                            @click="scoring.choiceQuestion.push(0)"></v-btn>
+                        <v-btn icon="mdi-minus-box-outline" variant="flat"
+                            @click="scoring.choiceQuestion.pop()"></v-btn>
+                    </div>
+                </div>
+                <v-row class="mt-2 mx-2">
+                    <v-col v-for="(_, key) in scoring.choiceQuestion" cols="3" xs="3" sm="3" md="3" lg="3">
+                        <v-text-field v-model="scoring.choiceQuestion[key]" :label="String(key + 1)" type="number"
+                            variant="outlined">
+                        </v-text-field>
                     </v-col>
                 </v-row>
-                <span class="text-center">주관식</span>
-                <v-number-input v-model="scoring.answerQuestion" label="주관식 문항수" :min="0" :max="10">
-                </v-number-input>
-                <v-card-actions>
-                    <v-btn icon="mdi-check-bold"></v-btn>
-                    <v-btn @click="isDistPopup = false" icon="mdi-close-thick"></v-btn>
+                <v-divider></v-divider>
+                <v-number-input class="mx-5 mt-4" v-model="scoring.answerQuestion" label="주관식 문항수" variant="outlined"
+                    :min="0" :max="10" />
+
+                <v-card-actions class="d-flex justify-end">
+                    <v-btn icon="mdi-check-bold" @click="saveSetting()"></v-btn>
+                    <v-btn icon="mdi-close-thick" @click="isDistPopup = false"></v-btn>
                 </v-card-actions>
-            </v-card>
+            </v-sheet>
         </v-dialog>
-
-
     </v-app>
 
 </template>
