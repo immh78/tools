@@ -1,11 +1,32 @@
-list = {
-    "anserQuestion": 5,
-    "choiceQuestion": [
-        10,
-        20,
-        '20',
-        '5'
-    ]
-}
+list = [
+    {
+        "amount": 700000,
+        "category": "십일조",
+        "date": "20250202",
+        "remark": "1월",
+        "key": "0"
+    },
+    {
+        "amount": 600000,
+        "category": "십일조",
+        "date": "20250323",
+        "remark": "2월",
+        "key": "1"
+    },
+    {
+        "amount": 700000,
+        "category": "십일조",
+        "date": "20250525",
+        "remark": "4월",
+        "key": "2"
+    },
+    {
+        "amount": 700000,
+        "category": "십일조",
+        "date": "20250525",
+        "remark": "5월",
+        "key": "3"
+    }
+]
 
-list.choiceQuestion의 값을 모두 Number로 변경
+amount의 합계

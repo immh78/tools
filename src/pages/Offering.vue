@@ -13,7 +13,7 @@ const isOpenPopup = ref(false);
 const { icon } = usePageMeta();
 const defaultIcon = ref(icon.value);
 const refreshIcon = ref('');
-const year = ref(2025);
+const year = ref(Number(getToday().slice(0, 4))); // 현재 연도로 초기화
 const offeringList = ref([]);
 const offeringItem = ref({
     date: "",
@@ -22,6 +22,8 @@ const offeringItem = ref({
     amount: 0,
     key: 0
 });
+
+const offeringSum = ref(0);
 
 const isOfferingAdd = ref(false);
 
@@ -52,7 +54,10 @@ async function selectData() {
             ...offering.value[year.value][key],
             "key": key,
         });
+        
     });
+
+    sumOffering();
 
     console.log("* offering", offering.value);
     console.log("* offeringList", offeringList.value);
@@ -168,7 +173,12 @@ async function deleteOffering(target) {
 
 watch(year, (newYear) => {
     offeringList.value = offering.value[newYear] || [];
+    sumOffering();
 });
+
+function sumOffering() {
+    offeringSum.value = offeringList.value.reduce((sum, item) => sum + item.amount, 0);
+}   
 
 onMounted(async () => {
     selectData();
@@ -190,13 +200,13 @@ onMounted(async () => {
                 </template>
             </v-app-bar>
             <v-number-input v-model="year" control-variant="split" variant="outlined"></v-number-input>
-
+            <v-card class="mx-4" style="border: 2px solid #d0d0d0;"  variant="outlined" width="200px"><span class="text-h6 ml-9">{{ offeringSum.toLocaleString() }}원</span></v-card>
             <v-timeline side="end">
                 <v-timeline-item v-for="item in offeringList.slice().reverse()" size="small" @click="openOfferingPopup(item)">
                     <span>{{ item?.date.slice(0, 4) }}년 {{ Number(item?.date.slice(4, 6)) }}월 {{ Number(item?.date.slice(6, 8)) }}일 </span>
                     <v-alert>
                         <span>{{ item?.category }}</span>
-                        <small>({{ item?.remark }})</small> {{ item?.amount.toLocaleString() }}원
+                        <small v-if="item?.remark">({{ item?.remark }})</small> {{ item?.amount.toLocaleString() }}원
                     </v-alert>
                 </v-timeline-item>
             </v-timeline>
