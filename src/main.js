@@ -31,6 +31,7 @@ router.isReady().then(() => {
                 'work-time',
                 'regular-task',
                 'offering',
+                'scoring',
                 'test'
             ];
 
