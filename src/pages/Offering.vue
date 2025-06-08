@@ -202,7 +202,7 @@ onMounted(async () => {
                 </template>
             </v-app-bar>
 
-            <v-carousel v-model="carouselIndex" :continuous="false" :show-arrows="true" hide-delimiter-background height="640">
+            <v-carousel v-model="carouselIndex" :continuous="false" :show-arrows="true" hide-delimiter-background height="801">
                 <v-carousel-item v-for="(year, i) in Object.keys(offering)" :key="i">
                     <div class="carousel-content">
                         <h3>{{ year }}</h3>
