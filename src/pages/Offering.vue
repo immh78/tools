@@ -205,7 +205,7 @@ onMounted(async () => {
             <v-carousel v-model="carouselIndex" :continuous="false" :show-arrows="true" hide-delimiter-background height="801">
                 <v-carousel-item v-for="(year, i) in Object.keys(offering)" :key="i">
                     <div class="carousel-content">
-                        <h3>{{ year }}</h3>
+                        <h3 class="ml-4 mt-2">{{ year }}</h3>
                         <v-card class="mx-4" style="border: 2px solid #d0d0d0;" variant="outlined" width="200px"><span
                                 class="text-h6 ml-9">{{
                                     sumOffering(year).toLocaleString() }}원</span></v-card>
