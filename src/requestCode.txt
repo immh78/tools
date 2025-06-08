@@ -1,32 +1,643 @@
-list = [
-    {
-        "amount": 700000,
-        "category": "십일조",
-        "date": "20250202",
-        "remark": "1월",
-        "key": "0"
-    },
-    {
-        "amount": 600000,
-        "category": "십일조",
-        "date": "20250323",
-        "remark": "2월",
-        "key": "1"
-    },
-    {
-        "amount": 700000,
-        "category": "십일조",
-        "date": "20250525",
-        "remark": "4월",
-        "key": "2"
-    },
-    {
-        "amount": 700000,
-        "category": "십일조",
-        "date": "20250525",
-        "remark": "5월",
-        "key": "3"
-    }
-]
+list = {
+    "2015": [
+        {
+            "amount": 300000,
+            "category": "십일조",
+            "date": "20150208",
+            "remark": ""
+        },
+        {
+            "amount": 300000,
+            "category": "십일조",
+            "date": "20150329",
+            "remark": ""
+        },
+        {
+            "amount": 350000,
+            "category": "십일조",
+            "date": "20150510",
+            "remark": ""
+        },
+        {
+            "amount": 50000,
+            "category": "감사",
+            "date": "20150510",
+            "remark": ""
+        },
+        {
+            "amount": 30000,
+            "category": "심방감사",
+            "date": "20150607",
+            "remark": ""
+        },
+        {
+            "amount": 350000,
+            "category": "십일조",
+            "date": "20150712",
+            "remark": ""
+        },
+        {
+            "amount": 350000,
+            "category": "십일조",
+            "date": "20150823",
+            "remark": ""
+        },
+        {
+            "amount": 350000,
+            "category": "십일조",
+            "date": "20151011",
+            "remark": ""
+        },
+        {
+            "amount": 350000,
+            "category": "십일조",
+            "date": "20151101",
+            "remark": ""
+        },
+        {
+            "amount": 50000,
+            "category": "추수감사",
+            "date": "20151101",
+            "remark": ""
+        }
+    ],
+    "2016": [
+        {
+            "amount": 350000,
+            "category": "십일조",
+            "date": "20160206",
+            "remark": "1월"
+        },
+        {
+            "amount": 350000,
+            "category": "십일조",
+            "date": "20160306",
+            "remark": "2월"
+        },
+        {
+            "amount": 350000,
+            "category": "십일조",
+            "date": "20160612",
+            "remark": "5월"
+        },
+        {
+            "amount": 20000,
+            "category": "맥추감사",
+            "date": "20160703",
+            "remark": ""
+        },
+        {
+            "amount": 350000,
+            "category": "십일조",
+            "date": "20160828",
+            "remark": "8월"
+        },
+        {
+            "amount": 250000,
+            "category": "십일조",
+            "date": "20161002",
+            "remark": "9월"
+        },
+        {
+            "amount": 100000,
+            "category": "십일조",
+            "date": "20161016",
+            "remark": "9월"
+        },
+        {
+            "amount": 150000,
+            "category": "십일조",
+            "date": "20161120",
+            "remark": "10월"
+        },
+        {
+            "amount": 200000,
+            "category": "십일조",
+            "date": "20161127",
+            "remark": "10월"
+        }
+    ],
+    "2017": [
+        {
+            "amount": 350000,
+            "category": "십일조",
+            "date": "20170101",
+            "remark": "2016년 12월"
+        },
+        {
+            "amount": 100000,
+            "category": "감사",
+            "date": "20170101",
+            "remark": ""
+        },
+        {
+            "amount": 50000,
+            "category": "신념감사",
+            "date": "20170101",
+            "remark": ""
+        },
+        {
+            "amount": 400000,
+            "category": "십일조",
+            "date": "20170226",
+            "remark": "2월"
+        },
+        {
+            "amount": 50000,
+            "category": "생일감사",
+            "date": "20170319",
+            "remark": "임효진"
+        },
+        {
+            "amount": 400000,
+            "category": "십일조",
+            "date": "20170327",
+            "remark": "3월"
+        },
+        {
+            "amount": 700000,
+            "category": "십일조",
+            "date": "20170521",
+            "remark": "4,5월"
+        },
+        {
+            "amount": 100000,
+            "category": "십일조",
+            "date": "20170528",
+            "remark": "4,5월"
+        },
+        {
+            "amount": 400000,
+            "category": "십일조",
+            "date": "20170702",
+            "remark": "6월"
+        },
+        {
+            "amount": 400000,
+            "category": "십일조",
+            "date": "20170730",
+            "remark": "7월"
+        },
+        {
+            "amount": 400000,
+            "category": "십일조",
+            "date": "20170827",
+            "remark": "8월"
+        },
+        {
+            "amount": 650000,
+            "category": "십일조",
+            "date": "20171001",
+            "remark": "9월,추석보너스"
+        },
+        {
+            "amount": 400000,
+            "category": "십일조",
+            "date": "20171022",
+            "remark": "10월)"
+        },
+        {
+            "amount": 50000,
+            "category": "십일조",
+            "date": "20171119",
+            "remark": "헌금"
+        },
+        {
+            "amount": 700000,
+            "category": "십일조",
+            "date": "20171224",
+            "remark": "12월,PI"
+        },
+        {
+            "amount": 50000,
+            "category": "성탄감사",
+            "date": "20171224",
+            "remark": ""
+        }
+    ],
+    "2018": [
+        {
+            "amount": 400000,
+            "category": "십일조",
+            "date": "20180128",
+            "remark": "1월"
+        },
+        {
+            "amount": 500000,
+            "category": "십일조",
+            "date": "20180225",
+            "remark": "2월"
+        },
+        {
+            "amount": 400000,
+            "category": "십일조",
+            "date": "20180401",
+            "remark": "3월"
+        },
+        {
+            "amount": 50000,
+            "category": "부활절감사",
+            "date": "20180401",
+            "remark": ""
+        },
+        {
+            "amount": 50000,
+            "category": "생일감사",
+            "date": "20180401",
+            "remark": "임효진"
+        },
+        {
+            "amount": 400000,
+            "category": "십일조",
+            "date": "20180429",
+            "remark": "4월"
+        },
+        {
+            "amount": 400000,
+            "category": "십일조",
+            "date": "20180527",
+            "remark": "5월"
+        },
+        {
+            "amount": 450000,
+            "category": "십일조",
+            "date": "20180701",
+            "remark": "6월"
+        },
+        {
+            "amount": 450000,
+            "category": "십일조",
+            "date": "20180722",
+            "remark": "7월"
+        },
+        {
+            "amount": 450000,
+            "category": "십일조",
+            "date": "20180826",
+            "remark": "8월"
+        },
+        {
+            "amount": 450000,
+            "category": "십일조",
+            "date": "20180923",
+            "remark": "9월"
+        },
+        {
+            "amount": 50000,
+            "category": "생일감사",
+            "date": "20181202",
+            "remark": "문명훈"
+        }
+    ],
+    "2019": [
+        {
+            "amount": 450000,
+            "category": "십일조",
+            "date": "20180127",
+            "remark": "1월"
+        },
+        {
+            "amount": 450000,
+            "category": "십일조",
+            "date": "20190310",
+            "remark": "2월"
+        },
+        {
+            "amount": 450000,
+            "category": "십일조",
+            "date": "20190331",
+            "remark": "3월"
+        },
+        {
+            "amount": 450000,
+            "category": "십일조",
+            "date": "20190421",
+            "remark": "4월"
+        },
+        {
+            "amount": 12000,
+            "category": "자전거선교",
+            "date": "20190505",
+            "remark": ""
+        },
+        {
+            "amount": 450000,
+            "category": "십일조",
+            "date": "20190602",
+            "remark": "5월"
+        },
+        {
+            "amount": 450000,
+            "category": "십일조",
+            "date": "20190630",
+            "remark": "6월"
+        },
+        {
+            "amount": 450000,
+            "category": "십일조",
+            "date": "20190721",
+            "remark": "7월"
+        },
+        {
+            "amount": 450000,
+            "category": "십일조",
+            "date": "20190825",
+            "remark": "8월"
+        },
+        {
+            "amount": 450000,
+            "category": "십일조",
+            "date": "20191006",
+            "remark": "9월"
+        },
+        {
+            "amount": 450000,
+            "category": "십일조",
+            "date": "20191110",
+            "remark": "10"
+        },
+        {
+            "amount": 50000,
+            "category": "추수감사",
+            "date": "20191117",
+            "remark": ""
+        },
+        {
+            "amount": 450000,
+            "category": "십일조",
+            "date": "20191201",
+            "remark": "11월"
+        },
+        {
+            "amount": 50000,
+            "category": "생일감사",
+            "date": "20191201",
+            "remark": ""
+        },
+        {
+            "amount": 450000,
+            "category": "십일조",
+            "date": "20191222",
+            "remark": "12월"
+        }
+    ],
+    "2020": [
+        {
+            "amount": 450000,
+            "category": "십일조",
+            "date": "20200209",
+            "remark": "1월"
+        },
+        {
+            "amount": 450000,
+            "category": "십일조",
+            "date": "20200510",
+            "remark": "4월"
+        },
+        {
+            "amount": 450000,
+            "category": "십일조",
+            "date": "20200524",
+            "remark": "5월"
+        },
+        {
+            "amount": 500000,
+            "category": "십일조",
+            "date": "20200621",
+            "remark": "6월"
+        },
+        {
+            "amount": 500000,
+            "category": "십일조",
+            "date": "20200802",
+            "remark": "7월"
+        },
+        {
+            "amount": 500000,
+            "category": "십일조",
+            "date": "20201011",
+            "remark": "9월"
+        },
+        {
+            "amount": 500000,
+            "category": "십일조",
+            "date": "20201108",
+            "remark": "10월"
+        }
+    ],
+    "2022": [
+        {
+            "amount": 500000,
+            "category": "십일조",
+            "date": "20220501",
+            "remark": "4월"
+        },
+        {
+            "amount": 600000,
+            "category": "십일조",
+            "date": "20220619",
+            "remark": "5월"
+        },
+        {
+            "amount": 500000,
+            "category": "십일조",
+            "date": "20220821",
+            "remark": "8월"
+        },
+        {
+            "amount": 500000,
+            "category": "십일조",
+            "date": "20221120",
+            "remark": "10월"
+        }
+    ],
+    "2023": [
+        {
+            "amount": 500000,
+            "category": "십일조",
+            "date": "20230226",
+            "remark": "2월"
+        },
+        {
+            "amount": 500000,
+            "category": "십일조",
+            "date": "20230326",
+            "remark": "3월"
+        },
+        {
+            "amount": 500000,
+            "category": "십일조",
+            "date": "20230528",
+            "remark": "5월"
+        },
+        {
+            "amount": 500000,
+            "category": "십일조",
+            "date": "20230813",
+            "remark": "7월"
+        },
+        {
+            "amount": 600000,
+            "category": "십일조",
+            "date": "20231008",
+            "remark": "9월"
+        },
+        {
+            "amount": 600000,
+            "category": "십일조",
+            "date": "20231119",
+            "remark": "10월"
+        },
+        {
+            "amount": 50000,
+            "category": "추수감사헌금",
+            "date": "20231119",
+            "remark": ""
+        },
+        {
+            "amount": 50000,
+            "category": "성탄감사헌금",
+            "date": "20231225",
+            "remark": ""
+        },
+        {
+            "amount": 600000,
+            "category": "십일조",
+            "date": "20231225",
+            "remark": "12월"
+        }
+    ],
+    "2024": [
+        {
+            "amount": 600000,
+            "category": "십일조",
+            "date": "20240204",
+            "remark": "1월"
+        },
+        {
+            "amount": 600000,
+            "category": "십일조",
+            "date": "20240225",
+            "remark": "2월"
+        },
+        {
+            "amount": 600000,
+            "category": "십일조",
+            "date": "20240414",
+            "remark": "3월"
+        },
+        {
+            "amount": 600000,
+            "category": "십일조",
+            "date": "20240505",
+            "remark": "4월"
+        },
+        {
+            "amount": 600000,
+            "category": "십일조",
+            "date": "20240526",
+            "remark": "5월"
+        },
+        {
+            "amount": 600000,
+            "category": "십일조",
+            "date": "20240623",
+            "remark": "6월"
+        },
+        {
+            "amount": 50000,
+            "category": "맥추감사헌금",
+            "date": "20240707",
+            "remark": ""
+        },
+        {
+            "amount": 50000,
+            "category": "감사헌금금",
+            "date": "20240721",
+            "remark": ""
+        },
+        {
+            "amount": 600000,
+            "category": "십일조",
+            "date": "20240728",
+            "remark": "7월"
+        },
+        {
+            "amount": 600000,
+            "category": "십일조",
+            "date": "28240908",
+            "remark": "8월"
+        },
+        {
+            "amount": 600000,
+            "category": "십일조",
+            "date": "20240924",
+            "remark": "9월"
+        },
+        {
+            "amount": 50000,
+            "category": "추수감사헌금",
+            "date": "20241103",
+            "remark": ""
+        }
+    ],
+    "2025": [
+        {
+            "amount": 700000,
+            "category": "십일조",
+            "date": "20250202",
+            "remark": "1월"
+        },
+        {
+            "amount": 600000,
+            "category": "십일조",
+            "date": "20250323",
+            "remark": "2월"
+        },
+        {
+            "amount": 700000,
+            "category": "십일조",
+            "date": "20250525",
+            "remark": "4월"
+        },
+        {
+            "amount": 700000,
+            "category": "십일조",
+            "date": "20250525",
+            "remark": "5월"
+        }
+    ]
+}
 
-amount의 합계
+2015 ~ 2025의 배열에 각 행별로 index값을 key로 입력하려면? vue.js에서 push를 이용한다.
+
+예)
+
+        {
+            "amount": 700000,
+            "category": "십일조",
+            "date": "20250202",
+            "remark": "1월",
+            "key":0
+        },
+        {
+            "amount": 600000,
+            "category": "십일조",
+            "date": "20250323",
+            "remark": "2월",
+            "key":1
+        },
+        {
+            "amount": 700000,
+            "category": "십일조",
+            "date": "20250525",
+            "remark": "4월",
+            "key":2
+        },
+        {
+            "amount": 700000,
+            "category": "십일조",
+            "date": "20250525",
+            "remark": "5월",
+            "key":3
+        }
