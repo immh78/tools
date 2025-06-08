@@ -13,8 +13,8 @@ const isOpenPopup = ref(false);
 const { icon } = usePageMeta();
 const defaultIcon = ref(icon.value);
 const refreshIcon = ref('');
-const year = ref(Number(getToday().slice(0, 4))); // 현재 연도로 초기화
-const offeringList = ref([]);
+// const year = ref(Number(getToday().slice(0, 4))); // 현재 연도로 초기화
+// const offeringList = ref([]);
 const offeringItem = ref({
     date: "",
     category: "",
@@ -23,7 +23,7 @@ const offeringItem = ref({
     key: 0
 });
 
-const offeringSum = ref(0);
+const carouselIndex = ref(0); // 캐러셀 인덱스
 
 const isOfferingAdd = ref(false);
 
@@ -48,19 +48,18 @@ async function selectData() {
             //console.error("Error fetching data:", err);
         });
 
-    offeringList.value = [];
-    Object.keys(offering.value[year.value] || {}).forEach(key => {
-        offeringList.value.push({
-            ...offering.value[year.value][key],
-            "key": key,
-        });
-        
-    });
+    // offeringList.value = [];
+    // Object.keys(offering.value[year.value] || {}).forEach(key => {
+    //     offeringList.value.push({
+    //         ...offering.value[year.value][key],
+    //         "key": key,
+    //     });
+    // });
 
-    sumOffering();
+    // sumOffering();
 
     console.log("* offering", offering.value);
-    console.log("* offeringList", offeringList.value);
+    // console.log("* offeringList", offeringList.value);
 
     resetIcon();
 }
@@ -87,7 +86,10 @@ function formatDate(dateStr) {
     return `${year}-${month}-${day}`;
 }
 
-function openOfferingPopup(item) {
+function openOfferingPopup(year, item) {
+
+    console.log("openOfferingPopup", year);
+
     if (item) {
         offeringItem.value = {
             ...item,
@@ -101,11 +103,11 @@ function openOfferingPopup(item) {
         let remark = ""
         let key = 0;
 
-        if (offeringList.value.length > 0) {
-            const lastItem = offeringList.value[offeringList.value.length - 1];
+        if (offering.value[year].length > 0) {
+            const lastItem = offering.value[year][offering.value[year].length - 1];
             category = lastItem.category;
             amount = lastItem.amount;
-            key = Math.max(...offeringList.value.map(item => Number(item.key))) + 1;
+            key = Math.max(...offering.value[year].map(item => Number(item.key))) + 1;
 
             if (category === '십일조') {
                 remark = Number(getToday().slice(5, 7)) + "월";
@@ -127,58 +129,58 @@ function openOfferingPopup(item) {
 
 function saveOffering() {
 
-    const data = {
-        [offeringItem.value.key]: {
-            date: offeringItem.value.date.replace(/-/g, ''), // YYYYMMDD 형식으로 변환
-            category: offeringItem.value.category,
-            remark: offeringItem.value.remark,
-            amount: Number(offeringItem.value.amount),
-        }
-    };
+    // const data = {
+    //     [offeringItem.value.key]: {
+    //         date: offeringItem.value.date.replace(/-/g, ''), // YYYYMMDD 형식으로 변환
+    //         category: offeringItem.value.category,
+    //         remark: offeringItem.value.remark,
+    //         amount: Number(offeringItem.value.amount),
+    //     }
+    // };
 
-    // Firebase에 저장
-    const dbRef = firebaseRef(database, "offering/" + year.value);
-    update(dbRef, data)
-        .then(() => {
-            console.log("헌금 정보가 성공적으로 저장되었습니다.");
-            isOpenPopup.value = false;
-            selectData(); // 데이터 새로고침
-        })
-        .catch(err => {
-            console.error("Error saving data:", err);
-        });
+    // // Firebase에 저장
+    // const dbRef = firebaseRef(database, "offering/" + year.value);
+    // update(dbRef, data)
+    //     .then(() => {
+    //         console.log("헌금 정보가 성공적으로 저장되었습니다.");
+    //         isOpenPopup.value = false;
+    //         selectData(); // 데이터 새로고침
+    //     })
+    //     .catch(err => {
+    //         console.error("Error saving data:", err);
+    //     });
 }
 
 async function deleteOffering(target) {
-    let key = "";
+    // let key = "";
 
-    if (target != null) {
-        key = "/" + target;
-    }
+    // if (target != null) {
+    //     key = "/" + target;
+    // }
 
-    //console.log("delete key", "tlj-resv/prepayment"+ key);
+    // //console.log("delete key", "tlj-resv/prepayment"+ key);
 
-    try {
-        const dbRef = firebaseRef(database, "offering/" + year.value + key);
-        await remove(dbRef); // 데이터를 저장
-    } catch (err) {
-        console.error("Error saving data:", err);
-    }
+    // try {
+    //     const dbRef = firebaseRef(database, "offering/" + year.value + key);
+    //     await remove(dbRef); // 데이터를 저장
+    // } catch (err) {
+    //     console.error("Error saving data:", err);
+    // }
 
-    isOpenPopup.value = false;
+    // isOpenPopup.value = false;
 
-    selectData();
+    // selectData();
 }
 
 
-watch(year, (newYear) => {
-    offeringList.value = offering.value[newYear] || [];
-    sumOffering();
-});
+// watch(year, (newYear) => {
+//     offeringList.value = offering.value[newYear] || [];
+//     sumOffering();
+// });
 
-function sumOffering() {
-    offeringSum.value = offeringList.value.reduce((sum, item) => sum + item.amount, 0);
-}   
+function sumOffering(year) {
+    return offering.value[year].reduce((sum, item) => sum + item.amount, 0);
+}
 
 onMounted(async () => {
     selectData();
@@ -196,20 +198,38 @@ onMounted(async () => {
                 </template>
                 <AppBarTitle :onIconClick="selectData" :refreshIcon="refreshIcon" />
                 <template v-slot:append>
-                    <v-btn icon="mdi-plus-circle" @click="openOfferingPopup()"></v-btn>
+                    <v-btn icon="mdi-plus-circle" @click="openOfferingPopup(Object.keys(offering)[carouselIndex])"></v-btn>
                 </template>
             </v-app-bar>
-            <v-number-input v-model="year" control-variant="split" variant="outlined"></v-number-input>
-            <v-card class="mx-4" style="border: 2px solid #d0d0d0;"  variant="outlined" width="200px"><span class="text-h6 ml-9">{{ offeringSum.toLocaleString() }}원</span></v-card>
-            <v-timeline side="end">
-                <v-timeline-item v-for="item in offeringList.slice().reverse()" size="small" @click="openOfferingPopup(item)">
-                    <span>{{ item?.date.slice(0, 4) }}년 {{ Number(item?.date.slice(4, 6)) }}월 {{ Number(item?.date.slice(6, 8)) }}일 </span>
-                    <v-alert>
-                        <span>{{ item?.category }}</span>
-                        <small v-if="item?.remark">({{ item?.remark }})</small> {{ item?.amount.toLocaleString() }}원
-                    </v-alert>
-                </v-timeline-item>
-            </v-timeline>
+
+            <v-carousel v-model="carouselIndex" :continuous="false" :show-arrows="true" hide-delimiter-background>
+                <v-carousel-item v-for="(year, i) in Object.keys(offering)" :key="i">
+                    <div class="carousel-content">
+
+                        <h3>{{ year }}</h3>
+                        <v-card class="mx-4" style="border: 2px solid #d0d0d0;" variant="outlined" width="200px"><span
+                                class="text-h6 ml-9">{{
+                                    sumOffering(year).toLocaleString() }}원</span></v-card>
+                        <div class="timeline-wrapper">
+                            <v-timeline side="end">
+                                <v-timeline-item v-for="item in offering[year].slice().reverse()" size="small"
+                                    @click="openOfferingPopup(year, item)">
+                                    <span>{{ item.date.slice(0, 4) }}년 {{ Number(item.date.slice(4, 6)) }}월 {{
+                                        Number(item.date.slice(6, 8)) }}일
+                                    </span>
+                                    <v-alert>
+                                        <span>{{ item.category }}</span>
+                                        <small v-if="item.remark">({{ item?.remark }})</small> {{
+                                            item.amount.toLocaleString()
+                                        }}원
+                                    </v-alert>
+                                </v-timeline-item>
+                            </v-timeline>
+                        </div>
+
+                    </div>
+                </v-carousel-item>
+            </v-carousel>
         </v-main>
 
         <v-dialog v-model="isOpenPopup" max-width="380px">
@@ -221,7 +241,8 @@ onMounted(async () => {
                 <v-text-field v-model="offeringItem.amount" label="금액" type="number" clearable />
                 <v-card-actions>
                     <v-btn @click="saveOffering()" icon="mdi-check-bold"></v-btn>
-                    <v-btn @click="deleteOffering(offeringItem.key)" :disabled="isOfferingAdd" icon="mdi-delete"></v-btn>
+                    <v-btn @click="deleteOffering(offeringItem.key)" :disabled="isOfferingAdd"
+                        icon="mdi-delete"></v-btn>
                     <v-btn @click="isOpenPopup = false" icon="mdi-close-thick"></v-btn>
                 </v-card-actions>
             </v-card>
@@ -230,4 +251,17 @@ onMounted(async () => {
 
 </template>
 
-<style scoped></style>
+<style scoped>
+.carousel-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.timeline-wrapper {
+    overflow-y: auto;
+    max-height: 60vh;
+    /* 필요에 따라 조절 */
+    padding: 8px;
+}
+</style>
