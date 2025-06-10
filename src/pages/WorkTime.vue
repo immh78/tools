@@ -6,21 +6,23 @@ import { AppBarTitle, usePageMeta } from '../composables/getRouteInfo';
 useLogger();
 
 const workTimeInfo = ref({});
-const start = ref("");
+const start = ref(""); // 0830
+const finish = ref(""); // 1721
+const popupTime = ref(""); // 08:30
 const isOver = ref(false);
 const isOverPay = ref(false);
 const overTimePay = ref(0);
-const todayWorkTime = ref({});
-const actTime = ref({});
-const remainTime = ref({hour:'-', minute:'-'});
+const todayWorkTime = ref({}); // 금일 근무시간
+const actTime = ref({}); // 누적 근무시간
+const remainTime = ref({hour:'-', minute:'-'}); // 잔여 근무시간
 const isSnackbar = ref(false);
-const startTime = ref("");
 const lastRefreshTime = ref("");
 
 const base = ref(0);
 const prog = ref(0);
 
 const isPopup = ref(false);
+const popupKind = ref("");
 
 // AppBarTitle 컴포넌트에서 사용하는 아이콘
 const { icon } = usePageMeta();
@@ -54,6 +56,7 @@ async function getWorkTimeInfo() {
 
     base.value = workTimeInfo.value.planTime;
     start.value = workTimeInfo.value.start;
+    finish.value = '';
 
     actTime.value = getHourMinute(workTimeInfo.value.actTime);
 
@@ -75,9 +78,8 @@ function refreshCalcTime() {
     if (start.value === "") {
         todayWorkTime.value = { hour: 0, minute: 0 };
     } else {
-       todayWorkTime.value = getHourMinute(calctodayWorkTime(start.value));
+       todayWorkTime.value = getHourMinute(calctodayWorkTime());
     }
-
     
     if (todayWorkTime.value.hour >= 9) {
         todayWorkTime.value.hour -= 1;
@@ -107,17 +109,19 @@ function refreshCalcTime() {
     remainTime.value = getHourMinute(workTimeInfo.value.planTime - workTimeInfo.value.actTime - getTime(todayWorkTime.value));
     //console.log("remainTime", remainTime.value);
 
-    const d = getNow();;
+    const d = getNow();
     lastRefreshTime.value = d.slice(0, 2) + ":" + d.slice(2);
     resetIcon();
 }
 
-function calctodayWorkTime(pStart) {
-    const now = getNow();
+function calctodayWorkTime() {
+    const now = finish.value === '' ? getNow() : finish.value;
+
+    console.log( "now", now);
 
     // 문자열을 시(hour)와 분(minute)으로 분해
-    const startHour = parseInt(pStart.slice(0, 2), 10);
-    const startMinute = parseInt(pStart.slice(2), 10);
+    const startHour = parseInt(start.value.slice(0, 2), 10);
+    const startMinute = parseInt(start.slice(2), 10);
 
     const nowHour = parseInt(now.slice(0, 2), 10);
     const nowMinute = parseInt(now.slice(2), 10);
@@ -138,9 +142,15 @@ function getNow() {
     return String(d.getHours()).padStart(2, '0') + String(d.getMinutes()).padStart(2, '0');
 }
 
-async function savetodayWorkTime() {
+async function saveTodayWorkTime() {
+    finish.value = popupTime.value.slice(0, 2) + popupTime.value.slice(3); // 0830
+
+    refreshCalcTime(); //todayWorkTime 갱신
+
     const time = workTimeInfo.value.actTime + getTime(todayWorkTime.value);
     const data = { "actTime": Number(time), "start": "" };
+
+    finish.value = ''; // 퇴근시간 초기화
 
     saveData(data)
     getWorkTimeInfo();
@@ -152,7 +162,7 @@ async function saveWorkInfo() {
     getWorkTimeInfo();
 }
 
-function openStartPopup() {
+function saveStartTime() {
     if (workTimeInfo.value.start === "") {
         const now = getNow();
         const data = { "start": now };
@@ -161,13 +171,20 @@ function openStartPopup() {
         getWorkTimeInfo();
     } else {
         //console.log("start", workTimeInfo.value.start);
-        startTime.value = workTimeInfo.value.start.slice(0, 2) + ":" + workTimeInfo.value.start.slice(2);
+        popupTime.value = workTimeInfo.value.start.slice(0, 2) + ":" + workTimeInfo.value.start.slice(2);
+        popupKind.value = "START";
         isPopup.value = true;
     }
 }
 
-function saveStart() {
-    const data = { "start": startTime.value.slice(0, 2) + startTime.value.slice(3) };
+function openFinishTimePopup() {
+    popupKind.value = "FINISH";
+    popupTime.value = getNow().slice(0, 2) + ":" + getNow().slice(2);
+    isPopup.value = true;
+}
+
+function saveStartTimeSelect() {
+    const data = { "start": popupTime.value.slice(0, 2) + popupTime.value.slice(3) };
     isPopup.value = false;
 
     saveData(data);
@@ -236,12 +253,10 @@ onMounted(async () => {
                             :style="{ color: workTimeInfo.start === '' ? 'white' : 'black' }" variant="outlined" type="number"
                             readonly></v-text-field> </v-col>
                 </v-row>
-
-
             </v-card>
             <div class="mt-4" style="display: flex; justify-content: center; align-items: center;">
-                <v-btn class="ma-2" @click="openStartPopup()"><v-icon>mdi-home-import-outline</v-icon> 출근</v-btn>
-                <v-btn class="ma-2" @click="savetodayWorkTime()"
+                <v-btn class="ma-2" @click="saveStartTime()"><v-icon>mdi-home-import-outline</v-icon> 출근</v-btn>
+                <v-btn class="ma-2" @click="openFinishTimePopup()"
                     :disabled="workTimeInfo.start === ''"><v-icon>mdi-home-export-outline</v-icon> 퇴근</v-btn>                    
             </div>
             <v-card class="ma-2" v-if="isOverPay" variant="flat" color="indigo-darken-3"
@@ -253,15 +268,14 @@ onMounted(async () => {
         </v-main>
 
         <v-dialog v-model="isPopup" max-width="500">
-            <v-card title="출입시간">
+            <v-card :title="popupKind === 'START'?'출입시간':'퇴근시간'">
 
-                <v-text-field class="ma-2" v-model="startTime" type="time" variant="outlined"></v-text-field>
+                <v-text-field class="ma-2" v-model="popupTime" type="time" variant="outlined"></v-text-field>
 
                 <v-card-actions>
                     <v-spacer></v-spacer>
-
                     <v-btn text="취소" @click="isPopup = false"></v-btn>
-                    <v-btn text="저장" @click="saveStart()"></v-btn>
+                    <v-btn text="저장" @click="popupKind === 'START' ? saveStartTimeSelect() : saveTodayWorkTime()"></v-btn>
                 </v-card-actions>
             </v-card>
 
