@@ -320,16 +320,23 @@ onMounted(async () => {
                     size="12px">mdi-clock-outline</v-icon> {{ lastRefreshTime }}</span>
             <v-card class="mt-2 ml-2 mr-2" variant="flat">
                 <v-progress-linear 
-                    :model-value="prog > calProg ? calProg : prog" 
-                    :color= "prog > calProg ? 'green-lighten-2' : 'blue'"
-                    :buffer-value="prog > calProg ? prog : calProg"
-                    :buffer-color="prog > calProg ? 'blue' : 'green-lighten-2'"
+                    model-value="workTimeInfo.actTime" 
+                    color= "blue"
+                    buffer-value="prog"
+                    buffer-color="blue-lighten-3"
                     buffer-opacity="1"
                     :max="base"
                     :bg-color="isOver ? isOverPay ? 'red-darken-1' : 'yellow-darken-3' : 'grey'"
                     bg-opaccity="1"
-                    height="8" 
-                    rounded >
+                    height="8">
+                </v-progress-linear>
+                <v-progress-linear 
+                    model-value="calProg" 
+                    color= "green-lighten-2"
+                    :max="base"
+                    bg-color="grey"
+                    bg-opaccity="1"
+                    height="4" >
                 </v-progress-linear>
             </v-card>
 
