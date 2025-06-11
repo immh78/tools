@@ -18,11 +18,11 @@ const actTime = ref({}); // 누적 근무시간
 const remainTime = ref({ hour: '-', minute: '-' }); // 잔여 근무시간
 const isSnackbar = ref(false);
 const lastRefreshTime = ref("");
-const workingDaysActTime = ref(0);
 const freeDays = ref([]);
 
-const base = ref(0);
+const base = ref(0); 
 const prog = ref(0);
+const calProg = ref(0);
 
 const isPopup = ref(false);
 const popupKind = ref("");
@@ -60,36 +60,8 @@ async function getWorkTimeInfo() {
     base.value = workTimeInfo.value.planTime;
     start.value = workTimeInfo.value.start;
     finish.value = '';
-    
+
     actTime.value = getHourMinute(workTimeInfo.value.actTime);
-
-    refreshCalcTime();
-}
-
-function getHourMinute(time) {
-    const hour = Math.floor(time);
-    const minute = Math.round((time - hour) * 60);
-    return { hour, minute };
-}
-
-function getTime({ hour, minute }) {
-    return Number(hour) + (Number(minute) / 60);
-}
-
-async function refreshCalcTime() {
-    setLoadingIcon();
-    console.log("refresh start", start.value);
-    if (start.value === "") {
-        todayWorkTime.value = { hour: 0, minute: 0 };
-    } else {
-        todayWorkTime.value = getHourMinute(calctodayWorkTime());
-    }
-
-    if (todayWorkTime.value.hour >= 9) {
-        todayWorkTime.value.hour -= 1;
-    } else if (todayWorkTime.value.hour >= 4 && todayWorkTime.value.minute >= 30) {
-        todayWorkTime.value = getHourMinute(getTime(todayWorkTime.value) - 0.5);
-    }
 
     // 달력에 의한 근무일수 계산
     const tempFreeDays = workTimeInfo.value.freeDays;
@@ -104,13 +76,44 @@ async function refreshCalcTime() {
     //console.log("freeDays.value", tempFreeDays, freeDays.value);
 
     const workingDays = await getWorkingDaysInMonth(tempFreeDays);
-    workingDaysActTime.value = workingDays.untilTodayWorkdays * 8;
+    calProg.value = workingDays.untilTodayWorkdays * 8;
 
-    //console.log("workingDaysActTime.value", workingDaysActTime.value);
+
+    console.log("calProg.value", calProg.value);
+
+    refreshCalcTime();
+}
+
+function getHourMinute(time) {
+    const hour = Math.floor(time);
+    const minute = Math.round((time - hour) * 60);
+    return { hour, minute };
+}
+
+function getTime({ hour, minute }) {
+    return Number(hour) + (Number(minute) / 60);
+}
+
+function refreshCalcTime() {
+    setLoadingIcon();
+    console.log("refresh start", start.value);
+    if (start.value === "") {
+        todayWorkTime.value = { hour: 0, minute: 0 };
+    } else {
+        todayWorkTime.value = getHourMinute(calctodayWorkTime());
+    }
+
+    if (todayWorkTime.value.hour >= 9) {
+        todayWorkTime.value.hour -= 1;
+    } else if (todayWorkTime.value.hour >= 4 && todayWorkTime.value.minute >= 30) {
+        todayWorkTime.value = getHourMinute(getTime(todayWorkTime.value) - 0.5);
+    }
 
     // workTimeInfo.value.actTime = 162;
     prog.value = workTimeInfo.value.actTime + getTime(todayWorkTime.value);
     //console.log(prog.value);
+
+    console.log("prog", prog.value, "base", base.value)
 
     if (prog.value > workTimeInfo.value.planTime) {
         isOver.value = true;
@@ -222,55 +225,55 @@ async function saveData(data) {
 }
 
 async function getWorkingDaysInMonth(freeDays = []) {
-  const today = new Date();
+    const today = new Date();
 
-  const year = today.getFullYear();
-  const month = today.getMonth(); // 0-based
-  const todayDay = today.getDate();
-  const lastDayOfMonth = new Date(year, month + 1, 0).getDate();
+    const year = today.getFullYear();
+    const month = today.getMonth(); // 0-based
+    const todayDay = today.getDate();
+    const lastDayOfMonth = new Date(year, month + 1, 0).getDate();
 
-  const apiKey = 'TJA71zif4CfRseoCQiA085iUVt%2BzzJGBzyyRB76Tc6aTqpCwyVqhB1AZwXaPg7NIx0Su8MNPf%2BtN%2BoadNkd6Gg%3D%3D';
-  const apiUrl = `https://apis.data.go.kr/B090041/openapi/service/SpcdeInfoService/getRestDeInfo?solYear=${year}&solMonth=${String(month + 1).padStart(2, '0')}&ServiceKey=${apiKey}&_type=json`;
+    const apiKey = 'TJA71zif4CfRseoCQiA085iUVt%2BzzJGBzyyRB76Tc6aTqpCwyVqhB1AZwXaPg7NIx0Su8MNPf%2BtN%2BoadNkd6Gg%3D%3D';
+    const apiUrl = `https://apis.data.go.kr/B090041/openapi/service/SpcdeInfoService/getRestDeInfo?solYear=${year}&solMonth=${String(month + 1).padStart(2, '0')}&ServiceKey=${apiKey}&_type=json`;
 
-  const response = await fetch(apiUrl);
-  const data = await response.json();
+    const response = await fetch(apiUrl);
+    const data = await response.json();
 
-  // 공공 API 휴일 목록
-  const holidays = new Set();
-  if (data.response.body.items?.item) {
-    const items = Array.isArray(data.response.body.items.item)
-      ? data.response.body.items.item
-      : [data.response.body.items.item];
-    for (const item of items) {
-      holidays.add(item.locdate.toString()); // 예: '20250606'
+    // 공공 API 휴일 목록
+    const holidays = new Set();
+    if (data.response.body.items?.item) {
+        const items = Array.isArray(data.response.body.items.item)
+            ? data.response.body.items.item
+            : [data.response.body.items.item];
+        for (const item of items) {
+            holidays.add(item.locdate.toString()); // 예: '20250606'
+        }
     }
-  }
 
-  // 사용자 지정 휴일 추가
-  for (const day of freeDays) {
-    holidays.add(day);
-  }
-
-  let fullMonthWorkdays = 0;
-  let untilTodayWorkdays = 0;
-
-  for (let day = 1; day <= lastDayOfMonth; day++) {
-    const date = new Date(year, month, day);
-    const weekday = date.getDay(); // 0=일요일, ..., 6=토요일
-    const dateStr = `${year}${String(month + 1).padStart(2, '0')}${String(day).padStart(2, '0')}`;
-
-    if (weekday >= 1 && weekday <= 5 && !holidays.has(dateStr)) {
-      fullMonthWorkdays++;
-      if (day <= todayDay) {
-        untilTodayWorkdays++;
-      }
+    // 사용자 지정 휴일 추가
+    for (const day of freeDays) {
+        holidays.add(day);
     }
-  }
 
-  return {
-    fullMonthWorkdays,
-    untilTodayWorkdays
-  };
+    let fullMonthWorkdays = 0;
+    let untilTodayWorkdays = 0;
+
+    for (let day = 1; day <= lastDayOfMonth; day++) {
+        const date = new Date(year, month, day);
+        const weekday = date.getDay(); // 0=일요일, ..., 6=토요일
+        const dateStr = `${year}${String(month + 1).padStart(2, '0')}${String(day).padStart(2, '0')}`;
+
+        if (weekday >= 1 && weekday <= 5 && !holidays.has(dateStr)) {
+            fullMonthWorkdays++;
+            if (day <= todayDay) {
+                untilTodayWorkdays++;
+            }
+        }
+    }
+
+    return {
+        fullMonthWorkdays,
+        untilTodayWorkdays
+    };
 }
 async function saveFreeDays() {
     console.log(freeDays.value)
@@ -288,13 +291,14 @@ async function saveFreeDays() {
     } catch (err) {
         console.error("Error saving data:", err);
     }
-}
 
+    getWorkTimeInfo();
+    isCalPopup.value = false;
+    
+}
 
 onMounted(async () => {
     getWorkTimeInfo();
-
-
 });
 </script>
 
@@ -315,9 +319,17 @@ onMounted(async () => {
                 style="display: flex; font-size:11px; justify-content: end; align-items: center;"><v-icon
                     size="12px">mdi-clock-outline</v-icon> {{ lastRefreshTime }}</span>
             <v-card class="mt-2 ml-2 mr-2" variant="flat">
-                <v-progress-linear v-model="prog" color="blue"
-                    :bg-color="isOver ? isOverPay ? 'red-darken-1' : 'yellow-darken-3' : 'blue-lighten-5'"
-                    bg-opacity="1" height="4" rounded :max="base">
+                <v-progress-linear 
+                    :model-value="prog > calProg ? calProg : prog" 
+                    :color= "prog > calProg ? 'green-lighten-2' : 'blue'"
+                    :buffer-value="prog > calProg ? prog : calProg"
+                    :buffer-color="prog > calProg ? 'blue' : 'green-lighten-2'"
+                    buffer-opacity="1"
+                    :max="base"
+                    :bg-color="isOver ? isOverPay ? 'red-darken-1' : 'yellow-darken-3' : 'grey'"
+                    bg-opaccity="1"
+                    height="8" 
+                    rounded >
                 </v-progress-linear>
             </v-card>
 
@@ -375,7 +387,7 @@ onMounted(async () => {
         </v-dialog>
         <v-dialog v-model="isCalPopup" max-width="500">
             <v-vard title="연차휴가일 선택">
-                <v-date-picker v-model="freeDays" multiple></v-date-picker>
+                <v-date-picker v-model="freeDays" color='red-lighten-3' multiple></v-date-picker>
                 <v-card-actions>
                     <v-spacer></v-spacer>
                     <v-btn text="취소" @click="isCalPopup = false"></v-btn>
