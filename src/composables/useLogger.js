@@ -9,12 +9,10 @@ const logPageVisit = async () => {
   const result = await fp.get();
   const visitorId = result.visitorId;
 
-  // 2. URL에서 pageId 추출
-  const pathSegments = window.location.href.split('/');
-  //console.log('Path:', window.location); // 디버깅용 로그
-
-  //console.log('Path Segments:', pathSegments); // 디버깅용 로그
-  const pageId = pathSegments[pathSegments.length - 1] || 'home';
+  // 2. 현재 페이지의 ID 추출
+  let pageId = extractLastPathSegment(window.location.href);
+  pageId = pageId === "#" ? "/" : pageId;
+  //console.log('Page ID:', pageId); // 디버깅용 로그
 
   // 3. 현재 시각
   const d = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Seoul' }));
@@ -31,17 +29,17 @@ const logPageVisit = async () => {
 
   try {
     const snapshot = await get(logsRef);
-    
+
     let existingLogs = [];
     let key = 0;
 
     if (snapshot.exists()) {
       existingLogs = snapshot.val();
       const LogKeys = Object.keys(existingLogs).map(Number); // 문자열이 아닌 숫자로 변환
-        // 0부터 순차적으로 증가하며 비어있는 값을 찾기
-        while (LogKeys.includes(key)) {
-          key++;
-        }
+      // 0부터 순차적으로 증가하며 비어있는 값을 찾기
+      while (LogKeys.includes(key)) {
+        key++;
+      }
     } else {
       key = 0;
     }
@@ -56,6 +54,16 @@ const logPageVisit = async () => {
   }
 };
 
+function extractLastPathSegment(url) {
+  // URL에서 맨 끝 '/'가 있을 경우 제거
+  const trimmedUrl = url.endsWith('/') ? url.slice(0, -1) : url;
+
+  // '/'를 기준으로 분할
+  const parts = trimmedUrl.split('/');
+
+  // 마지막 경로 추출
+  return parts[parts.length - 1];
+}
 
 // Composition API 훅 형태로 내보냄
 export const useLogger = () => {
