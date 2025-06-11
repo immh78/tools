@@ -357,7 +357,7 @@ onMounted(async () => {
                 </v-row>
                 <v-row>
                     <v-col cols="6">
-                        <v-text-field label="금일 근무시간" v-model="todayWorkTime.hour"
+                        <v-text-field :label="`금일 근무시간 (${workTimeInfo.start?.slice(0, 2) + ':' + workTimeInfo.start?.slice(2)})`" v-model="todayWorkTime.hour"
                             :style="{ color: workTimeInfo.start === '' ? 'white' : 'black' }" variant="outlined"
                             type="number" readonly></v-text-field> </v-col>
                     <v-col cols="6">
