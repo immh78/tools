@@ -113,7 +113,7 @@ function refreshCalcTime() {
     prog.value = workTimeInfo.value.actTime + getTime(todayWorkTime.value);
     //console.log(prog.value);
 
-    console.log("prog", prog.value, "base", base.value)
+    console.log("prog", prog.value, "base", base.value, "act", workTimeInfo.value.actTime)
 
     if (prog.value > workTimeInfo.value.planTime) {
         isOver.value = true;
@@ -320,9 +320,9 @@ onMounted(async () => {
                     size="12px">mdi-clock-outline</v-icon> {{ lastRefreshTime }}</span>
             <v-card class="mt-2 ml-2 mr-2" variant="flat">
                 <v-progress-linear 
-                    model-value="workTimeInfo.actTime" 
+                    :model-value="workTimeInfo.actTime" 
                     color= "blue"
-                    buffer-value="prog"
+                    :buffer-value="prog"
                     buffer-color="blue-lighten-3"
                     buffer-opacity="1"
                     :max="base"
@@ -331,12 +331,12 @@ onMounted(async () => {
                     height="8">
                 </v-progress-linear>
                 <v-progress-linear 
-                    model-value="calProg" 
-                    color= "green-lighten-2"
+                    :model-value="calProg" 
+                    color= "grey"
                     :max="base"
                     bg-color="grey"
                     bg-opaccity="1"
-                    height="4" >
+                    height="2" >
                 </v-progress-linear>
             </v-card>
 
