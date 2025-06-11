@@ -19,6 +19,7 @@ const remainTime = ref({ hour: '-', minute: '-' }); // 잔여 근무시간
 const isSnackbar = ref(false);
 const lastRefreshTime = ref("");
 const freeDays = ref([]);
+const prePay= 16.5;
 
 const base = ref(0); 
 const prog = ref(0);
@@ -57,7 +58,7 @@ async function getWorkTimeInfo() {
         });
 
 
-    base.value = workTimeInfo.value.planTime;
+    base.value = workTimeInfo.value.planTime + prePay;
     start.value = workTimeInfo.value.start;
     finish.value = '';
 
@@ -115,16 +116,16 @@ function refreshCalcTime() {
 
     console.log("prog", prog.value, "base", base.value, "act", workTimeInfo.value.actTime)
 
-    if (prog.value > workTimeInfo.value.planTime) {
+    if (prog.value > workTimeInfo.value.planTime + prePay) {
         isOver.value = true;
         base.value = prog.value;
         prog.value = workTimeInfo.value.planTime;
 
         //console.log("over", workTimeInfo.value.actTime + todayWorkTime.value - workTimeInfo.value.planTime - 16.5);
 
-        if (workTimeInfo.value.actTime + getTime(todayWorkTime.value) - workTimeInfo.value.planTime > 16.5) {
+        if (workTimeInfo.value.actTime + getTime(todayWorkTime.value) - workTimeInfo.value.planTime > prePay) {
             isOverPay.value = true;
-            overTimePay.value = Math.round(workTimeInfo.value.salary / 240 * 1.5 * (workTimeInfo.value.actTime + getTime(todayWorkTime.value) - workTimeInfo.value.planTime - 16.5)).toLocaleString();
+            overTimePay.value = Math.round(workTimeInfo.value.salary / 240 * 1.5 * (workTimeInfo.value.actTime + getTime(todayWorkTime.value) - workTimeInfo.value.planTime - prePay)).toLocaleString();
         }
     }
 
@@ -333,6 +334,9 @@ onMounted(async () => {
                 <v-progress-linear 
                     :model-value="calProg" 
                     color= "grey"
+                    :buffer-value="calProg + prePay"
+                    buffer-color="grey-lighten-2"
+                    buffer-opacity="1"
                     :max="base"
                     bg-color="grey"
                     bg-opaccity="1"
