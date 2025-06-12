@@ -40,7 +40,8 @@ async function login() {
     cookies.set('authToken', token);
     userStore.setUser({
       email: user.email,
-      name: selectUserName(user.uid)
+      name: selectUserName(user.uid),
+      uid: user.uid
     });
 
     router.push('/');

@@ -1,8 +1,9 @@
 // src/router/index.js 또는 main.js
 import { createRouter, createWebHashHistory } from 'vue-router';
+import { database, ref as firebaseRef, get } from "../config/firebase";
+
 import Main from '../pages/Main.vue';
 import DuesList from '../pages/DuesList.vue';
-//import EnqQuizChapterAdj from '../pages/EngQuizChapterAdj.vue';
 import TljSMS from '../pages/TljSMS.vue';
 import LogView from '../pages/LogView.vue';
 import WorkTime from '../pages/WorkTime.vue';
@@ -14,6 +15,7 @@ import Scoring from '../pages/Scoring.vue';
 import Login from '../pages/Login.vue';
 import Register from '../pages/Register.vue';
 import { isLoggedIn } from '../config/authGuard';
+
 
 const routes = [
   {
