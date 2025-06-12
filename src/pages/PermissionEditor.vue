@@ -2,7 +2,6 @@
 import { ref, onMounted } from 'vue';
 import { database, ref as firebaseRef, get, set } from '../config/firebase';
 import { useRouter } from 'vue-router';
-import { AppBarTitle, usePageMeta } from '../composables/getRouteInfo';
 
 const routes = useRouter().options.routes;
 const routeList = routes.filter(r => r.meta?.restricted);
@@ -12,22 +11,20 @@ const permissionMap = ref({});
 const isSnackbar = ref(false);
 
 // AppBarTitle 컴포넌트에서 사용하는 아이콘
-const { icon } = usePageMeta();
-const defaultIcon = ref(icon.value);
-const refreshIcon = ref('');
+const titleIcon = ref('');
 
 function setLoadingIcon() {
-  refreshIcon.value = 'mdi-refresh';
+    titleIcon.value = 'mdi-refresh';
 }
 
 function resetIcon() {
-  refreshIcon.value = defaultIcon.value; // 복원
+    titleIcon.value = 'mdi-account-key'; // 복원
 }
 
 const headers = [
-    { text: '페이지 경로', value: 'path' },
-    { text: '설명', value: 'comment' },
-    { text: '권한 사용자', value: 'users' }
+    { title: '페이지', value: 'path' },
+    { title: '설명', value: 'comment' },
+    { title: '사용자', value: 'users' }
 ];
 
 async function loadData() {
@@ -70,36 +67,34 @@ onMounted(loadData);
             <template v-slot:append>
                 <v-btn icon="mdi-content-save" @click="savePermissions()" />
             </template>
-            <AppBarTitle :onIconClick="loadData" :refreshIcon="refreshIcon" />
+            <v-app-bar-title><v-icon @click="loadData()">{{ titleIcon }}</v-icon> 식권대장 점심</v-app-bar-title>
         </v-app-bar>
 
         <v-main>
-            <v-container>
-                <span class="mt-2 mr-2"
-                    style="display: flex; font-size:11px; justify-content: end; align-items: center;">
-                    <v-icon size="12px">mdi-account-key</v-icon>
-                    {{ new Date().toLocaleString() }}
-                </span>
-
-                <v-card class="mt-2 ml-2 mr-2" variant="flat">
-                    <v-data-table :items="routeList" :headers="headers" item-value="path">
-                        <template #item.users="{ item }">
+            <v-card class="ml-2 mr-2" variant="flat">
+                <v-data-table :items="routeList" :headers="headers" item-value="path" hide-default-footer
+                    items-per-page="-1" :show-items-per-page="false">
+                    <template #item.users="{ item }">
+                        <v-select class="mt-6" v-model="permissionMap[item.path]" :items="userOptions" item-title="name"
+                            item-value="uid" multiple chips clearable variant="outlined" density="comfortable" />
+                        <!-- <div class="d-flex align-center" style="height: 100%;">
                             <v-select v-model="permissionMap[item.path]" :items="userOptions" item-title="name"
-                                item-value="uid" multiple chips clearable variant="outlined" density="comfortable" />
-                        </template>
-                    </v-data-table>
+                                item-value="uid" multiple chips clearable variant="outlined" density="comfortable"
+                                style="width: 100%;" /> -->
+                        <!-- </div> -->
+                    </template>
+                </v-data-table>
 
-                    <v-card-actions class="justify-end">
-                        <v-btn color="primary" class="ma-2" @click="savePermissions">
-                            <v-icon start>mdi-content-save</v-icon>
-                            저장
-                        </v-btn>
-                    </v-card-actions>
-                </v-card>
-            </v-container>
+                <v-card-actions class="justify-end">
+                    <v-btn color="primary" class="ma-2" @click="savePermissions">
+                        <v-icon start>mdi-content-save</v-icon>
+                        저장
+                    </v-btn>
+                </v-card-actions>
+            </v-card>
+
         </v-main>
 
         <v-snackbar v-model="isSnackbar">저장 완료!</v-snackbar>
     </v-app>
 </template>
-

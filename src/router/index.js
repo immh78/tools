@@ -54,7 +54,7 @@ const routes = [
     meta: { requiresAuth: true, restricted: true }
   },
   { path: '/scoring', component: Scoring, comment: '채점', icon: 'mdi-note-edit-outline',
-    meta: { requiresAuth: false, restricted: false }
+    meta: { requiresAuth: true, restricted: false }
    },
   {
     path: '/test', component: Test, comment: '테스트', icon: 'mdi-flask',
@@ -76,7 +76,7 @@ const routes = [
   ,
   {
     path: '/permission-editor', component: PermissionEditor, comment: '권한설정', icon: 'mdi-account-key',
-    meta: { requiresAuth: false, restricted: false }
+    meta: { requiresAuth: true, restricted: true }
   }
 ]
 

@@ -16,6 +16,7 @@ const router = useRouter();
 const cookies = useCookies();
 const userStore = useUserStore();
 
+
 // 라우트 배열에서 메인 페이지(`/`)를 제외한 라우트만 필터링
 const filteredRoutes = router.options.routes.filter(route => route.path !== '/');
 
