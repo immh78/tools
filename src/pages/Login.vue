@@ -1,50 +1,31 @@
 <script setup>
 import { ref } from 'vue';
 import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth, database, ref as firebaseRef, get } from '../config/firebase';
-import { useRouter } from 'vue-router';
+import { auth } from '../config/firebase';
+import { useRouter, useRoute } from 'vue-router';
 import { useCookies } from '@vueuse/integrations/useCookies';
-import { useUserStore } from '../store/user';
 
 const email = ref('');
 const password = ref('');
 const showPassword = ref(false);
 const loading = ref(false);
+const route = useRoute();
 const router = useRouter();
 const cookies = useCookies();
-const userStore = useUserStore(); // ✅ 여기서 실행해서 인스턴스를 얻음
 
-async function selectUserName(uid) {
-  const dbRef = firebaseRef(database, "user/" + uid);
-  let userInfo = "";
-  await get(dbRef)
-    .then(snapshot => {
-      if (snapshot.exists()) {
-        userInfo = snapshot.val();
-      }
-    })
-    .catch(err => {
-      //console.error("Error fetching data:", err);
-    });
-
-  return userInfo.name;
-}
 
 async function login() {
   try {
     const userCredential = await signInWithEmailAndPassword(auth, email.value, password.value);
     const user = userCredential.user;
-    console.log("user", user);
     const token = await user.getIdToken();
 
     cookies.set('authToken', token);
-    userStore.setUser({
-      email: user.email,
-      name: selectUserName(user.uid),
-      uid: user.uid
-    });
 
-    router.push('/');
+    // 리디렉트 경로 있으면 해당 페이지로, 없으면 홈으로
+    const redirectTo = route.query.redirect || '/';
+    router.push(redirectTo);
+
   } catch (error) {
     console.error('로그인 오류:', error.code);
     switch (error.code) {

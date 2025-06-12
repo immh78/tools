@@ -9,15 +9,18 @@ export function usePageMeta() {
   const route = useRoute();
   const router = useRouter();
 
-  const matched = computed(() =>
-    router.options.routes.find(r => r.path === route.path) || {}
-  );
+  const matched = computed(() => {
+    const found = router.options.routes.find(r => r.path === route.path);
+    return found || {};
+  });
 
-  const comment = computed(() => matched.value.comment || '페이지');
-  const icon = computed(() => matched.value.icon || 'mdi-apps');
+  const comment = computed(() => matched.value?.comment || '페이지');
+  const icon = computed(() => matched.value?.icon || 'mdi-apps');
 
   return { comment, icon };
 }
+
+
 
 /**
  * 공통 <v-app-bar-title> 컴포넌트

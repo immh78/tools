@@ -80,7 +80,7 @@ async function getWorkTimeInfo() {
     calProg.value = workingDays.untilTodayWorkdays * 8;
 
 
-    console.log("calProg.value", calProg.value);
+    //console.log("calProg.value", calProg.value);
 
     refreshCalcTime();
 }
@@ -97,7 +97,7 @@ function getTime({ hour, minute }) {
 
 function refreshCalcTime() {
     setLoadingIcon();
-    console.log("refresh start", start.value);
+    //console.log("refresh start", start.value);
     if (start.value === "") {
         todayWorkTime.value = { hour: 0, minute: 0 };
     } else {
@@ -114,7 +114,7 @@ function refreshCalcTime() {
     prog.value = workTimeInfo.value.actTime + getTime(todayWorkTime.value);
     //console.log(prog.value);
 
-    console.log("prog", prog.value, "base", base.value, "act", workTimeInfo.value.actTime)
+    //console.log("prog", prog.value, "base", base.value, "act", workTimeInfo.value.actTime)
 
     if (prog.value > workTimeInfo.value.planTime + prePay) {
         isOver.value = true;

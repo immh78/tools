@@ -35,6 +35,9 @@ onMounted(async () => {
   const result = await fp.get();
 
   visitorId.value = result.visitorId;
+
+  console.log(userStore.user);
+
 });
 </script>
 

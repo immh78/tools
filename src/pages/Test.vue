@@ -1,24 +1,40 @@
-<template>
-  <div class="pattern-container" @touchstart="start" @touchmove="move" @touchend="end">
-    <div
-      v-for="(dot, index) in dots"
-      :key="index"
-      :class="['dot', { active: selected.includes(index) }]"
-      :style="{ left: dot.x + 'px', top: dot.y + 'px' }"
-      ref="dotRefs"
-    ></div>
-    <canvas ref="canvas" class="canvas"></canvas>
-  </div>
-</template>
-
 <script setup>
 import { ref, onMounted } from 'vue'
+import { database, ref as firebaseRef, get } from '../config/firebase';
 
 const selected = ref([])
 const dots = ref([])
 const dotRefs = ref([])
 const canvas = ref(null)
 const ctx = ref(null)
+
+
+async function selectData() {
+  const dbRef = firebaseRef(database, "permission/tools");
+  await get(dbRef)
+    .then(snapshot => {
+      if (snapshot.exists()) {
+        const permissionData = snapshot.val();
+        console.log("permissionData", permissionData);
+      }
+    })
+    .catch(err => {
+      //console.error("Error fetching data:", err);
+    });
+
+  const dbRef2 = firebaseRef(database, "user");
+  await get(dbRef2)
+    .then(snapshot => {
+      if (snapshot.exists()) {
+        const userData = snapshot.val();
+        console.log("userData", userData);
+      }
+    })
+    .catch(err => {
+      //console.error("Error fetching data:", err);
+    });
+
+}
 
 onMounted(() => {
   const spacing = 100
@@ -30,6 +46,8 @@ onMounted(() => {
   ctx.value = canvas.value.getContext('2d')
   canvas.value.width = 300
   canvas.value.height = 300
+
+  selectData();
 })
 
 const start = (e) => {
@@ -71,6 +89,16 @@ const draw = () => {
   ctx.value.stroke()
 }
 </script>
+
+<template>
+  <div class="pattern-container" @touchstart="start" @touchmove="move" @touchend="end">
+    <div v-for="(dot, index) in dots" :key="index" :class="['dot', { active: selected.includes(index) }]"
+      :style="{ left: dot.x + 'px', top: dot.y + 'px' }" ref="dotRefs"></div>
+    <canvas ref="canvas" class="canvas"></canvas>
+  </div>
+</template>
+
+
 
 <style scoped>
 .pattern-container {
