@@ -78,6 +78,7 @@ async function selectData() {
             //console.error("Error fetching data:", err);
         });
 
+    console.log("* tljResv:", tljResv.value);
     // Calculate sum
     prepayTab.value = [];
     if (tljResv.value.prepayment) {
@@ -90,6 +91,8 @@ async function selectData() {
             itemPrepay.key = key;  // 각 항목에 key 값을 추가
             prepayTab.value.push(itemPrepay);
         });
+
+        console.log("* prepayTab:", prepayTab.value);
 
     } else {
         summary.value.prepayment = 0;
@@ -696,11 +699,24 @@ onMounted(async () => {
 </template>
 
 <style scoped>
-::v-deep(.v-data-table__th) {
+::v-deep(#prepaymentTable .v-data-table__th) {
     font-size: 28px;
     font-weight: bold;
     background-color: rgb(199, 221, 162);
 }
+
+::v-deep(#reservationTable .v-data-table__th) {
+    font-size: 28px;
+    font-weight: bold;
+    background-color: #ddb2a2;
+}
+
+::v-deep(#productTable .v-data-table__th) {
+    font-size: 28px;
+    font-weight: bold;
+    background-color: hsl(290, 46%, 75%);
+}
+
 
 tr {
     height: 60px !important;
@@ -721,7 +737,7 @@ td {
 .sum-header {
     font-size: 28px;
     font-weight: bold;
-    background-color: rgb(199, 221, 162);
+    background-color: #a2b8dd;
 }
 
 .sum-value {
