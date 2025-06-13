@@ -110,7 +110,7 @@ onMounted(loadData);
             <template v-slot:append>
                 <v-btn icon="mdi-content-save" @click="savePermissions()" />
             </template>
-            <v-app-bar-title><v-icon @click="loadData()">{{ titleIcon }}</v-icon> 식권대장 점심</v-app-bar-title>
+            <v-app-bar-title><v-icon @click="loadData()">{{ titleIcon }}</v-icon> 권한 설정</v-app-bar-title>
         </v-app-bar>
 
         <v-main>
