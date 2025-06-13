@@ -10,16 +10,21 @@ import * as directives from "vuetify/directives";
 import "vuetify/styles";
 import '@mdi/font/css/materialdesignicons.css'; // MDI 아이콘 스타일 추가
 import { createPinia } from 'pinia';
-import persistedState from 'pinia-plugin-persistedstate'; 
+import persistedState from 'pinia-plugin-persistedstate';
+import * as labs from 'vuetify/labs/components'
+
 
 
 // Vuetify 인스턴스 생성
 const vuetify = createVuetify({
-    components,
+    components: {
+        ...components, ...labs
+    },
     directives,
+
 })
 const pinia = createPinia();
-pinia.use(persistedState); 
+pinia.use(persistedState);
 
 
 router.isReady().then(() => {

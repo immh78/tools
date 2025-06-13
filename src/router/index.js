@@ -18,6 +18,7 @@ import Login from '../pages/Login.vue';
 import Register from '../pages/Register.vue';
 import AccessDenied from '../pages/AccessDenied.vue';
 import PermissionEditor from '../pages/PermissionEditor.vue';
+import DbBrowser from '../pages/DbBrowser.vue';
 
 
 const routes = [
@@ -53,9 +54,14 @@ const routes = [
     path: '/offering', component: Offering, comment: '헌금', icon: 'mdi-offer',
     meta: { requiresAuth: true, restricted: true }
   },
-  { path: '/scoring', component: Scoring, comment: '채점', icon: 'mdi-note-edit-outline',
+  {
+    path: '/scoring', component: Scoring, comment: '채점', icon: 'mdi-note-edit-outline',
     meta: { requiresAuth: true, restricted: false }
-   },
+  },
+  {
+    path: '/db-browser', component: DbBrowser, comment: 'DB 브라우저', icon: 'mdi-database-search',
+    meta: { requiresAuth: true, restricted: true }
+  },
   {
     path: '/test', component: Test, comment: '테스트', icon: 'mdi-flask',
     meta: { requiresAuth: false, restricted: false }
@@ -86,7 +92,7 @@ async function checkPermission(path, uid) {
 
   const dbRef = firebaseRef(database, "permission/tools" + path);
   //console.log('check permission', "permission/tools" + path, uid)
-  
+
   try {
     const snapshot = await get(dbRef);
     if (snapshot.exists()) {
