@@ -2,7 +2,7 @@
 import { ref, onMounted, watch } from 'vue'
 import { database, ref as firebaseRef, get, update, remove } from "../config/firebase";
 import { useLogger } from '../composables/useLogger';
-import { AppBarTitle, usePageMeta} from '../composables/getRouteInfo';
+import { AppBarTitle, usePageMeta } from '../composables/getRouteInfo';
 
 useLogger();
 
@@ -10,6 +10,9 @@ const carBook = ref({});
 const tab = ref("SORENTO");
 const mileageSORENTO = ref(0);
 const mileageSM6 = ref(0);
+const forecateDateSORENTO = ref("");
+const forecateDateSM6 = ref("");
+const forecateDate = ref("");
 const mileage = ref(0);
 const lastChangeOilSORENTO = ref(0);
 const lastChangeOilSM6 = ref(0);
@@ -30,19 +33,19 @@ const defaultIcon = ref(icon.value);
 const refreshIcon = ref('');
 
 function setLoadingIcon() {
-  refreshIcon.value = 'mdi-refresh';
+    refreshIcon.value = 'mdi-refresh';
 }
 
 function resetIcon() {
-  refreshIcon.value = defaultIcon.value; // 복원
+    refreshIcon.value = defaultIcon.value; // 복원
 }
 
 const headers = [
     { title: '날짜', align: 'start', key: 'date', value: 'date', width: 140 },
-    { title: '항목', align: 'start', key: 'category', value: 'category', nowrap:true },
+    { title: '항목', align: 'start', key: 'category', value: 'category', nowrap: true },
     { title: '주행거리', align: 'end', key: 'mileage', value: 'mileage', width: 120 },
 ];
-const currentPage = ref(1); 
+const currentPage = ref(1);
 
 async function selectData() {
     setLoadingIcon();
@@ -65,8 +68,11 @@ async function selectData() {
     //console.log("listSORENTO", listSORENTO.value);
     //console.log("listSM6", listSM6.value);
 
-    mileageSORENTO.value = calcEstimatedMileage(listSORENTO.value);
-    mileageSM6.value = calcEstimatedMileage(listSM6.value);
+    mileageSORENTO.value = calcEstimatedMileage(listSORENTO.value).forecateMileage;
+    const avgPerDaySORENTO = calcEstimatedMileage(listSORENTO.value).avgPerDay;
+    
+    mileageSM6.value = calcEstimatedMileage(listSM6.value).forecateMileage;
+    const avgPerDaySM6 = calcEstimatedMileage(listSM6.value).avgPerDay;
 
     //console.log("mileageSORENTO", mileageSORENTO.value);
     //console.log("mileageSM6", mileageSM6.value);
@@ -74,9 +80,24 @@ async function selectData() {
     lastChangeOilSORENTO.value = getLastChangeOilMileage(listSORENTO.value);
     lastChangeOilSM6.value = getLastChangeOilMileage(listSM6.value);
 
+    forecateDateSORENTO.value = getForecateDate(mileageSORENTO.value, lastChangeOilSORENTO.value, avgPerDaySORENTO);
+    forecateDateSM6.value = getForecateDate(mileageSM6.value, lastChangeOilSM6.value, avgPerDaySM6);
+
     //console.log("lastChangeOilSORENTO", lastChangeOilSORENTO.value);
     //console.log("lastChangeOilSM6", lastChangeOilSM6.value);
     resetIcon();
+}
+
+function getForecateDate(mileage, lastChangeOil, avgPerDay) {
+    const today = new Date().setHours(0, 0, 0, 0);
+    const date = new Date(today + (((oilChangeMileage - (mileage - lastChangeOil)) / avgPerDay) * 1000 * 60 * 60 * 24));
+    console.log("마지막 오일 교체후 거리", mileage - lastChangeOil)
+    console.log("오일교체까지 남은 거리", oilChangeMileage - (mileage - lastChangeOil))
+    console.log("남은거리/ 하루평균 주행거리", (oilChangeMileage - (mileage - lastChangeOil)) / avgPerDay)
+    console.log("오늘 + 남은일수", today + (((oilChangeMileage - (mileage - lastChangeOil)) / avgPerDay) * 1000 * 60 * 60 * 24));
+    // "2025. 7. 12" 형식으로 출력
+
+    return `${date.getFullYear()}.${date.getMonth() + 1}.${date.getDate()}`;
 }
 
 function parseDate(dateStr) {
@@ -113,14 +134,17 @@ function calcEstimatedMileage(data) {
     const daysDiff = (date2 - date1) / (1000 * 60 * 60 * 24)
     const mileageDiff = mileage2 - mileage1
 
-    const avgPerDay = mileageDiff / daysDiff
+    const avgPerDay = mileageDiff / daysDiff;
 
     const today = new Date().setHours(0, 0, 0, 0);
 
     //console.log("today", today, "date2", date2, "diff", (today - date2)/ (1000 * 60 * 60 * 24));
     const daysSinceLast = (today - date2) / (1000 * 60 * 60 * 24)
 
-    return mileage2 + Math.round(avgPerDay * daysSinceLast)
+    const forecateMileage = mileage2 + Math.round(avgPerDay * daysSinceLast);
+    // 오늘까지 예상 주행거리 = 최종 주행거리 + (평균 일일 주행거리 * 오늘까지 지난 일수)
+
+    return { forecateMileage, avgPerDay };
 }
 
 function getLastChangeOilMileage(data) {
@@ -145,13 +169,17 @@ function changeTab(newTab) {
     if (newTab === "SORENTO") {
         mileage.value = mileageSORENTO.value;
         oilMileage.value = mileageSORENTO.value - lastChangeOilSORENTO.value;
+        forecateDate.value = forecateDateSORENTO.value;
         list.value = listSORENTO.value;
 
     } else {
         mileage.value = mileageSM6.value;
         oilMileage.value = mileageSM6.value - lastChangeOilSM6.value;
+        forecateDate.value = forecateDateSM6.value;
         list.value = listSM6.value;
     }
+
+    //console.log("forecateDate", forecateDate.value);
 }
 
 watch(() => addData.value.category, (newVal) => {
@@ -233,12 +261,12 @@ function openDetailPopup(item) {
 
 async function addAction() {
     const key = carBook.value[tab.value].length;
-    addData.value.date = addData.value.date.replaceAll('-', '');    
+    addData.value.date = addData.value.date.replaceAll('-', '');
     addData.value.cost = addData.value.cost ? Number(addData.value.cost) : -1;
     addData.value.category = addData.value.category || "주행거리";
     addData.value.remark = addData.value.remark || "";
     addData.value.mileage = Number(addData.value.mileage);
-    
+
 
     const data = {
         [key]: addData.value
@@ -283,6 +311,7 @@ onMounted(async () => {
             </v-tabs>
             <v-card class="mt-2 mx-4" variant="flat">
                 <v-text-field v-model="mileage" label="주행거리" variant="outlined" class="mt-2"></v-text-field>
+                <span style="display: block; text-align: right; font-size: 12px;">{{ forecateDate }}</span>
                 <v-progress-linear :color="getProgressColor(oilMileage / oilChangeMileage * 100)" height="12"
                     :max="oilChangeMileage" v-model="oilMileage"
                     :style="{ color: getProgressTextColor(oilMileage / oilChangeMileage * 100), fontSize: '9px' }"
@@ -290,23 +319,24 @@ onMounted(async () => {
                         oilMileage.toLocaleString()
                     }}</v-progress-linear>
             </v-card>
-            <v-data-table :headers="headers" :items="list.filter(item => item.category !== '주행거리')" no-data-text="조회중입니다." loading-text="조회중입니다."
-                items-per-page=8 v-model:page="currentPage">
+            <v-data-table :headers="headers" :items="list.filter(item => item.category !== '주행거리')"
+                no-data-text="조회중입니다." loading-text="조회중입니다." items-per-page=8 v-model:page="currentPage">
                 <template v-slot:item.date="{ item }">
                     <span @click="openDetailPopup(item)">
-                   {{ item.date.slice(0, 4) }}. {{ Number(item.date.slice(4, 6)) }}. {{ Number(item.date.slice(6, 8)) }}
-                   </span>
+                        {{ item.date.slice(0, 4) }}. {{ Number(item.date.slice(4, 6)) }}. {{ Number(item.date.slice(6,
+                            8)) }}
+                    </span>
                 </template>
                 <template v-slot:item.category="{ item }" @click="openDetailPopup(item)">
                     <span @click="openDetailPopup(item)">
-                    {{ item.category.length > 12 ? item.category.substring(0, 12) + "..." : item.category }}
-                   </span>
+                        {{ item.category.length > 12 ? item.category.substring(0, 12) + "..." : item.category }}
+                    </span>
                 </template>
                 <template v-slot:item.mileage="{ item }" @click="openDetailPopup(item)">
                     <span @click="openDetailPopup(item)">
-                    {{ item.mileage.toLocaleString() }}     
-                   </span>
-                 </template>
+                        {{ item.mileage.toLocaleString() }}
+                    </span>
+                </template>
             </v-data-table>
         </v-main>
         <v-dialog v-model="isPopup" max-width="380px">

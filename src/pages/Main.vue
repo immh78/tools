@@ -37,7 +37,7 @@ onMounted(async () => {
 
   visitorId.value = result.visitorId;
 
-  console.log(userStore.user);
+  //console.log(userStore.user);
 
 });
 </script>

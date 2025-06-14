@@ -123,7 +123,7 @@ router.beforeEach(async (to, from, next) => {
 
   // 권한 필요
   if (to.meta.restricted && uid) {
-    console.log("to.path", to.path);
+    //console.log("to.path", to.path);
     const isPermitted = await checkPermission(to.path, uid);
     if (!isPermitted) {
       return next('/access-denied');
