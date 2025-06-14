@@ -1,10 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import { useLogger } from '../composables/useLogger';
 import { database, ref as firebaseRef, get, update, remove } from "../config/firebase";
 import { AppBarTitle, usePageMeta } from '../composables/getRouteInfo';
-
-useLogger();
 
 const offering = ref({});
 const isOpenPopup = ref(false);

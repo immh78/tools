@@ -24,65 +24,65 @@ import DbBrowser from '../pages/DbBrowser.vue';
 const routes = [
   {
     path: '/', component: Main, comment: '도구 모음', icon: 'mdi-tools',
-    meta: { requiresAuth: true, restricted: true }
+    meta: { requiresAuth: true, restricted: true, loggable: true }
   },
   {
     path: '/dues-list', component: DuesList, comment: '우미린 가족여행 회비 목록', icon: 'mdi-umbrella-beach',
-    meta: { requiresAuth: true, restricted: false }
+    meta: { requiresAuth: true, restricted: false, loggable: true }
   },
   {
     path: '/tlj-sms', component: TljSMS, comment: '뚜레쥬르 식권대장 예약', icon: 'mdi-cupcake',
-    meta: { requiresAuth: true, restricted: true }
+    meta: { requiresAuth: true, restricted: true, loggable: true }
   },
   {
     path: '/log-view', component: LogView, comment: '로그 조회', icon: 'mdi-note-search-outline',
-    meta: { requiresAuth: true, restricted: true }
+    meta: { requiresAuth: true, restricted: true, loggable: true }
   },
   {
     path: '/work-time', component: WorkTime, comment: '근무 시간', icon: 'mdi-clipboard-text-clock',
-    meta: { requiresAuth: true, restricted: true }
+    meta: { requiresAuth: true, restricted: true, loggable: true }
   },
   {
     path: '/regular-task', component: RegularTask, comment: '정기적으로 할 일', icon: 'mdi-clipboard-check-outline',
-    meta: { requiresAuth: true, restricted: true }
+    meta: { requiresAuth: true, restricted: true, loggable: true }
   },
   {
     path: '/car-book', component: CarBook, comment: '차계부', icon: 'mdi-car-wrench',
-    meta: { requiresAuth: true, restricted: true }
+    meta: { requiresAuth: true, restricted: true, loggable: true }
   },
   {
     path: '/offering', component: Offering, comment: '헌금', icon: 'mdi-offer',
-    meta: { requiresAuth: true, restricted: true }
+    meta: { requiresAuth: true, restricted: true, loggable: true }
   },
   {
     path: '/scoring', component: Scoring, comment: '채점', icon: 'mdi-note-edit-outline',
-    meta: { requiresAuth: true, restricted: false }
+    meta: { requiresAuth: true, restricted: false, loggable: true }
   },
   {
     path: '/db-browser', component: DbBrowser, comment: 'DB 브라우저', icon: 'mdi-database-search',
-    meta: { requiresAuth: true, restricted: true }
+    meta: { requiresAuth: true, restricted: true, loggable: true }
   },
   {
     path: '/test', component: Test, comment: '테스트', icon: 'mdi-flask',
-    meta: { requiresAuth: false, restricted: false }
+    meta: { requiresAuth: false, restricted: false, loggable: true }
   },
   {
     path: '/login', component: Login, comment: '로그인', icon: 'mdi-login',
-    meta: { requiresAuth: false, restricted: false }
+    meta: { requiresAuth: false, restricted: false, loggable: false }
 
   },
   {
     path: '/register', component: Register, comment: '회원등록', icon: 'mdi-account-plus',
-    meta: { requiresAuth: false, restricted: false }
+    meta: { requiresAuth: false, restricted: false, loggable: false }
   },
   {
     path: '/access-denied', component: AccessDenied, comment: '권한없음', icon: 'mdi-cancel',
-    meta: { requiresAuth: false, restricted: false }
+    meta: { requiresAuth: false, restricted: false, loggable: false }
   },
   ,
   {
     path: '/permission-editor', component: PermissionEditor, comment: '권한설정', icon: 'mdi-account-key',
-    meta: { requiresAuth: true, restricted: true }
+    meta: { requiresAuth: true, restricted: true, loggable: true }
   }
 ]
 

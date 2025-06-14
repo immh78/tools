@@ -1,11 +1,9 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'
-import { useLogger } from '../composables/useLogger';
 import html2canvas from 'html2canvas';
 import { database, ref as firebaseRef, get, update, remove } from "../config/firebase";
 import { AppBarTitle, usePageMeta } from '../composables/getRouteInfo';
 
-useLogger();
 
 const tljResv = ref({});
 const tab = ref("");

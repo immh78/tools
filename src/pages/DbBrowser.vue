@@ -1,10 +1,7 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'
 import { database, ref as dbRef, get } from '../config/firebase';
-import { useLogger } from '../composables/useLogger';
 import { AppBarTitle, usePageMeta } from '../composables/getRouteInfo';
-
-useLogger();
 
 // AppBarTitle 컴포넌트에서 사용하는 아이콘
 const { icon } = usePageMeta();

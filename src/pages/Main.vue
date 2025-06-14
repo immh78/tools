@@ -2,14 +2,11 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router';
 import FingerprintJS from '@fingerprintjs/fingerprintjs';
-import { useLogger } from '../composables/useLogger';
 import { AppBarTitle } from '../composables/getRouteInfo';
 import { auth } from '../config/firebase';
 import { signOut } from 'firebase/auth';
 import { useCookies } from '@vueuse/integrations/useCookies';
 import { useUserStore } from '../store/user';
-
-useLogger();
 
 const visitorId = ref('');
 const router = useRouter();

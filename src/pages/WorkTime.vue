@@ -397,14 +397,14 @@ onMounted(async () => {
             </v-card>
         </v-dialog>
         <v-dialog v-model="isCalPopup" max-width="500">
-            <v-vard title="연차휴가일 선택">
+            <v-card title="연차휴가일 선택">
                 <v-date-picker v-model="freeDays" color='red-lighten-3' multiple></v-date-picker>
                 <v-card-actions>
                     <v-spacer></v-spacer>
                     <v-btn text="취소" @click="isCalPopup = false"></v-btn>
                     <v-btn text="저장" @click="saveFreeDays()"></v-btn>
                 </v-card-actions>
-            </v-vard>
+            </v-card>
         </v-dialog>
     </v-app>
 

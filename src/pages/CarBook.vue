@@ -1,10 +1,7 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'
 import { database, ref as firebaseRef, get, update, remove } from "../config/firebase";
-import { useLogger } from '../composables/useLogger';
 import { AppBarTitle, usePageMeta } from '../composables/getRouteInfo';
-
-useLogger();
 
 const carBook = ref({});
 const tab = ref("SORENTO");

@@ -1,10 +1,7 @@
 <script setup>
 import { database, ref as firebaseRef, get, update, set } from "../config/firebase";
 import { ref, onMounted } from 'vue';
-import { useLogger } from '../composables/useLogger';
 import { AppBarTitle, usePageMeta } from '../composables/getRouteInfo';
-
-useLogger();
 
 const logTable = ref(null);
 const userTable = ref([]);
