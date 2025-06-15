@@ -65,11 +65,15 @@ async function selectData() {
     //console.log("listSORENTO", listSORENTO.value);
     //console.log("listSM6", listSM6.value);
 
-    mileageSORENTO.value = calcEstimatedMileage(listSORENTO.value).forecateMileage;
-    const avgPerDaySORENTO = calcEstimatedMileage(listSORENTO.value).avgPerDay;
+    let {forecateMileage, avgPerDay} = calcEstimatedMileage(listSORENTO.value);
 
-    mileageSM6.value = calcEstimatedMileage(listSM6.value).forecateMileage;
-    const avgPerDaySM6 = calcEstimatedMileage(listSM6.value).avgPerDay;
+    mileageSORENTO.value = forecateMileage;
+    const avgPerDaySORENTO = avgPerDay;
+
+    ({forecateMileage, avgPerDay} = calcEstimatedMileage(listSM6.value));
+
+    mileageSM6.value = forecateMileage;
+    const avgPerDaySM6 = avgPerDay;
 
     //console.log("mileageSORENTO", mileageSORENTO.value);
     //console.log("mileageSM6", mileageSM6.value);
@@ -108,14 +112,33 @@ function sortData(data) {
     return [...data].sort((a, b) => parseDate(b.date) - parseDate(a.date));
 }
 
+function threeMonthsAgo(yyyymmdd) {
+  // 1. 문자열 → Date
+  const y = +yyyymmdd.slice(0, 4);
+  const m = +yyyymmdd.slice(4, 6) - 1; // JS는 0-based month
+  const d = +yyyymmdd.slice(6, 8);
+  const date = new Date(Date.UTC(y, m, d));   // UTC로 만들어두면 타임존 문제↓ 최소화
+
+  // 2. 3개월 차감 (내장 메서드가 월 길이/윤년 자동 보정)
+  date.setUTCMonth(date.getUTCMonth() - 3);
+
+  // 3. 다시 YYYYMMDD 포맷
+  const yyyy = date.getUTCFullYear();
+  const mm   = String(date.getUTCMonth() + 1).padStart(2, '0');
+  const dd   = String(date.getUTCDate()).padStart(2, '0');
+  return `${yyyy}${mm}${dd}`;
+}
+
 function calcEstimatedMileage(data) {
     // 마지막 두 항목을 날짜 순으로 정렬 후 가져오기
     const sortedData = data;
     const latest = sortedData[0];
     let previous = {};
 
+    console.log("latest.date", latest.date);
+
     for (let i = 1; i < sortedData.length; i++) {
-        if (latest.date > sortedData[i].date) {
+        if (threeMonthsAgo(latest.date) > sortedData[i].date) {
             previous = sortedData[i];
             break;
         }
