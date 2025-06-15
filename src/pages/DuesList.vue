@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted } from 'vue';
-import { AppBarTitle, usePageMeta} from '../composables/getRouteInfo';
+import { AppBarTitle, usePageMeta } from '../composables/getRouteInfo';
 
 const API_KEY = 'AIzaSyAjcEIdV46fa6Kw3Hdyzf3No_3cXtScRLc'; // 본인의 Google API Key 입력
 const SHEET_ID = '1-NlBFmwdIZop6pDvasfBtT7sn1jdwIfuCTq4bcHvN0s'; // 본인의 Sheet ID 입력
@@ -12,11 +12,11 @@ const defaultIcon = ref(icon.value);
 const refreshIcon = ref('');
 
 function setLoadingIcon() {
-  refreshIcon.value = 'mdi-refresh';
+    refreshIcon.value = 'mdi-refresh';
 }
 
 function resetIcon() {
-  refreshIcon.value = defaultIcon.value; // 복원
+    refreshIcon.value = defaultIcon.value; // 복원
 }
 
 
@@ -86,17 +86,16 @@ onMounted(async () => {
 
 <template>
     <v-app>
+        <v-app-bar color="teal-darken-4"> <!--image="https://picsum.photos/1920/1080?random-->
+            <template v-slot:image>
+                <v-img gradient="to top right, rgba(19,84,122,.8), rgba(128,208,199,.8)"></v-img>
+            </template>
+            <template v-slot:append>
+                <v-btn icon="mdi-calculator" @click="openSumPopup()"></v-btn>
+            </template>
+            <AppBarTitle :onIconClick="selectData" :refreshIcon="refreshIcon" />
+        </v-app-bar>
         <v-main>
-            <v-app-bar color="teal-darken-4"> <!--image="https://picsum.photos/1920/1080?random-->
-                <template v-slot:image>
-                    <v-img gradient="to top right, rgba(19,84,122,.8), rgba(128,208,199,.8)"></v-img>
-                </template>
-                <template v-slot:append>
-                    <v-btn icon="mdi-calculator" @click="openSumPopup()"></v-btn>
-                </template>
-                <AppBarTitle :onIconClick="selectData" :refreshIcon="refreshIcon" />
-            </v-app-bar>
-
             <v-data-table :headers="headers" :items="rows" class="elevation-1" no-data-text="조회중입니다."
                 hide-default-footer items-per-page="-1" :show-items-per-page="false">
                 <template v-slot:item.destination="{ item }">

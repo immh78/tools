@@ -187,19 +187,18 @@ onMounted(async () => {
 
 <template>
     <v-app>
+        <v-app-bar color="teal-darken-4">
+            <template v-slot:image>
+                <v-img gradient="to top right, rgba(19,84,122,.8), rgba(128,208,199,.8)"></v-img>
+            </template>
+            <AppBarTitle :onIconClick="selectData" :refreshIcon="refreshIcon" />
+            <template v-slot:append>
+                <v-btn icon="mdi-plus-circle" @click="openOfferingPopup(Object.keys(offering)[carouselIndex])"></v-btn>
+            </template>
+        </v-app-bar>
         <v-main>
-            <v-app-bar color="teal-darken-4">
-                <template v-slot:image>
-                    <v-img gradient="to top right, rgba(19,84,122,.8), rgba(128,208,199,.8)"></v-img>
-                </template>
-                <AppBarTitle :onIconClick="selectData" :refreshIcon="refreshIcon" />
-                <template v-slot:append>
-                    <v-btn icon="mdi-plus-circle"
-                        @click="openOfferingPopup(Object.keys(offering)[carouselIndex])"></v-btn>
-                </template>
-            </v-app-bar>
-
-            <v-carousel v-model="carouselIndex" :continuous="false" :show-arrows="true" hide-delimiter-background height="801">
+            <v-carousel v-model="carouselIndex" :continuous="false" :show-arrows="true" hide-delimiter-background
+                height="801">
                 <v-carousel-item v-for="(year, i) in Object.keys(offering)" :key="i">
                     <div class="carousel-content">
                         <h3 class="ml-4 mt-2">{{ year }}</h3>
@@ -215,7 +214,7 @@ onMounted(async () => {
                                     </span>
                                     <v-alert>
                                         <span>{{ item.category }}</span>
-                                        <small v-if="item.remark">({{ item?.remark }})</small> 
+                                        <small v-if="item.remark">({{ item?.remark }})</small>
                                         {{ item.amount.toLocaleString() }}원
                                     </v-alert>
                                 </v-timeline-item>
@@ -247,18 +246,17 @@ onMounted(async () => {
 </template>
 
 <style scoped>
-
 .carousel-content {
-  display: flex;
-  flex-direction: column;
-  height: calc(100vh - 64px); /* AppBar 높이 제외 */
-  overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 64px);
+    /* AppBar 높이 제외 */
+    overflow: hidden;
 }
 
 .timeline-wrapper {
-  flex: 1;
-  overflow-y: auto;
-  margin-top: 12px; 
+    flex: 1;
+    overflow-y: auto;
+    margin-top: 12px;
 }
-
 </style>

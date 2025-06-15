@@ -97,26 +97,27 @@ onMounted(async () => {
 
 <template>
     <v-app>
+        <v-app-bar color="teal-darken-4">
+            <template v-slot:image>
+                <v-img gradient="to top right, rgba(19,84,122,.8), rgba(128,208,199,.8)"></v-img>
+            </template>
+            <AppBarTitle :onIconClick="selectData" :refreshIcon="refreshIcon" />
+            <template v-slot:append>
+                <v-btn icon="mdi-eraser" @click="setInit()"></v-btn>
+                <v-btn icon="mdi-cog" @click="isDistPopup = true"></v-btn>
+            </template>
+        </v-app-bar>
         <v-main>
-            <v-app-bar color="teal-darken-4">
-                <template v-slot:image>
-                    <v-img gradient="to top right, rgba(19,84,122,.8), rgba(128,208,199,.8)"></v-img>
-                </template>
-                <AppBarTitle :onIconClick="selectData" :refreshIcon="refreshIcon" />
-                <template v-slot:append>
-                    <v-btn icon="mdi-eraser" @click="setInit()"></v-btn>
-                    <v-btn icon="mdi-cog" @click="isDistPopup = true"></v-btn>
-                </template>
-            </v-app-bar>
             <v-sheet class="ma-2 pa-2" color="#e0e0e0" rounded="lg">
                 <span>객관식</span>
-                <v-row class="mt-2" >
+                <v-row class="mt-2">
                     <v-col v-for="(score, key) in scoring.choiceQuestion" cols="2">
                         <span class="ma-0 pa-0 text-h7">{{ key + 1 }}</span><br />
-                        <v-btn-toggle v-model="choiceList[key]" :mandatory=true divided >
-                            <v-btn style="width: 50px; height: 50px; min-width: 50px;" color="primary"
-                                :value="score" icon="mdi-circle-outline"></v-btn>
-                            <v-btn style="width: 50px; height: 50px; min-width: 50px;" color="error" :value=0 icon="mdi-close"></v-btn>
+                        <v-btn-toggle v-model="choiceList[key]" :mandatory=true divided>
+                            <v-btn style="width: 50px; height: 50px; min-width: 50px;" color="primary" :value="score"
+                                icon="mdi-circle-outline"></v-btn>
+                            <v-btn style="width: 50px; height: 50px; min-width: 50px;" color="error" :value=0
+                                icon="mdi-close"></v-btn>
                         </v-btn-toggle>
 
                     </v-col>
@@ -127,8 +128,8 @@ onMounted(async () => {
                 <span>주관식</span>
                 <v-row class="mt-2" no-gutters>
                     <v-col v-for="(score, key) in answerList" cols="2" class="pa-3">
-                        <v-number-input bg-color="white" class="custom-font-size" v-model="answerList[key]" :label="(key + 1) + '번'"
-                            :min="0" :max="10" variant="outlined" />
+                        <v-number-input bg-color="white" class="custom-font-size" v-model="answerList[key]"
+                            :label="(key + 1) + '번'" :min="0" :max="10" variant="outlined" />
                     </v-col>
                 </v-row>
             </v-sheet>
@@ -154,13 +155,13 @@ onMounted(async () => {
                 <v-row class="mt-2 mx-2">
                     <v-col v-for="(_, key) in scoring.choiceQuestion" cols="2" xs="3" sm="3" md="2" lg="1">
                         <v-text-field class="centered-input" v-model="scoring.choiceQuestion[key]"
-                            :label="String(key + 1) + '번'"  variant="outlined">
+                            :label="String(key + 1) + '번'" variant="outlined">
                         </v-text-field>
                     </v-col>
                 </v-row>
                 <v-divider></v-divider>
-                <v-number-input class="custom-font-size mx-5 mt-4" v-model="scoring.answerQuestion" label="주관식 문항수" variant="outlined"
-                    :min="0" :max="10" />
+                <v-number-input class="custom-font-size mx-5 mt-4" v-model="scoring.answerQuestion" label="주관식 문항수"
+                    variant="outlined" :min="0" :max="10" />
 
                 <v-card-actions class="d-flex justify-end">
                     <v-btn icon="mdi-check-bold" @click="saveSetting()"></v-btn>
@@ -178,8 +179,7 @@ onMounted(async () => {
 }
 
 ::v-deep(.centered-input input) {
-  text-align: center;
-  font-size:20px;
+    text-align: center;
+    font-size: 20px;
 }
-
 </style>

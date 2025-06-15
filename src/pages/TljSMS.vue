@@ -314,7 +314,7 @@ function openResvPopup(item, productParams) {
     let amount = 0;
     let qty = 1;
 
-     //console.log("* productParams:", productParams, item);
+    //console.log("* productParams:", productParams, item);
 
     if (item == null) {
         isResvAdd.value = true;
@@ -326,12 +326,12 @@ function openResvPopup(item, productParams) {
             }
         } else {
             key = 0;
-        }       
+        }
 
         if (productParams != null) {
             product = productParams.product;
             amount = productParams.cost;
-        } 
+        }
     } else {
         isResvAdd.value = false;
         key = item.key;
@@ -533,16 +533,16 @@ onMounted(async () => {
 
 <template>
     <v-app>
+        <v-app-bar color="teal-darken-4"> <!--image="https://picsum.photos/1920/1080?random-->
+            <template v-slot:image>
+                <v-img gradient="to top right, rgba(19,84,122,.8), rgba(128,208,199,.8)"></v-img>
+            </template>
+            <template v-slot:append>
+                <v-btn icon="mdi-send" @click="shareTableAsImage()" :disabled="!isSendButton"></v-btn>
+            </template>
+            <AppBarTitle :onIconClick="selectData" :refreshIcon="refreshIcon" />
+        </v-app-bar>
         <v-main>
-            <v-app-bar color="teal-darken-4"> <!--image="https://picsum.photos/1920/1080?random-->
-                <template v-slot:image>
-                    <v-img gradient="to top right, rgba(19,84,122,.8), rgba(128,208,199,.8)"></v-img>
-                </template>
-                <template v-slot:append>
-                    <v-btn icon="mdi-send" @click="shareTableAsImage()" :disabled="!isSendButton"></v-btn>
-                </template>
-                <AppBarTitle :onIconClick="selectData" :refreshIcon="refreshIcon" />
-            </v-app-bar>
             <v-tabs v-model="tab" bg-color="#202020">
                 <v-tab value="prepayment">선결제 내역</v-tab>
                 <v-tab value="summary">사용내역</v-tab>
@@ -560,7 +560,7 @@ onMounted(async () => {
                                 @click="item.date === '합계' ? '' : openPrepayPopup(item)">
                                 <td>{{ item.date === '합계' ? '합계' : item.date.slice(4, 6) + '/'
                                     + item.date.slice(6, 8)
-                                    }}</td>
+                                }}</td>
                                 <td :style="{
                                     textAlign: 'right',
                                     fontWeight: item.date === '합계' ? 'bold' : 'normal',
@@ -622,8 +622,9 @@ onMounted(async () => {
                         items-per-page="-1" :show-items-per-page="false">
                         <template v-slot:item="{ item, index }">
                             <tr>
-                                <td @click="openResvPopup( null, item)">{{ item.product }}</td>
-                                <td :style="{ textAlign: 'right' }" @click="openProductPopup(item)">{{ item.cost.toLocaleString() }}</td>
+                                <td @click="openResvPopup(null, item)">{{ item.product }}</td>
+                                <td :style="{ textAlign: 'right' }" @click="openProductPopup(item)">{{
+                                    item.cost.toLocaleString() }}</td>
                             </tr>
                         </template>
                     </v-data-table>

@@ -67,7 +67,7 @@ async function selectData() {
 
     mileageSORENTO.value = calcEstimatedMileage(listSORENTO.value).forecateMileage;
     const avgPerDaySORENTO = calcEstimatedMileage(listSORENTO.value).avgPerDay;
-    
+
     mileageSM6.value = calcEstimatedMileage(listSM6.value).forecateMileage;
     const avgPerDaySM6 = calcEstimatedMileage(listSM6.value).avgPerDay;
 
@@ -292,16 +292,16 @@ onMounted(async () => {
 
 <template>
     <v-app>
+        <v-app-bar color="teal-darken-4">
+            <template v-slot:image>
+                <v-img gradient="to top right, rgba(19,84,122,.8), rgba(128,208,199,.8)"></v-img>
+            </template>
+            <template v-slot:append>
+                <v-btn icon="mdi-clipboard-edit-outline" @click="openAddPopup()"></v-btn>
+            </template>
+            <AppBarTitle :onIconClick="selectData" :refreshIcon="refreshIcon" />
+        </v-app-bar>
         <v-main>
-            <v-app-bar color="teal-darken-4">
-                <template v-slot:image>
-                    <v-img gradient="to top right, rgba(19,84,122,.8), rgba(128,208,199,.8)"></v-img>
-                </template>
-                <template v-slot:append>
-                    <v-btn icon="mdi-clipboard-edit-outline" @click="openAddPopup()"></v-btn>
-                </template>
-                <AppBarTitle :onIconClick="selectData" :refreshIcon="refreshIcon" />
-            </v-app-bar>
             <v-tabs v-model="tab" bg-color="#202020">
                 <v-tab value="SORENTO">SORENTO</v-tab>
                 <v-tab value="SM6">SM6</v-tab>
