@@ -181,11 +181,11 @@ router.afterEach((to) => {
   const userStore = useUserStore();
   const uid = userStore.user?.uid;
 
-  console.log("router.afterEach #1");
+  //console.log("router.afterEach #1");
   // meta.loggable === true인 페이지만 기록
   if (to.meta?.loggable && uid) {
     // '/'는 실질적으로 대시보드 같은 첫 화면이므로 필요하면 별도 처리
-    console.log("router.afterEach #2");
+    //console.log("router.afterEach #2");
     logPageVisit(to);    
   }
 });

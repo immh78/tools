@@ -23,7 +23,7 @@ async function login() {
     const token = await user.getIdToken();
 
     cookies.set('authToken', token);
-    console.log(user);
+    //console.log(user);
 
     if (user) {
       userStore.setUser({
@@ -35,7 +35,7 @@ async function login() {
       userStore.clearUser();
     }
 
-    console.log("userStore.user", userStore.user);
+    //console.log("userStore.user", userStore.user);
 
     // 리디렉트 경로 있으면 해당 페이지로, 없으면 홈으로
     const redirectTo = route.query.redirect || '/';
