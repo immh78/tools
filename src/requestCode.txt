@@ -1,30 +1,258 @@
+* log db
 {
-    "apiKey": "AIzaSyAjcEIdV46fa6Kw3Hdyzf3No_3cXtScRLc",
-    "authDomain": "my-firebase-9450e.firebaseapp.com",
-    "appName": "[DEFAULT]",
-    "currentUser": {
-        "uid": "Pd3M2l2WV8PGI8duqyOLZMMH6Dn1",
-        "email": "mmh@a.com",
-        "emailVerified": false,
-        "isAnonymous": false,
-        "providerData": [
-            {
-                "providerId": "password",
-                "uid": "mmh@a.com",
-                "displayName": null,
-                "email": "mmh@a.com",
-                "phoneNumber": null,
-                "photoURL": null
-            }
-        ],
-        "stsTokenManager": {
-            "refreshToken": "AMf-vBzwztPDVPp6YPoRH_a2KgoTV52ZA65Ld6GFc1zOZyZgSYtGHgUxrUc8y6JDjF1hFPo6ANjOK00i6YUTR19uiZKHDdsnG_JIVCObEPitm98bd2OnGuXoUO2sHCNdmCPtqojrbxMIZ4dN3kZvoJMvCJHT-NeBFGSfrn2RoLTAzJfkMEfK9u20YDDymBHGH66hEOTMsfIQqbFcw0AkToTlrzLuY3asQw",
-            "accessToken": "eyJhbGciOiJSUzI1NiIsImtpZCI6ImE0YTEwZGVjZTk4MzY2ZDZmNjNlMTY3Mjg2YWU5YjYxMWQyYmFhMjciLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vbXktZmlyZWJhc2UtOTQ1MGUiLCJhdWQiOiJteS1maXJlYmFzZS05NDUwZSIsImF1dGhfdGltZSI6MTc1MDAyNDUzNSwidXNlcl9pZCI6IlBkM00ybDJXVjhQR0k4ZHVxeU9MWk1NSDZEbjEiLCJzdWIiOiJQZDNNMmwyV1Y4UEdJOGR1cXlPTFpNTUg2RG4xIiwiaWF0IjoxNzUwMDI0NTM1LCJleHAiOjE3NTAwMjgxMzUsImVtYWlsIjoibW1oQGEuY29tIiwiZW1haWxfdmVyaWZpZWQiOmZhbHNlLCJmaXJlYmFzZSI6eyJpZGVudGl0aWVzIjp7ImVtYWlsIjpbIm1taEBhLmNvbSJdfSwic2lnbl9pbl9wcm92aWRlciI6InBhc3N3b3JkIn19.bQ4QaJz8xUr4xnEyx1m3khD5CQSIRxpXxOL0pTFG0oDDrqtDxDrdvzfKGfUVIYJo9mbCpSqC97jdtLolGiieSz8YO7qjENHsCv4vYfsfnLswgu1VTvR21PoGMNfLEAaZnES_SbXbQDiBol91KjVirDA7K6NmNOFxfBT0nI3RL1431OrfVHJS5Dftbut8TuLaGcSe5QBqPEqWU4IL-QT6juAuK4iulpdtjbK5o0R7MrJ4jw4JgxqAdn0EUC7ILUwAgro8MSE-iRxGcw9eRqxpfHgDUScOEdXCNKfB1LyEoLCXSx6my8YlUI6i3pAhKrHlnna0OM3uL40kQWn4kU-7mA",
-            "expirationTime": 1750028135561
+    "car-book": {
+        "-OSpjmrm4LAr0j29LH5_": {
+            "datetime": "20250616073912",
+            "uid": "Pd3M2l2WV8PGI8duqyOLZMMH6Dn1"
         },
-        "createdAt": "1749511654744",
-        "lastLoginAt": "1750024535460",
-        "apiKey": "AIzaSyAjcEIdV46fa6Kw3Hdyzf3No_3cXtScRLc",
-        "appName": "[DEFAULT]"
+        "-OSpjpfDhW7_9ySk3kwK": {
+            "datetime": "20250616073924",
+            "uid": "Pd3M2l2WV8PGI8duqyOLZMMH6Dn1"
+        }
+    },
+    "log-view": {
+        "-OSpkImjS4ts1urU3z7u": {
+            "datetime": "20250616074127",
+            "uid": "Pd3M2l2WV8PGI8duqyOLZMMH6Dn1"
+        }
+    },
+    "regular-task": {
+        "-OSpjuXFrKbWJ_k7tn_q": {
+            "datetime": "20250616073943",
+            "uid": "Pd3M2l2WV8PGI8duqyOLZMMH6Dn1"
+        },
+        "-OSpjzyKFiypHbkBvwV2": {
+            "datetime": "20250616074006",
+            "uid": "Pd3M2l2WV8PGI8duqyOLZMMH6Dn1"
+        }
+    },
+    "root": {
+        "-OSpj1ckBGtGJ5K3NWQr": {
+            "datetime": "20250616073555",
+            "uid": "Pd3M2l2WV8PGI8duqyOLZMMH6Dn1"
+        },
+        "-OSpjlFWnKIHiTNJpUUy": {
+            "datetime": "20250616073905",
+            "uid": "Pd3M2l2WV8PGI8duqyOLZMMH6Dn1"
+        },
+        "-OSpjlnxtF6vnDHqnAJZ": {
+            "datetime": "20250616073908",
+            "uid": "Pd3M2l2WV8PGI8duqyOLZMMH6Dn1"
+        },
+        "-OSpjmLCQfswfZaCiUIV": {
+            "datetime": "20250616073910",
+            "uid": "Pd3M2l2WV8PGI8duqyOLZMMH6Dn1"
+        },
+        "-OSpkILFV3pZ8X3mPzcU": {
+            "datetime": "20250616074125",
+            "uid": "Pd3M2l2WV8PGI8duqyOLZMMH6Dn1"
+        },
+        "-OSpkXW6jBAu221csyNd": {
+            "datetime": "20250616074228",
+            "uid": "Pd3M2l2WV8PGI8duqyOLZMMH6Dn1"
+        }
+    },
+    "test": {
+        "-OSpkZdCK1qFZAu2Z1_N": {
+            "datetime": "20250616074236",
+            "uid": "Pd3M2l2WV8PGI8duqyOLZMMH6Dn1"
+        }
+    },
+    "tlj-sms": {
+        "-OSpk2DF_KewAp7M7Kbb": {
+            "datetime": "20250616074019",
+            "uid": "Pd3M2l2WV8PGI8duqyOLZMMH6Dn1"
+        }
+    },
+    "work-time": {
+        "-OSpj748uCNR5YFDXh4H": {
+            "datetime": "20250616073617",
+            "uid": "Pd3M2l2WV8PGI8duqyOLZMMH6Dn1"
+        }
     }
 }
+
+
+* LogView.vue
+<script setup>
+import { database, ref as firebaseRef, get, update, set } from "../config/firebase";
+import { ref, onMounted } from 'vue';
+import { AppBarTitle, usePageMeta } from '../composables/getRouteInfo';
+
+const logTable = ref(null);
+const userTable = ref([]);
+const error = ref(null);
+const tableData = ref([])
+const adminUid = ref('');
+const headers = ref([
+    { title: 'Page', align: 'start', key: 'page', value: 'page' },
+    { title: 'User', align: 'start', key: 'user', value: 'user' },
+    { title: 'Count', align: 'end', key: 'count', value: 'count' },
+    { title: 'Date', align: 'center', key: 'latest', value: 'latest' },
+]);
+
+// AppBarTitle 컴포넌트에서 사용하는 아이콘
+const { icon } = usePageMeta();
+const defaultIcon = ref(icon.value);
+const refreshIcon = ref('');
+
+function setLoadingIcon() {
+  refreshIcon.value = 'mdi-refresh';
+}
+
+function resetIcon() {
+  refreshIcon.value = defaultIcon.value; // 복원
+}
+
+async function getLogs() {
+    const dbRef = firebaseRef(database, "logs");
+    await get(dbRef)
+        .then(snapshot => {
+            if (snapshot.exists()) {
+                logTable.value = snapshot.val();
+                //console.log("Fetched logs:", logs.value);
+            } else {
+                console.log("No data available");
+            }
+        })
+        .catch(err => {
+            console.error("Error fetching data:", err);
+            error.value = err.message;
+        });
+}
+
+async function getUser() {
+    const dbRef = firebaseRef(database, "user");
+    await get(dbRef)
+        .then(snapshot => {
+            if (snapshot.exists()) {
+                userTable.value = snapshot.val();
+                //console.log("Fetched logs:", logs.value);
+            } else {
+                console.log("No data available");
+            }
+        })
+        .catch(err => {
+            console.error("Error fetching data:", err);
+            error.value = err.message;
+        });
+}
+
+function processLogs(logs, users) {
+    const entries = {}
+
+    //console.log(user);
+
+    for (const page in logs) {
+        logs[page].forEach(log => {
+            const uid = log.uid;
+            const user = users[uid] || {}; // user[uid]가 없으면 빈 객체로 대체
+
+            const key = `${page}_${user.name || uid}`;
+
+            if (!entries[key]) {
+                entries[key] = {
+                    page,
+                    user: user.name || uid, // visitor.name이 없으면 기본값 설정
+                    uid: uid,
+                    count: 1,
+                    latest: log.datetime
+                };
+            } else {
+                entries[key].count++;
+                if (log.datetime > entries[key].latest) {
+                    entries[key].latest = log.datetime;
+                }
+            }
+        });
+    }
+
+    const formatDate = datetime => {
+        return `${datetime.slice(4, 6)}/${datetime.slice(6, 8)} ` +
+            `${datetime.slice(8, 10)}:${datetime.slice(10, 12)}`
+    }
+
+    tableData.value = Object.values(entries).map(entry => ({
+        page: entry.page,
+        user: entry.user,
+        uid: entry.uid,
+        count: entry.count,
+        latest: formatDate(entry.latest),
+        isHost: entry.isHost
+    }));
+
+    //console.log("*** data : ", tableData);
+}
+
+async function dataLoding() {
+    setLoadingIcon();
+    await getLogs();
+    await getUser()
+
+    processLogs(logTable.value, userTable.value);
+
+    //console.log("userTable:", userTable.value);
+
+    adminUid.value = Object.entries(userTable.value).find(([key, user]) => user.name === "문명훈")?.[0] || '';
+
+    //console.log("adminUid:", adminUid.value);
+    resetIcon();
+}
+
+function clearLog() {
+    const filteredLogs = {};
+
+    // 2. logs 중에서 alloweduids에 포함된 uid만 유지
+    for (const page in logTable.value) {
+        const pageLogs = logTable.value[page];
+        const filteredPageLogs = pageLogs.filter(log => log.uid !== adminUid.value);
+
+        if (filteredPageLogs.length > 0) {
+            filteredLogs[page] = filteredPageLogs;
+        }
+    }
+
+    //console.log("Filtered logs:", filteredLogs);
+
+    
+    const dbRefLogs = firebaseRef(database, "logs");
+    set(dbRefLogs, filteredLogs); // 모든 로그 데이터를 삭제
+ 
+    dataLoding();
+}   
+
+onMounted(async () => {
+    dataLoding();
+});
+</script>
+
+<template>
+    <v-app>
+        <v-app-bar color="teal-darken-4">
+            <template v-slot:image>
+                <v-img gradient="to top right, rgba(19,84,122,.8), rgba(128,208,199,.8)"></v-img>
+            </template>
+            <AppBarTitle :onIconClick="dataLoding" :refreshIcon="refreshIcon" />            
+            <template v-slot:append>
+                <v-btn icon="mdi-broom" @click="clearLog()"></v-btn>
+            </template>
+        </v-app-bar>
+        <v-main>
+            <v-data-table :headers="headers" :items="tableData" class="elevation-1" no-data-text="조회중입니다."
+                hide-default-footer items-per-page="-1" :show-items-per-page="false">
+                <template v-slot:item.visitor="{ item }">
+                    <span @click="item.visitor.endsWith('...') ? openUserInputPopup(item.uid) : ''">{{
+                        item.visitor
+                    }}</span>
+                </template>
+            </v-data-table>
+        </v-main>
+    </v-app>
+
+</template>
+
+<style scoped>
+
+</style>
+
+log DB에 맞게 db조회 로직 변경

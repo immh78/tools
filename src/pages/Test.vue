@@ -10,7 +10,7 @@ const ctx = ref(null)
 
 
 async function selectData() {
-  const dbRef = firebaseRef(database, "permission/tools");
+  const dbRef = firebaseRef(database, "logs");
   await get(dbRef)
     .then(snapshot => {
       if (snapshot.exists()) {
