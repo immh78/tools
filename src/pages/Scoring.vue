@@ -1,17 +1,12 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'
-import { useLogger } from '../composables/useLogger';
 import { database, ref as firebaseRef, get, update, set } from "../config/firebase";
 import { AppBarTitle, usePageMeta } from '../composables/getRouteInfo';
-
-useLogger();
 
 const scoring = ref({});
 const totalScore = ref(0);
 const choiceList = ref([]);
 const answerList = ref([]);
-
-
 
 const isDistPopup = ref(false);
 

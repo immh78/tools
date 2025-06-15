@@ -1,48 +1,22 @@
 <script setup>
 import { ref, onMounted } from 'vue';
-import { onAuthStateChanged } from 'firebase/auth';
-import { auth, database, ref as firebaseRef, get } from './config/firebase';
 import { useUserStore } from './store/user';
 import { RouterView } from 'vue-router';
-import { useLogger } from './composables/useLogger';
 
 const ready = ref(false);
 const userStore = useUserStore();
 
 onMounted(() => {
-  onAuthStateChanged(auth, async (user) => {
-    if (user) {
-      userStore.setUser({
-        email: user.email,
-        name: await selectUserName(user.uid),
-        uid: user.uid
-      });   
-    } else {
-      userStore.clearUser();
-    }
-    ready.value = true;
+    //console.log(userStore.user);
 
-    if (user) {
-      useLogger(); // ✅ 로그인 확인 이후 logger 사용
+    if (userStore.user.uid) {
+      ready.value = true;
+    } else {
+      ready.value = false;
     }
-  });
+    
 });
 
-async function selectUserName(uid) {
-  const dbRef = firebaseRef(database, "user/" + uid);
-  let userInfo = "";
-  await get(dbRef)
-    .then(snapshot => {
-      if (snapshot.exists()) {
-        userInfo = snapshot.val();
-      }
-    })
-    .catch(err => {
-      //console.error("Error fetching data:", err);
-    });
-
-  return userInfo.name;
-}
 </script>
 
 <template>
