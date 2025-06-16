@@ -420,7 +420,7 @@ onMounted(async () => {
                     <v-text-field v-model="addData.mileage" label="주행거리" type="number" clearable />
                     <v-row no-gutters>
                         <v-col cols="10">
-                            <v-text-field v-model="carBook.fuel.unitCost" label="단가" type="number" clearable />
+                            <v-number-input v-model="carBook.fuel.unitCost" label="단가" :min="1000" :step="10" clearable />
                         </v-col>
                         <v-col cols="2">
                             <v-btn icon="mdi-calculator" variant="flat" @click="calcFuelAmount('COST')"></v-btn>
@@ -428,7 +428,7 @@ onMounted(async () => {
                     </v-row>
                     <v-row no-gutters>
                         <v-col cols="10">
-                            <v-number-input v-model="carBook.fuel.liter" label="주유량(ℓ)" :min="1" clearable />
+                            <v-number-input v-model="carBook.fuel.liter" label="주유량(ℓ)" :min="1" :step="5" clearable />
                         </v-col>
                         <v-col cols="2">
                             <v-btn icon="mdi-calculator" variant="flat" @click="calcFuelAmount('LITER')"></v-btn>
@@ -436,7 +436,7 @@ onMounted(async () => {
                     </v-row>
                     <v-row no-gutters>
                         <v-col cols="10">
-                            <v-text-field v-model="fuelAmount" label="금액" type="number" clearable />
+                            <v-number-input v-model="fuelAmount" label="금액" :min="0" :step="1000" clearable />
                         </v-col>
                         <v-col cols="2">
                             <v-btn icon="mdi-calculator" variant="flat" @click="calcFuelAmount('AMOUNT')"></v-btn>
