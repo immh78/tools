@@ -11,6 +11,7 @@ const forecateDateSORENTO = ref("");
 const forecateDateSM6 = ref("");
 const forecateDate = ref("");
 const mileage = ref(0);
+const mileageText = ref('');
 const lastChangeOilSORENTO = ref(0);
 const lastChangeOilSM6 = ref(0);
 const oilMileage = ref(0);
@@ -45,6 +46,28 @@ const headers = [
     { title: '주행거리', align: 'end', key: 'mileage', value: 'mileage', width: 120 },
 ];
 const currentPage = ref(1);
+
+/* 유틸: 숫자 → 쉼표포맷 문자열 */
+const toComma = n =>
+  n === null || n === '' ? '' : Number(n).toLocaleString()
+
+/* 유틸: 문자열 → 숫자 (쉼표 제거) */
+const toNumber = str => {
+  const digits = str.replace(/,/g, '')
+  return digits === '' ? null : Number(digits)
+}
+
+/* 입력 변화 감시 → 실제 숫자 업데이트 */
+watch(mileageText, val => {
+  const num = toNumber(val)
+  if (!Number.isNaN(num)) mileage.value = num
+})
+
+/* 실제 숫자 변화 감시 → 포맷 문자열 업데이트
+   (백엔드에서 값 받아왔을 때도 포맷 유지) */
+watch(mileage, val => {
+  mileageText.value = toComma(val)
+})
 
 async function selectData() {
     setLoadingIcon();
@@ -369,7 +392,7 @@ onMounted(async () => {
                 <v-tab value="SM6">SM6</v-tab>
             </v-tabs>
             <v-card class="mt-2 mx-4" variant="flat">
-                <v-text-field v-model="mileage" label="주행거리" variant="outlined" class="mt-2"></v-text-field>
+                <v-text-field v-model="mileageText" label="주행거리" variant="outlined" class="mt-2"></v-text-field>
                 <span style="display: block; text-align: right; font-size: 12px;">{{ forecateDate }}</span>
                 <v-progress-linear :color="getProgressColor(oilMileage / oilChangeMileage * 100)" height="12"
                     :max="oilChangeMileage" v-model="oilMileage"
@@ -414,7 +437,7 @@ onMounted(async () => {
         </v-dialog>
         <v-dialog v-model="isFuelPopup" max-width="380px">
             <v-card>
-                <v-card-title>주유</v-card-title>
+                <v-card-title>주유비</v-card-title>
                 <v-container>
                     <v-text-field label="날짜" v-model="addData.date" type="date" />
                     <v-text-field v-model="addData.mileage" label="주행거리" type="number" clearable />
