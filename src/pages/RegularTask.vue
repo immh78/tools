@@ -24,7 +24,6 @@ function resetIcon() {
     refreshIcon.value = defaultIcon.value; // 복원
 }
 
-
 async function selectData() {
     setLoadingIcon();
     const dbRef = firebaseRef(database, "regular-task");
@@ -38,8 +37,7 @@ async function selectData() {
             //console.error("Error fetching data:", err);
         });
 
-
-    //console.log("* regularTask", regularTask.value);
+    console.log("* regularTask", regularTask.value);
     //console.log("* regularTask.task", regularTask.value.task);
 
     const result = {}
@@ -70,7 +68,33 @@ async function selectData() {
         }
     }
 
+    // nextDate 추가
+    for (const key in taskList.value) {
+        if (regularTask.value.duration[key] !== undefined) {
+            const baseDate = taskList.value[key].date;
+            const nextDate = addDaysToDate(baseDate, regularTask.value.duration[key]);
+            taskList.value[key].nextDate = nextDate;
+        }
+    }
+
+    console.log(taskList.value);
+
     resetIcon();
+}
+
+// 날짜 계산 유틸리티
+function addDaysToDate(dateStr, daysToAdd) {
+    const year = parseInt(dateStr.slice(0, 4), 10);
+    const month = parseInt(dateStr.slice(4, 6), 10) - 1; // JS month index starts from 0
+    const day = parseInt(dateStr.slice(6, 8), 10);
+
+    const date = new Date(year, month, day);
+    date.setDate(date.getDate() + daysToAdd);
+
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1);
+    const d = String(date.getDate());
+    return `${y}.${m}.${d}`;
 }
 
 function daysBetweenToday(dateString) {
@@ -166,7 +190,6 @@ function getProgressColor(value) {
     }
 }
 
-
 onMounted(async () => {
     selectData();
 });
@@ -181,25 +204,32 @@ onMounted(async () => {
             <AppBarTitle :onIconClick="selectData" :refreshIcon="refreshIcon" />
         </v-app-bar>
         <v-main>
-            <div class="mt-4"></div>
             <v-container>
-                <v-row v-for="(value, key) in taskList">
-                    <v-col>
-                        <h5 class="text-black mt-0 ml-2">{{ key }}</h5>
-                        <v-sheet class="d-flex align-center mx-2 px-2 py-3" color="#f4f4f4" rounded="lg"
-                            @click="openPopup(key)">
-
-                            <v-progress-linear
-                                :color="getProgressColor(value.diffDays / regularTask.duration[key] * 100)" height="14"
-                                :max="regularTask.duration[key]" v-model="value.diffDays"
-                                :style="{ color: getProgressTextColor(value.diffDays / regularTask.duration[key] * 100), fontSize: '11px' }"
-                                rounded>
-                                {{ value.diffDays }}
-                            </v-progress-linear>
-                            <div class="ms-4" style="font-size: 10px;">{{ regularTask.duration[key] }}</div>
-                        </v-sheet>
-                    </v-col>
-                </v-row>
+                <div v-for="(value, key) in taskList">
+                    <v-row class="mt-6" no-gutters>
+                        <v-col cols="6">
+                            <h5 class="text-black mt-0 ml-2">{{ key }}</h5>
+                        </v-col>
+                        <v-col cols="6" class="text-right pr-3">
+                            <small style="color:grey;">{{ value.nextDate }}</small>
+                        </v-col>
+                    </v-row>
+                    <v-row no-gutters>
+                        <v-col cols="12">
+                            <v-sheet class="d-flex align-center mx-2 px-2 py-3" color="#f4f4f4" rounded="lg"
+                                @click="openPopup(key)">
+                                <v-progress-linear
+                                    :color="getProgressColor(value.diffDays / regularTask.duration[key] * 100)"
+                                    height="14" :max="regularTask.duration[key]" v-model="value.diffDays"
+                                    :style="{ color: getProgressTextColor(value.diffDays / regularTask.duration[key] * 100), fontSize: '11px' }"
+                                    rounded>
+                                    {{ value.diffDays }}
+                                </v-progress-linear>
+                                <div class="ms-4" style="font-size: 10px;">{{ regularTask.duration[key] }}</div>
+                            </v-sheet>
+                        </v-col>
+                    </v-row>
+                </div>
             </v-container>
         </v-main>
 
