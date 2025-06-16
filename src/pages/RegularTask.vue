@@ -37,7 +37,7 @@ async function selectData() {
             //console.error("Error fetching data:", err);
         });
 
-    console.log("* regularTask", regularTask.value);
+    //console.log("* regularTask", regularTask.value);
     //console.log("* regularTask.task", regularTask.value.task);
 
     const result = {}
@@ -77,7 +77,7 @@ async function selectData() {
         }
     }
 
-    console.log(taskList.value);
+    //console.log(taskList.value);
 
     resetIcon();
 }
