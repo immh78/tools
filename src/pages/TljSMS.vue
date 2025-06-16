@@ -76,7 +76,7 @@ async function selectData() {
             //console.error("Error fetching data:", err);
         });
 
-    console.log("* tljResv:", tljResv.value);
+    //console.log("* tljResv:", tljResv.value);
     // Calculate sum
     prepayTab.value = [];
     if (tljResv.value.prepayment) {
@@ -90,7 +90,9 @@ async function selectData() {
             prepayTab.value.push(itemPrepay);
         });
 
-        console.log("* prepayTab:", prepayTab.value);
+        prepayTab.value.sort((a, b) => a.date.localeCompare(b.date));
+
+        //console.log("* prepayTab:", prepayTab.value);
 
     } else {
         summary.value.prepayment = 0;
