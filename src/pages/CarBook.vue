@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'
-import { database, ref as firebaseRef, get, update, remove } from "../config/firebase";
+import { database, ref as firebaseRef, get, set, update } from "../config/firebase";
 import { AppBarTitle, usePageMeta } from '../composables/getRouteInfo';
 
 const carBook = ref({});
@@ -18,9 +18,11 @@ const oilChangeMileage = 15000;
 const listSORENTO = ref([]);
 const listSM6 = ref([]);
 const list = ref([]);
+const fuelAmount = ref(0);
 
 const isPopup = ref(false);
 const isPopupKind = ref("");
+const isFuelPopup = ref(false); // 가스 등록 팝업
 const comboList = ['기름', '엔진오일', '주행거리'];
 const addData = ref({});
 
@@ -65,12 +67,12 @@ async function selectData() {
     //console.log("listSORENTO", listSORENTO.value);
     //console.log("listSM6", listSM6.value);
 
-    let {forecateMileage, avgPerDay} = calcEstimatedMileage(listSORENTO.value);
+    let { forecateMileage, avgPerDay } = calcEstimatedMileage(listSORENTO.value);
 
     mileageSORENTO.value = forecateMileage;
     const avgPerDaySORENTO = avgPerDay;
 
-    ({forecateMileage, avgPerDay} = calcEstimatedMileage(listSM6.value));
+    ({ forecateMileage, avgPerDay } = calcEstimatedMileage(listSM6.value));
 
     mileageSM6.value = forecateMileage;
     const avgPerDaySM6 = avgPerDay;
@@ -113,20 +115,20 @@ function sortData(data) {
 }
 
 function threeMonthsAgo(yyyymmdd) {
-  // 1. 문자열 → Date
-  const y = +yyyymmdd.slice(0, 4);
-  const m = +yyyymmdd.slice(4, 6) - 1; // JS는 0-based month
-  const d = +yyyymmdd.slice(6, 8);
-  const date = new Date(Date.UTC(y, m, d));   // UTC로 만들어두면 타임존 문제↓ 최소화
+    // 1. 문자열 → Date
+    const y = +yyyymmdd.slice(0, 4);
+    const m = +yyyymmdd.slice(4, 6) - 1; // JS는 0-based month
+    const d = +yyyymmdd.slice(6, 8);
+    const date = new Date(Date.UTC(y, m, d));   // UTC로 만들어두면 타임존 문제↓ 최소화
 
-  // 2. 3개월 차감 (내장 메서드가 월 길이/윤년 자동 보정)
-  date.setUTCMonth(date.getUTCMonth() - 3);
+    // 2. 3개월 차감 (내장 메서드가 월 길이/윤년 자동 보정)
+    date.setUTCMonth(date.getUTCMonth() - 3);
 
-  // 3. 다시 YYYYMMDD 포맷
-  const yyyy = date.getUTCFullYear();
-  const mm   = String(date.getUTCMonth() + 1).padStart(2, '0');
-  const dd   = String(date.getUTCDate()).padStart(2, '0');
-  return `${yyyy}${mm}${dd}`;
+    // 3. 다시 YYYYMMDD 포맷
+    const yyyy = date.getUTCFullYear();
+    const mm = String(date.getUTCMonth() + 1).padStart(2, '0');
+    const dd = String(date.getUTCDate()).padStart(2, '0');
+    return `${yyyy}${mm}${dd}`;
 }
 
 function calcEstimatedMileage(data) {
@@ -279,6 +281,42 @@ function openDetailPopup(item) {
     isPopup.value = true;
 }
 
+function openFuelPopup() {
+    addData.value = {
+        "date": getToday(),
+        "mileage": mileage.value,
+        "category": '기름',
+        "cost": 0,
+        "remark": ''
+    }
+
+    fuelAmount.value = carBook.value.fuel.unitCost * carBook.value.fuel.liter;
+    isFuelPopup.value = true;
+}
+
+function calcFuelAmount(type) {
+    if (type === 'COST' || type === 'LITER') {
+        fuelAmount.value = Math.round(carBook.value.fuel.unitCost * carBook.value.fuel.liter);
+    } else if (type === 'AMOUNT') {
+        carBook.value.fuel.liter = Math.round(fuelAmount.value / carBook.value.fuel.unitCost);
+    }
+}
+
+async function addFuel() {
+    addData.value.cost = fuelAmount.value;
+    addData.value.remark = String(carBook.value.fuel.liter);
+    isFuelPopup.value = false;
+    
+    try {
+        const dbRef = firebaseRef(database, "car-book/fuel");
+        await set(dbRef, carBook.value.fuel); // 데이터를 저장
+    } catch (err) {
+        console.error("Error saving data:", err);
+    }
+
+    addAction();
+}
+
 async function addAction() {
     const key = carBook.value[tab.value].length;
     addData.value.date = addData.value.date.replaceAll('-', '');
@@ -286,7 +324,6 @@ async function addAction() {
     addData.value.category = addData.value.category || "주행거리";
     addData.value.remark = addData.value.remark || "";
     addData.value.mileage = Number(addData.value.mileage);
-
 
     const data = {
         [key]: addData.value
@@ -302,9 +339,10 @@ async function addAction() {
     }
 
     isPopup.value = false;
-    selectData();
+    await selectData();
     changeTab(tab.value);
 }
+
 
 onMounted(async () => {
     await selectData();
@@ -321,6 +359,7 @@ onMounted(async () => {
             </template>
             <template v-slot:append>
                 <v-btn icon="mdi-clipboard-edit-outline" @click="openAddPopup()"></v-btn>
+                <v-btn icon="mdi-gas-station" @click="openFuelPopup()"></v-btn>
             </template>
             <AppBarTitle :onIconClick="selectData" :refreshIcon="refreshIcon" />
         </v-app-bar>
@@ -360,7 +399,7 @@ onMounted(async () => {
             </v-data-table>
         </v-main>
         <v-dialog v-model="isPopup" max-width="380px">
-            <v-card>
+            <v-card class="pa-4">
                 <v-card-title>정비내역{{ isPopupKind === 'ADD' ? ' 등록' : '' }}</v-card-title>
                 <v-text-field label="날짜" v-model="addData.date" type="date" />
                 <v-combobox v-model="addData.category" label="항목" :items="comboList"></v-combobox>
@@ -370,6 +409,43 @@ onMounted(async () => {
                 <v-card-actions>
                     <v-btn v-if="isPopupKind === 'ADD'" @click="addAction()" icon="mdi-check-bold"></v-btn>
                     <v-btn @click="isPopup = false" icon="mdi-close-thick"></v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+        <v-dialog v-model="isFuelPopup" max-width="380px">
+            <v-card>
+                <v-card-title>주유</v-card-title>
+                <v-container>
+                    <v-text-field label="날짜" v-model="addData.date" type="date" />
+                    <v-text-field v-model="addData.mileage" label="주행거리" type="number" clearable />
+                    <v-row no-gutters>
+                        <v-col cols="10">
+                            <v-text-field v-model="carBook.fuel.unitCost" label="단가" type="number" clearable />
+                        </v-col>
+                        <v-col cols="2">
+                            <v-btn icon="mdi-calculator" variant="flat" @click="calcFuelAmount('COST')"></v-btn>
+                        </v-col>
+                    </v-row>
+                    <v-row no-gutters>
+                        <v-col cols="10">
+                            <v-number-input v-model="carBook.fuel.liter" label="주유량(ℓ)" :min="1" clearable />
+                        </v-col>
+                        <v-col cols="2">
+                            <v-btn icon="mdi-calculator" variant="flat" @click="calcFuelAmount('LITER')"></v-btn>
+                        </v-col>
+                    </v-row>
+                    <v-row no-gutters>
+                        <v-col cols="10">
+                            <v-text-field v-model="fuelAmount" label="금액" type="number" clearable />
+                        </v-col>
+                        <v-col cols="2">
+                            <v-btn icon="mdi-calculator" variant="flat" @click="calcFuelAmount('AMOUNT')"></v-btn>
+                        </v-col>
+                    </v-row>
+                </v-container>
+                <v-card-actions>
+                    <v-btn @click="addFuel()" icon="mdi-check-bold"></v-btn>
+                    <v-btn @click="isFuelPopup = false" icon="mdi-close-thick"></v-btn>
                 </v-card-actions>
             </v-card>
         </v-dialog>
