@@ -370,6 +370,9 @@ async function addAction() {
     changeTab(tab.value);
 }
 
+function onRowClick(_, ctx) {
+    openDetailPopup(ctx.item)
+}
 
 onMounted(async () => {
     await selectData();
@@ -406,20 +409,21 @@ onMounted(async () => {
                     }}</v-progress-linear>
             </v-card>
             <v-data-table :headers="headers" :items="list.filter(item => item.category !== '주행거리')"
-                no-data-text="조회중입니다." loading-text="조회중입니다." items-per-page=8 v-model:page="currentPage">
+                no-data-text="조회중입니다." loading-text="조회중입니다." items-per-page=8 v-model:page="currentPage"
+                @click:row="onRowClick">
                 <template v-slot:item.date="{ item }">
-                    <span @click="openDetailPopup(item)">
+                    <span>
                         {{ item.date.slice(0, 4) }}. {{ Number(item.date.slice(4, 6)) }}. {{ Number(item.date.slice(6,
                             8)) }}
                     </span>
                 </template>
                 <template v-slot:item.category="{ item }" @click="openDetailPopup(item)">
-                    <span @click="openDetailPopup(item)">
+                    <span>
                         {{ item.category.length > 12 ? item.category.substring(0, 12) + "..." : item.category }}
                     </span>
                 </template>
                 <template v-slot:item.mileage="{ item }" @click="openDetailPopup(item)">
-                    <span @click="openDetailPopup(item)">
+                    <span>
                         {{ item.mileage.toLocaleString() }}
                     </span>
                 </template>
