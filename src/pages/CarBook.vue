@@ -49,24 +49,24 @@ const currentPage = ref(1);
 
 /* 유틸: 숫자 → 쉼표포맷 문자열 */
 const toComma = n =>
-  n === null || n === '' ? '' : Number(n).toLocaleString()
+    n === null || n === '' ? '' : Number(n).toLocaleString()
 
 /* 유틸: 문자열 → 숫자 (쉼표 제거) */
 const toNumber = str => {
-  const digits = str.replace(/,/g, '')
-  return digits === '' ? null : Number(digits)
+    const digits = str.replace(/,/g, '')
+    return digits === '' ? null : Number(digits)
 }
 
 /* 입력 변화 감시 → 실제 숫자 업데이트 */
 watch(mileageText, val => {
-  const num = toNumber(val)
-  if (!Number.isNaN(num)) mileage.value = num
+    const num = toNumber(val)
+    if (!Number.isNaN(num)) mileage.value = num
 })
 
 /* 실제 숫자 변화 감시 → 포맷 문자열 업데이트
    (백엔드에서 값 받아왔을 때도 포맷 유지) */
 watch(mileage, val => {
-  mileageText.value = toComma(val)
+    mileageText.value = toComma(val)
 })
 
 async function selectData() {
@@ -117,10 +117,10 @@ async function selectData() {
 function getForecateDate(mileage, lastChangeOil, avgPerDay) {
     const today = new Date().setHours(0, 0, 0, 0);
     const date = new Date(today + (((oilChangeMileage - (mileage - lastChangeOil)) / avgPerDay) * 1000 * 60 * 60 * 24));
-    console.log("마지막 오일 교체후 거리", mileage - lastChangeOil)
-    console.log("오일교체까지 남은 거리", oilChangeMileage - (mileage - lastChangeOil))
-    console.log("남은거리/ 하루평균 주행거리", (oilChangeMileage - (mileage - lastChangeOil)) / avgPerDay)
-    console.log("오늘 + 남은일수", today + (((oilChangeMileage - (mileage - lastChangeOil)) / avgPerDay) * 1000 * 60 * 60 * 24));
+    //console.log("마지막 오일 교체후 거리", mileage - lastChangeOil)
+    //console.log("오일교체까지 남은 거리", oilChangeMileage - (mileage - lastChangeOil))
+    //console.log("남은거리/ 하루평균 주행거리", (oilChangeMileage - (mileage - lastChangeOil)) / avgPerDay)
+    //console.log("오늘 + 남은일수", today + (((oilChangeMileage - (mileage - lastChangeOil)) / avgPerDay) * 1000 * 60 * 60 * 24));
     // "2025. 7. 12" 형식으로 출력
 
     return `${date.getFullYear()}.${date.getMonth() + 1}.${date.getDate()}`;
@@ -160,7 +160,7 @@ function calcEstimatedMileage(data) {
     const latest = sortedData[0];
     let previous = {};
 
-    console.log("latest.date", latest.date);
+    //console.log("latest.date", latest.date);
 
     for (let i = 1; i < sortedData.length; i++) {
         if (threeMonthsAgo(latest.date) > sortedData[i].date) {
@@ -228,19 +228,20 @@ function changeTab(newTab) {
 }
 
 watch(() => addData.value.category, (newVal) => {
-    let findedItem = {};
+    if (isPopupKind.value === 'ADD') {
+        let findedItem = {};
 
-    if (tab.value === 'SORENTO') {
-        findedItem = listSORENTO.value.find(item => item.category === newVal);
+        if (tab.value === 'SORENTO') {
+            findedItem = listSORENTO.value.find(item => item.category === newVal);
 
-    } else {
-        findedItem = listSM6.value.find(item => item.category === newVal);
+        } else {
+            findedItem = listSM6.value.find(item => item.category === newVal);
+        }
+
+        addData.value.remark = findedItem ? findedItem.remark : '';
+        addData.value.cost = findedItem ? findedItem.cost : '';
     }
-
-    addData.value.remark = findedItem ? findedItem.remark : '';
-    addData.value.cost = findedItem ? findedItem.cost : '';
-
-})
+});
 
 function getProgressTextColor(value) {
     // value: 퍼센트 (0~100)
@@ -293,6 +294,7 @@ function openAddPopup() {
 }
 
 function openDetailPopup(item) {
+    //console.log("openDetailPopup", item);
     addData.value = {
         "date": item.date.slice(0, 4) + '-' + item.date.slice(4, 6) + '-' + item.date.slice(6, 8),
         "category": item.category,
@@ -300,6 +302,8 @@ function openDetailPopup(item) {
         "cost": item.cost,
         "remark": item.remark
     }
+    //console.log("addData.value", addData.value);
+
     isPopupKind.value = "VIEW";
     isPopup.value = true;
 }
@@ -329,7 +333,7 @@ async function addFuel() {
     addData.value.cost = fuelAmount.value;
     addData.value.remark = String(carBook.value.fuel.liter);
     isFuelPopup.value = false;
-    
+
     try {
         const dbRef = firebaseRef(database, "car-book/fuel");
         await set(dbRef, carBook.value.fuel); // 데이터를 저장
@@ -443,7 +447,8 @@ onMounted(async () => {
                     <v-text-field v-model="addData.mileage" label="주행거리" type="number" clearable />
                     <v-row no-gutters>
                         <v-col cols="10">
-                            <v-number-input v-model="carBook.fuel.unitCost" label="단가" :min="1000" :step="10" clearable />
+                            <v-number-input v-model="carBook.fuel.unitCost" label="단가" :min="1000" :step="10"
+                                clearable />
                         </v-col>
                         <v-col cols="2">
                             <v-btn icon="mdi-calculator" variant="flat" @click="calcFuelAmount('COST')"></v-btn>
