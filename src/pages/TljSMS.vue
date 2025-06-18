@@ -600,7 +600,7 @@ onMounted(async () => {
                     <v-data-table id="reservationTable" :headers="resvHeaders" :items="resvTab" hide-default-footer
                         items-per-page="-1" :show-items-per-page="false">
                         <template v-slot:item="{ item, index }">
-                            <tr :style="item.product === '합계' ? 'background-color: #fffad4 !important;' : ''"
+                            <tr :style="item.product === '합계' ? 'background-color: #fff1e0 !important;' : ''"
                                 @click="item.product === '합계' ? '' : openResvPopup(item)">
                                 <td>{{ item.product }}</td>
                                 <td :style="{
