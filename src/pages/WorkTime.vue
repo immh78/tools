@@ -103,7 +103,9 @@ function refreshCalcTime() {
     }
 
     //console.log("todayWorkTime", todayWorkTime.value.hour, todayWorkTime.value.minute)
-    if (todayWorkTime.value.hour >= 9) {
+    console.log("getNow", getNow().slice(0, 2));
+
+    if (Number(getNow().slice(0, 2)) >= 13) {
         todayWorkTime.value.hour -= 1;
     } else if ((todayWorkTime.value.hour === 4 && todayWorkTime.value.minute >= 30) || todayWorkTime.value.hour > 4) {
         //console.log("30분 차감!")
