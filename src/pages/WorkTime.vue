@@ -282,7 +282,7 @@ async function getWorkingDaysInMonth(freeDays = []) {
     let commonWorkTime = 0;
     if (!holidays.has(todayStr)) {
         if (weekday >= 1 && weekday <= 4)        // 월(1)~목(4)
-        commonWorkTime = 9;
+        commonWorkTime = 9.5;
         else if (weekday === 5)                  // 금(5)
         commonWorkTime = 5;
         // 토(6), 일(0)은 그대로 0
