@@ -18,6 +18,7 @@ const isSnackbar = ref(false);
 const lastRefreshTime = ref("");
 const freeDays = ref([]);
 const prePay= 16.5;
+const commonWorkTime = ref(0);
 
 const base = ref(0); 
 const prog = ref(0);
@@ -76,6 +77,7 @@ async function getWorkTimeInfo() {
 
     const workingDays = await getWorkingDaysInMonth(tempFreeDays);
     calProg.value = workingDays.untilTodayWorkdays * 8;
+    commonWorkTime.value = workingDays.commonWorkTime;
 
 
     //console.log("calProg.value", calProg.value);
@@ -234,6 +236,7 @@ async function getWorkingDaysInMonth(freeDays = []) {
     const month = today.getMonth(); // 0-based
     const todayDay = today.getDate();
     const lastDayOfMonth = new Date(year, month + 1, 0).getDate();
+    const weekday     = today.getDay(); // 0=일, ..., 6=토
 
     const apiKey = 'TJA71zif4CfRseoCQiA085iUVt%2BzzJGBzyyRB76Tc6aTqpCwyVqhB1AZwXaPg7NIx0Su8MNPf%2BtN%2BoadNkd6Gg%3D%3D';
     const apiUrl = `https://apis.data.go.kr/B090041/openapi/service/SpcdeInfoService/getRestDeInfo?solYear=${year}&solMonth=${String(month + 1).padStart(2, '0')}&ServiceKey=${apiKey}&_type=json`;
@@ -273,9 +276,22 @@ async function getWorkingDaysInMonth(freeDays = []) {
         }
     }
 
+    // ── 2. 오늘의 근무 시간 판단 ──
+    const todayStr    = `${year}${String(month + 1).padStart(2,'0')}${String(todayDay).padStart(2,'0')}`;
+
+    let commonWorkTime = 0;
+    if (!holidays.has(todayStr)) {
+        if (weekday >= 1 && weekday <= 4)        // 월(1)~목(4)
+        commonWorkTime = 9;
+        else if (weekday === 5)                  // 금(5)
+        commonWorkTime = 5;
+        // 토(6), 일(0)은 그대로 0
+    }    
+
     return {
         fullMonthWorkdays,
-        untilTodayWorkdays
+        untilTodayWorkdays,
+        commonWorkTime
     };
 }
 async function saveFreeDays() {
@@ -332,6 +348,17 @@ onMounted(async () => {
                     :bg-color="isOver ? isOverPay ? 'red-darken-1' : 'yellow-darken-3' : 'grey'"
                     bg-opaccity="1"
                     height="8">
+                </v-progress-linear>
+                <v-progress-linear 
+                    :model-value="workTimeInfo.actTime" 
+                    color= "light-green"
+                    :buffer-value="workTimeInfo.actTime + commonWorkTime"
+                    buffer-color="light-green-lighten-3"
+                    buffer-opacity="1"
+                    :max="base"
+                    bg-color="grey"
+                    bg-opaccity="1"
+                    height="2" >
                 </v-progress-linear>
                 <v-progress-linear 
                     :model-value="calProg" 
