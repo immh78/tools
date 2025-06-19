@@ -35,7 +35,7 @@ router.isReady().then(() => {
             if (!manifest) return
 
             const tools = [
-                'dues-list',
+                'travel-logs',
                 'car-book',
                 'tlj-sms',
                 'log-view',
