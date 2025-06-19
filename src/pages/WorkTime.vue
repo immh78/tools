@@ -349,7 +349,7 @@ onMounted(async () => {
                     bg-opaccity="1"
                     height="8">
                 </v-progress-linear>
-                <v-progress-linear 
+                <v-progress-linear v-if="workTimeInfo.start !== ''"
                     :model-value="workTimeInfo.actTime" 
                     color= "light-green"
                     :buffer-value="workTimeInfo.actTime + commonWorkTime"
