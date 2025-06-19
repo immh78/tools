@@ -5,7 +5,8 @@ import { isLoggedIn } from '../config/authGuard';
 import { useUserStore } from '../store/user';
 
 import Main from '../pages/Main.vue';
-import DuesList from '../pages/DuesList.vue';
+//import DuesList from '../pages/DuesList.vue';
+import TravelLogs from '../pages/TravelLogs.vue';
 import TljSMS from '../pages/TljSMS.vue';
 import LogView from '../pages/LogView.vue';
 import WorkTime from '../pages/WorkTime.vue';
@@ -26,7 +27,7 @@ const routes = [
     meta: { requiresAuth: true, restricted: true, loggable: true }
   },
   {
-    path: '/dues-list', component: DuesList, comment: '우미린 가족여행 회비 목록', icon: 'mdi-umbrella-beach',
+    path: '/travel-logs', component: TravelLogs, comment: '우미린 가족여행 기록', icon: 'mdi-umbrella-beach',
     meta: { requiresAuth: true, restricted: false, loggable: true }
   },
   {
