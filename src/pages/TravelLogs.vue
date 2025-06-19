@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { AppBarTitle, usePageMeta } from '../composables/getRouteInfo';
-import { database, ref as firebaseRef, get, update, set } from "../config/firebase";
+import { database, ref as firebaseRef, get, update, remove } from "../config/firebase";
 import html2canvas from 'html2canvas';
 
 // AppBarTitle 컴포넌트에서 사용하는 아이콘
@@ -80,6 +80,7 @@ async function saveData(param) {
 }
 
 async function deleteData() {
+    //console.log("delete", selectRow.value, travelLogs.value[selectRow.value].key)
     try {
         const dbRef = firebaseRef(database, `travel-logs/${travelLogs.value[selectRow.value].key}`);
         await remove(dbRef); // 데이터를 저장
@@ -88,21 +89,24 @@ async function deleteData() {
     }
 
     await selectData();
+    isPopup.value = false;
 }
 
 function confirmPopup() {
-    console.log("selectRow.value", selectRow.value);
+    let row = selectRow.value;
 
-    if (selectRow.value === -1) {
+    if (row === -1) {
+        row = 0;
         popupData.value.key = getNewKey();
         travelLogs.value.unshift({ ...popupData.value });
-        travelLogs.value[0].date = formatDate(popupData.value.date, "");
     } else {
-        travelLogs.value[selectRow.value] = { ...popupData.value };
-        travelLogs.value[selectRow.value].date = formatDate(popupData.value.date, "");
+        travelLogs.value[row] = { ...popupData.value };
     }
+    travelLogs.value[row].amount = Number(popupData.value.amount);
+    travelLogs.value[row].date = formatDate(popupData.value.date, "");
 
-    saveData(travelLogs.value[selectRow.value]);
+    saveData(travelLogs.value[row]);
+    //console.log("travelLogs.value[row]", travelLogs.value[row]);
     isPopup.value = false;
 }
 
@@ -142,17 +146,16 @@ async function selectData() {
 
     try {
         const dbRef = firebaseRef(database, "travel-logs");
+        travelLogs.value = [];
         await get(dbRef)
             .then(snapshot => {
                 if (snapshot.exists()) {
-                    travelLogs.value = snapshot.val();
-
+                    const data = snapshot.val();
                     // Key값 컬럼 추가
-                    Object.keys(travelLogs.value).forEach(key => {
-                        travelLogs.value[key].key = Number(key);
+                    Object.keys(data).forEach(key => {
+                        //console.log("key", key);
+                        travelLogs.value.push({...data[key], 'key': Number(key)});                        
                     })
-
-
                 }
             })
             .catch(err => {
@@ -161,6 +164,8 @@ async function selectData() {
 
         /* 날짜 역순 정렬 */
         travelLogs.value.sort((a, b) => b.date.localeCompare(a.date))
+
+        //console.log("travelLogs.value", travelLogs.value)
 
     } catch (error) {
         console.error('Error fetching data:', error);
@@ -242,7 +247,7 @@ onMounted(async () => {
                 <template #item.amount="{ item }">
                     <span :style="{ color: item.isSettled ? 'black' : 'red' }">{{
                         item.amount?.toLocaleString() || 0
-                    }}</span>
+                        }}</span>
                 </template>
             </v-data-table>
 
