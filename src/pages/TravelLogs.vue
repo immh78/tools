@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue';
 import { AppBarTitle, usePageMeta } from '../composables/getRouteInfo';
 import { database, ref as firebaseRef, get, update, set } from "../config/firebase";
+import html2canvas from 'html2canvas';
 
 // AppBarTitle 컴포넌트에서 사용하는 아이콘
 const { icon } = usePageMeta();
@@ -20,7 +21,7 @@ const travelLogs = ref([]);
 const isSumPopup = ref(false);
 const isPopup = ref(false);
 const isSaveNotice = ref(false);
-const totalUnadjustedAmount = ref(0);
+const notSettledAmount = ref(0);
 const selectRow = ref(0);
 const popupData = ref({});
 
@@ -31,19 +32,17 @@ const headers = ref([
 ]);
 
 function openSumPopup() {
-    isSumPopup.value = true;
 
     // adjust가 "N"인 amount의 합계 계산
-    const total = rows.value
-        .filter(row => row.adjust === 'N')
+    const total = travelLogs.value
+        .filter(row => !row.isSettled)
         .reduce((sum, row) => {
-            // 쉼표 제거 후 숫자로 변환
-            const amount = parseFloat((row.amount || '0').replace(/,/g, ''));
-            return sum + amount;
+            return sum + row.amount;
         }, 0);
 
     // 숫자를 127,400원 형식으로 포맷팅
-    totalUnadjustedAmount.value = new Intl.NumberFormat('ko-KR').format(total) + '원';
+    notSettledAmount.value = new Intl.NumberFormat('ko-KR').format(total) + '원';
+    isSumPopup.value = true;
 }
 
 function onRowClick(_, ctx) {
@@ -60,25 +59,15 @@ function onClickAdd() {
     isPopup.value = true;
 }
 
-
-function onClickSave() {
-    travelLogs.value.filter(row => row.isUpdated).forEach(uptRow => {
-        saveData(uptRow);
-    })
-
-    selectData();
-    isSaveNotice.value = true;
-}
-
 async function saveData(param) {
     const data = {
         [param.key]: {
-            "amount": param.amount||0,
+            "amount": param.amount || 0,
             "date": param.date,
-            "destination": param.destination||"",
-            "item": param.item||"",
-            "memo": param.memo||"",
-            "isSettled": param.isSettled||false
+            "destination": param.destination || "",
+            "item": param.item || "",
+            "memo": param.memo || "",
+            "isSettled": param.isSettled || false
         }
     }
 
@@ -90,6 +79,16 @@ async function saveData(param) {
     }
 }
 
+async function deleteData() {
+    try {
+        const dbRef = firebaseRef(database, `travel-logs/${travelLogs.value[selectRow.value].key}`);
+        await remove(dbRef); // 데이터를 저장
+    } catch (err) {
+        console.error("Error saving data:", err);
+    }
+
+    await selectData();
+}
 
 function confirmPopup() {
     console.log("selectRow.value", selectRow.value);
@@ -98,13 +97,12 @@ function confirmPopup() {
         popupData.value.key = getNewKey();
         travelLogs.value.unshift({ ...popupData.value });
         travelLogs.value[0].date = formatDate(popupData.value.date, "");
-        travelLogs.value[0].isUpdated = true;
     } else {
         travelLogs.value[selectRow.value] = { ...popupData.value };
         travelLogs.value[selectRow.value].date = formatDate(popupData.value.date, "");
-        travelLogs.value[selectRow.value].isUpdated = true;
     }
 
+    saveData(travelLogs.value[selectRow.value]);
     isPopup.value = false;
 }
 
@@ -152,7 +150,6 @@ async function selectData() {
                     // Key값 컬럼 추가
                     Object.keys(travelLogs.value).forEach(key => {
                         travelLogs.value[key].key = Number(key);
-                        travelLogs.value[key].isUpdated = false;
                     })
 
 
@@ -172,6 +169,30 @@ async function selectData() {
     resetIcon();
 }
 
+async function onClickShare() {
+    const tableElement = document.getElementById("shareContent");
+
+    if (!tableElement) {
+        console.error('Table element not found');
+        return;
+    }
+
+    const canvas = await html2canvas(tableElement);
+    const context = canvas.getContext('2d');
+
+    const image = canvas.toDataURL('image/png');
+
+    if (navigator.share) {
+        await navigator.share({
+            title: '미정산 내역',
+            text: '아래 이미지를 확인하세요.',
+            files: [new File([await (await fetch(image)).blob()], 'table.png', { type: 'image/png' })],
+        });
+    } else {
+        alert('공유 API를 지원하지 않는 브라우저입니다.');
+    }
+
+}
 function formatDate(yyyymmdd, kind) {
     if (kind === '.') {
         const year = yyyymmdd.slice(0, 4)
@@ -190,8 +211,6 @@ function formatDate(yyyymmdd, kind) {
     }
 }
 
-
-
 onMounted(async () => {
     await selectData();
 });
@@ -205,8 +224,7 @@ onMounted(async () => {
             </template>
             <template v-slot:append>
                 <!--<v-btn icon="mdi-calculator" @click="openSumPopup()"></v-btn>-->
-                <v-btn icon="mdi-content-save" @click="onClickSave()"></v-btn>
-
+                <v-btn icon="mdi-calculator" @click="openSumPopup()"></v-btn>
             </template>
             <AppBarTitle :onIconClick="selectData" :refreshIcon="refreshIcon" />
         </v-app-bar>
@@ -214,25 +232,24 @@ onMounted(async () => {
             <v-data-table :headers="headers" :items="travelLogs" class="elevation-1" no-data-text="조회중입니다."
                 hide-default-footer items-per-page="-1" :show-items-per-page="false" @click:row="onRowClick">
                 <template #item.date="{ item }">
-                    <span :style="{ fontStyle: item.isUpdated ? 'italic' : '' }">{{ formatDate(item.date, ".") }}</span>
+                    <span>{{ formatDate(item.date, ".") }}</span>
                 </template>
                 <template #item.destination="{ item }">
-                    <span :style="{ fontStyle: item.isUpdated ? 'italic' : '' }">{{ item.destination }}</span><br>
-                    <span :style="{ fontSize: '12px', color: 'grey', fontStyle: item.isUpdated ? 'italic' : '' }">{{ item.item
-                        }}</span>
+                    <span>{{ item.destination }}</span><br>
+                    <span :style="{ fontSize: '12px', color: 'grey' }">{{ item.item }}</span>
                 </template>
 
                 <template #item.amount="{ item }">
-                    <span :style="{ color: item.isSettled ? 'black' : 'red', fontStyle: item.isUpdated ? 'italic' : '' }">{{
+                    <span :style="{ color: item.isSettled ? 'black' : 'red' }">{{
                         item.amount?.toLocaleString() || 0
-                        }}</span>
+                    }}</span>
                 </template>
             </v-data-table>
 
             <v-fab icon="mdi-plus" color="blue" @click="onClickAdd()" class="fixed-fab" />
         </v-main>
         <v-dialog v-model="isPopup" max-width="600px">
-            <v-card>
+            <v-card class="pa-4">
                 <v-text-field label="날짜" v-model="popupData.date" type="date" />
                 <v-text-field label="여행지" v-model="popupData.destination" type="text" />
                 <v-text-field label="지출내역" v-model="popupData.item" type="text" />
@@ -241,9 +258,42 @@ onMounted(async () => {
                 <v-checkbox label="정산여부" v-model="popupData.isSettled" />
                 <v-card-actions>
                     <v-spacer></v-spacer>
-                    <v-btn @click="confirmPopup()">확인</v-btn>
-                    <v-btn @click="isPopup = false">삭제</v-btn>
-                    <v-btn @click="isPopup = false">닫기</v-btn>
+                    <v-btn @click="confirmPopup()" icon="mdi-check-bold"></v-btn>
+                    <v-btn @click="deleteData()" :disabled="selectRow === -1" icon="mdi-delete"></v-btn>
+                    <v-btn @click="isPopup = false" icon="mdi-close-thick"></v-btn>
+
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+        <v-dialog v-model="isSumPopup" max-width="600px">
+            <v-card>
+                <div id="shareContent">
+                    <v-card-title class="d-flex justify-space-between align-center">
+                        미정산 금액
+                        <v-btn icon="mdi-share-variant" variant="flat" @click="onClickShare()"></v-btn>
+                    </v-card-title>
+                    <v-container>
+                        <div v-for="(value, key) in travelLogs.filter(row => !row.isSettled)">
+                            <v-row style="font-size: 14px;">
+                                <v-col cols="4">
+                                    <span>{{ formatDate(value.date, ".") }}</span>
+                                </v-col>
+                                <v-col cols="5">
+                                    <span>{{ value.destination }}</span>
+                                </v-col>
+                                <v-col cols="3">
+                                    <span>{{ value.amount?.toLocaleString() || 0 }}</span>
+                                </v-col>
+                            </v-row>
+                        </div>
+                    </v-container>
+                    <v-divider class="mx-4 border-dashed" />
+                    <v-card-text class="text-end"> {{ notSettledAmount }}
+                    </v-card-text>
+                </div>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn @click="isSumPopup = false" icon="mdi-close-thick"></v-btn>
                 </v-card-actions>
             </v-card>
         </v-dialog>
@@ -260,5 +310,16 @@ onMounted(async () => {
     /* 화면 우측에서 16px 왼쪽 */
     z-index: 1050;
     /* 다른 요소 위에 표시되도록 설정 */
+}
+
+.borderless-table :deep(.v-table thead th),
+.borderless-table :deep(.v-table tbody td) {
+    border: none !important;
+    /* 각 셀의 테두리 제거 */
+}
+
+.borderless-table :deep(.v-table tbody tr:not(:last-child)) {
+    border-bottom: none !important;
+    /* 행 사이 구분선 제거 */
 }
 </style>
