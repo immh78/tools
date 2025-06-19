@@ -1,7 +1,7 @@
 {
-    "name": "우미린 가족여행 회비 목록",
-    "short_name": "우미린 가족여행 회비 목록",
-    "start_url": "/tools/#/dues-list",
+    "name": "우미린 가족여행",
+    "short_name": "우미린 가족여행",
+    "start_url": "/tools/#/travel-logs",
     "display": "standalone",
     "theme_color": "#000000",    
     "background_color": "#ffffff",
