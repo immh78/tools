@@ -53,9 +53,13 @@ function onRowClick(_, ctx) {
 }
 
 function onClickAdd() {
+    console.log("popupData.value", popupData.value);
+
     selectRow.value = -1;
     popupData.value = {};
     popupData.value.date = getToday();
+    popupData.value.destination = travelLogs.value[0].destination;
+    
     isPopup.value = true;
 }
 
@@ -256,10 +260,10 @@ onMounted(async () => {
         <v-dialog v-model="isPopup" max-width="600px">
             <v-card class="pa-4">
                 <v-text-field label="날짜" v-model="popupData.date" type="date" />
-                <v-text-field label="여행지" v-model="popupData.destination" type="text" />
-                <v-text-field label="지출내역" v-model="popupData.item" type="text" />
-                <v-text-field label="금액" v-model="popupData.amount" type="number" />
-                <v-text-field label="비고" v-model="popupData.memo" type="text" />
+                <v-text-field label="여행지" v-model="popupData.destination" type="text" clearable/>
+                <v-text-field label="지출내역" v-model="popupData.item" type="text" clearable/>
+                <v-text-field label="금액" v-model="popupData.amount" type="number" clearable/>
+                <v-text-field label="비고" v-model="popupData.memo" type="text" clearable/>
                 <v-checkbox label="정산여부" v-model="popupData.isSettled" />
                 <v-card-actions>
                     <v-spacer></v-spacer>
