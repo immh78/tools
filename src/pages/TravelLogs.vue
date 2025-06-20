@@ -244,7 +244,7 @@ onMounted(async () => {
                     <span>{{ formatDate(item.date, ".") }}</span>
                 </template>
                 <template #item.destination="{ item }">
-                    <span>{{ item.destination }}</span><br>
+                    <span>{{ item.destination }}</span> <v-icon size="14px" color="grey-darken-1" v-if="item.memo">mdi-note-text-outline</v-icon><br>
                     <span :style="{ fontSize: '12px', color: 'grey' }">{{ item.item }}</span>
                 </template>
 
