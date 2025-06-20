@@ -31,6 +31,7 @@ const isProductAdd = ref(false);
 const productItem = ref({});
 
 const isConfirmPopup = ref(false);
+const isAddBtn = ref(true);
 const confirmAction = ref("");
 
 // AppBarTitle 컴포넌트에서 사용하는 아이콘
@@ -73,15 +74,14 @@ async function selectData() {
             }
         })
         .catch(err => {
-            //console.error("Error fetching data:", err);
+            console.error("Error fetching data:", err);
         });
 
-    //console.log("* tljResv:", tljResv.value);
+    console.log("* tljResv:", tljResv.value);
     // Calculate sum
     prepayTab.value = [];
     if (tljResv.value.prepayment) {
-        summary.value.prepayment = tljResv.value.prepayment.reduce((sum, item) => sum + item.amount, 0);
-
+        
         const prepaymentKeys = Object.keys(tljResv.value.prepayment).map(Number)
 
         prepaymentKeys.forEach(key => {
@@ -89,6 +89,8 @@ async function selectData() {
             itemPrepay.key = key;  // 각 항목에 key 값을 추가
             prepayTab.value.push(itemPrepay);
         });
+
+        summary.value.prepayment = prepayTab.value.reduce((sum, item) => sum + item.amount, 0);
 
         prepayTab.value.sort((a, b) => a.date.localeCompare(b.date));
 
@@ -540,6 +542,13 @@ watch(() => tab.value, (newTab) => {
         isSendButton.value = true;
     }
 
+    if (newTab === 'summary') {
+        isAddBtn.value = false;
+    } else {
+        isAddBtn.value = true;
+    }
+
+
 });
 
 onMounted(async () => {
@@ -644,7 +653,7 @@ onMounted(async () => {
                     </v-data-table>
                 </v-tabs-window-item>
             </v-tabs-window>
-            <v-fab icon="mdi-plus" color="blue" @click="onClickAdd()" class="fixed-fab" />
+            <v-fab icon="mdi-plus" color="blue" @click="onClickAdd()" class="fixed-fab" :active="isAddBtn"/>
         </v-main>
 
         <v-dialog v-model="isPrepayPopup" max-width="600px">
