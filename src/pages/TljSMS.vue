@@ -483,6 +483,10 @@ function openConfirmPopup(action) {
     isConfirmPopup.value = true;
 }
 
+function onClickAdd() {
+
+}
+
 function action() {
     isConfirmPopup.value = false;
     switch (confirmAction.value) {
@@ -635,6 +639,7 @@ onMounted(async () => {
                     </v-container>
                 </v-tabs-window-item>
             </v-tabs-window>
+            <v-fab icon="mdi-plus" color="blue" @click="onClickAdd()" class="fixed-fab" />
         </v-main>
 
         <v-dialog v-model="isPrepayPopup" max-width="600px">
@@ -748,4 +753,15 @@ td {
 .table-row {
     border-bottom: 1px solid silver;
 }
+
+.fixed-fab {
+    position: fixed;
+    bottom: 16px;
+    /* 화면 하단에서 16px 위 */
+    right: 16px;
+    /* 화면 우측에서 16px 왼쪽 */
+    z-index: 1050;
+    /* 다른 요소 위에 표시되도록 설정 */
+}
+
 </style>
