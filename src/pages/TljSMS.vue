@@ -484,7 +484,17 @@ function openConfirmPopup(action) {
 }
 
 function onClickAdd() {
-
+    switch (tab.value) {
+        case 'prepayment':
+            openPrepayPopup();
+            break;
+        case 'reservation':
+            openResvPopup();
+            break;
+        case 'production':
+            openProductPopup();
+            break;
+    }
 }
 
 function action() {
@@ -578,7 +588,6 @@ onMounted(async () => {
                         </template>
                     </v-data-table>
                     <v-container style="text-align: center;">
-                        <v-btn class="ma-1" @click="openPrepayPopup()">추가</v-btn>
                         <v-btn class="ma-1" @click="openConfirmPopup('DEL_PREPAY')">전체삭제</v-btn>
                     </v-container>
                 </v-tabs-window-item>
@@ -619,7 +628,6 @@ onMounted(async () => {
                         </template>
                     </v-data-table>
                     <v-container style="text-align: center;">
-                        <v-btn class="ma-1" @click="openResvPopup()">추가</v-btn>
                         <v-btn class="ma-1" @click="openConfirmPopup('DEL_RESV')">전체삭제</v-btn>
                     </v-container>
                 </v-tabs-window-item>
@@ -634,9 +642,6 @@ onMounted(async () => {
                             </tr>
                         </template>
                     </v-data-table>
-                    <v-container style="text-align: center;">
-                        <v-btn class="ma-1" @click="openProductPopup()">추가</v-btn>
-                    </v-container>
                 </v-tabs-window-item>
             </v-tabs-window>
             <v-fab icon="mdi-plus" color="blue" @click="onClickAdd()" class="fixed-fab" />
@@ -763,5 +768,4 @@ td {
     z-index: 1050;
     /* 다른 요소 위에 표시되도록 설정 */
 }
-
 </style>
