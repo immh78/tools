@@ -485,7 +485,7 @@ onMounted(async () => {
                 <v-text-field v-model="addData.mileage" label="주행거리" type="number" clearable />
                 <v-text-field v-if="addData.category === '기름'" v-model="addData.liter" label="주유량" type="number"
                     clearable />
-                <v-text-field v-model="addData.cost" label="비용" type="number" clearable />
+                <v-text-field v-if="addData.category !== '주행거리'" v-model="addData.cost" label="비용" type="number" clearable />
                 <v-text-field v-model="addData.remark" label="비고" clearable />
 
                 <v-card-actions>
