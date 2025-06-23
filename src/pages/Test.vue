@@ -1,130 +1,72 @@
-<script setup>
-import { ref, onMounted } from 'vue'
-import { database, ref as firebaseRef, get } from '../config/firebase';
-
-const selected = ref([])
-const dots = ref([])
-const dotRefs = ref([])
-const canvas = ref(null)
-const ctx = ref(null)
-
-
-async function selectData() {
-  const dbRef = firebaseRef(database, "logs");
-  await get(dbRef)
-    .then(snapshot => {
-      if (snapshot.exists()) {
-        const permissionData = snapshot.val();
-        console.log("permissionData", permissionData);
-      }
-    })
-    .catch(err => {
-      //console.error("Error fetching data:", err);
-    });
-
-  const dbRef2 = firebaseRef(database, "user");
-  await get(dbRef2)
-    .then(snapshot => {
-      if (snapshot.exists()) {
-        const userData = snapshot.val();
-        console.log("userData", userData);
-      }
-    })
-    .catch(err => {
-      //console.error("Error fetching data:", err);
-    });
-
-}
-
-onMounted(() => {
-  const spacing = 100
-  for (let y = 0; y < 3; y++) {
-    for (let x = 0; x < 3; x++) {
-      dots.value.push({ x: x * spacing + 50, y: y * spacing + 50 })
-    }
-  }
-  ctx.value = canvas.value.getContext('2d')
-  canvas.value.width = 300
-  canvas.value.height = 300
-
-  selectData();
-})
-
-const start = (e) => {
-  selected.value = []
-  draw()
-  move(e)
-}
-
-const move = (e) => {
-  const touch = e.touches[0]
-  const { clientX, clientY } = touch
-  dots.value.forEach((dot, index) => {
-    const dx = dot.x - clientX + canvas.value.getBoundingClientRect().left
-    const dy = dot.y - clientY + canvas.value.getBoundingClientRect().top
-    if (Math.sqrt(dx * dx + dy * dy) < 30 && !selected.value.includes(index)) {
-      selected.value.push(index)
-      draw()
-    }
-  })
-}
-
-const end = () => {
-  alert('패턴 입력 완료: ' + selected.value.join('-'))
-}
-
-const draw = () => {
-  ctx.value.clearRect(0, 0, 300, 300)
-  ctx.value.strokeStyle = 'blue'
-  ctx.value.lineWidth = 5
-  ctx.value.beginPath()
-  selected.value.forEach((index, i) => {
-    const dot = dots.value[index]
-    if (i === 0) {
-      ctx.value.moveTo(dot.x, dot.y)
-    } else {
-      ctx.value.lineTo(dot.x, dot.y)
-    }
-  })
-  ctx.value.stroke()
-}
-</script>
-
 <template>
-  <div class="pattern-container" @touchstart="start" @touchmove="move" @touchend="end">
-    <div v-for="(dot, index) in dots" :key="index" :class="['dot', { active: selected.includes(index) }]"
-      :style="{ left: dot.x + 'px', top: dot.y + 'px' }" ref="dotRefs"></div>
-    <canvas ref="canvas" class="canvas"></canvas>
-  </div>
+  <v-container>
+    <v-row justify="center">
+      <v-col cols="12" md="6">
+        <v-card class="pa-6">
+          <v-file-input
+            v-model="file"
+            accept="image/*"
+            label="프로필 이미지 업로드"
+            prepend-icon="mdi-camera"
+          ></v-file-input>
+
+          <v-btn
+            color="primary"
+            block
+            class="mt-4"
+            :loading="uploading"
+            @click="uploadImage"
+          >
+            Upload to ImageKit
+          </v-btn>
+
+          <v-img
+            v-if="uploadedUrl"
+            :src="uploadedUrl"
+            class="mt-6"
+            max-height="300"
+            contain
+          ></v-img>
+        </v-card>
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
 
+<script setup>
+import { ref } from 'vue'
+import ImageKit from 'imagekit-javascript'
 
+// 1️⃣ 상태 변수
+const file = ref(null)
+const uploading = ref(false)
+const uploadedUrl = ref("")
 
-<style scoped>
-.pattern-container {
-  position: relative;
-  width: 300px;
-  height: 300px;
-  margin: auto;
-  touch-action: none;
+// 2️⃣ ImageKit SDK 초기화 (publicKey만 사용 가능)
+const imagekit = new ImageKit({
+  publicKey: "public_ztSp7aVVdzbqRsYwLROe43CM2SQ=",
+  urlEndpoint: "https://ik.imagekit.io/66nnelktc",
+})
+
+// 3️⃣ 업로드 함수
+const uploadImage = async () => {
+  if (!file.value) return
+  uploading.value = true
+
+  try {
+    const result = await imagekit.upload({
+      file: file.value, // File 객체
+      fileName: file.value.name,
+      folder: "/vue-test",
+      useUniqueFileName: true,
+    })
+
+    uploadedUrl.value = result.url
+  } catch (err) {
+    console.error("Upload failed:", err)
+    alert("ImageKit 업로드 실패: 콘솔 확인")
+  } finally {
+    uploading.value = false
+  }
 }
-
-.dot {
-  position: absolute;
-  width: 30px;
-  height: 30px;
-  background: gray;
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-}
-
-.dot.active {
-  background: blue;
-}
-
-.canvas {
-  position: absolute;
-  top: 0;
-  left: 0;
-}
-</style>
+</script>

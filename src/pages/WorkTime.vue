@@ -17,10 +17,13 @@ const remainTime = ref({ hour: '-', minute: '-' }); // 잔여 근무시간
 const isSnackbar = ref(false);
 const lastRefreshTime = ref("");
 const freeDays = ref([]);
-const prePay= 16.5;
+const prePay = 16.5;
 const commonWorkTime = ref(0);
+const remainWorkTime = ref(0);
+const isForcastOverPay = ref(true);
+const forcastOverTimePay = ref(0);
 
-const base = ref(0); 
+const base = ref(0);
 const prog = ref(0);
 const calProg = ref(0);
 
@@ -78,6 +81,7 @@ async function getWorkTimeInfo() {
     const workingDays = await getWorkingDaysInMonth(tempFreeDays);
     calProg.value = workingDays.untilTodayWorkdays * 8;
     commonWorkTime.value = workingDays.commonWorkTime;
+    remainWorkTime.value = workingDays.remainingWorkHours;
 
 
     //console.log("calProg.value", calProg.value);
@@ -105,7 +109,7 @@ function refreshCalcTime() {
     }
 
     //console.log("todayWorkTime", todayWorkTime.value.hour, todayWorkTime.value.minute)
-    console.log("getNow", getNow().slice(0, 2));
+    //console.log("getNow", getNow().slice(0, 2));
 
     if (Number(getNow().slice(0, 2)) >= 13) {
         todayWorkTime.value.hour -= 1;
@@ -131,6 +135,11 @@ function refreshCalcTime() {
             isOverPay.value = true;
             overTimePay.value = Math.round(workTimeInfo.value.salary / 240 * 1.5 * (workTimeInfo.value.actTime + getTime(todayWorkTime.value) - workTimeInfo.value.planTime - prePay)).toLocaleString();
         }
+    }
+
+    if ( workTimeInfo.value.actTime + remainWorkTime.value - workTimeInfo.value.planTime > prePay ) {
+        isForcastOverPay.value = true;
+        forcastOverTimePay.value = Math.round(workTimeInfo.value.salary / 240 * 1.5 * (workTimeInfo.value.actTime + remainWorkTime.value - workTimeInfo.value.planTime - prePay)).toLocaleString();
     }
 
     remainTime.value = getHourMinute(workTimeInfo.value.planTime - workTimeInfo.value.actTime - getTime(todayWorkTime.value));
@@ -236,7 +245,8 @@ async function getWorkingDaysInMonth(freeDays = []) {
     const month = today.getMonth(); // 0-based
     const todayDay = today.getDate();
     const lastDayOfMonth = new Date(year, month + 1, 0).getDate();
-    const weekday     = today.getDay(); // 0=일, ..., 6=토
+    const weekday = today.getDay(); // 0=일, ..., 6=토
+    const lastDay = new Date(year, month + 1, 0).getDate();
 
     const apiKey = 'TJA71zif4CfRseoCQiA085iUVt%2BzzJGBzyyRB76Tc6aTqpCwyVqhB1AZwXaPg7NIx0Su8MNPf%2BtN%2BoadNkd6Gg%3D%3D';
     const apiUrl = `https://apis.data.go.kr/B090041/openapi/service/SpcdeInfoService/getRestDeInfo?solYear=${year}&solMonth=${String(month + 1).padStart(2, '0')}&ServiceKey=${apiKey}&_type=json`;
@@ -277,25 +287,51 @@ async function getWorkingDaysInMonth(freeDays = []) {
     }
 
     // ── 2. 오늘의 근무 시간 판단 ──
-    const todayStr    = `${year}${String(month + 1).padStart(2,'0')}${String(todayDay).padStart(2,'0')}`;
+    const todayStr = `${year}${String(month + 1).padStart(2, '0')}${String(todayDay).padStart(2, '0')}`;
 
     let commonWorkTime = 0;
     if (!holidays.has(todayStr)) {
         if (weekday >= 1 && weekday <= 4)        // 월(1)~목(4)
-        commonWorkTime = 9.5;
+            commonWorkTime = 9.5;
         else if (weekday === 5)                  // 금(5)
-        commonWorkTime = 5;
+            commonWorkTime = 5;
         // 토(6), 일(0)은 그대로 0
-    }    
+    }
+
+    /* ── 4. 오늘 이후 근무 시간 합계 (규칙 적용) ── */
+    let remainingWorkHours = 0;                        // ★
+
+    for (let d = todayDay + 1; d <= lastDay; d++) {    // ★ 내일~말일
+        const date = new Date(year, month, d);
+        const weekday = date.getDay();                  // 0=일,6=토
+        const dateStr = `${year}${String(month + 1).padStart(2, '0')}${String(d).padStart(2, '0')}`;
+
+        // 평일 + 휴일 아님
+        if (weekday >= 1 && weekday <= 5 && !holidays.has(dateStr)) {
+            // 기본 시간
+            let hours = weekday === 5 ? 5 : 9.5;           // 금=5, 월~목=9.5
+
+            // 내일이 휴일이면 5.5로 대체
+            const nextDate = new Date(year, month, d + 1);
+            const nextDateStr =
+                `${nextDate.getFullYear()}${String(nextDate.getMonth() + 1).padStart(2, '0')}` +
+                `${String(nextDate.getDate()).padStart(2, '0')}`;
+
+            if (holidays.has(nextDateStr)) hours = 5.5;    // ★ 대체 규칙
+
+            remainingWorkHours += hours;                   // ★ 합산
+        }
+    }
 
     return {
         fullMonthWorkdays,
         untilTodayWorkdays,
-        commonWorkTime
+        commonWorkTime,
+        remainingWorkHours
     };
 }
 async function saveFreeDays() {
-    console.log(freeDays.value)
+    //console.log(freeDays.value)
     const formattedDates = freeDays.value.map(iso => {
         const date = new Date(iso);
         const yyyy = date.getFullYear();
@@ -313,7 +349,7 @@ async function saveFreeDays() {
 
     getWorkTimeInfo();
     isCalPopup.value = false;
-    
+
 }
 
 onMounted(async () => {
@@ -338,38 +374,19 @@ onMounted(async () => {
                 style="display: flex; font-size:11px; justify-content: end; align-items: center;"><v-icon
                     size="12px">mdi-clock-outline</v-icon> {{ lastRefreshTime }}</span>
             <v-card class="mt-2 ml-2 mr-2" variant="flat">
-                <v-progress-linear 
-                    :model-value="workTimeInfo.actTime" 
-                    color= "blue"
-                    :buffer-value="prog"
-                    buffer-color="blue-lighten-3"
-                    buffer-opacity="1"
-                    :max="base"
-                    :bg-color="isOver ? isOverPay ? 'red-darken-1' : 'yellow-darken-3' : 'grey'"
-                    bg-opaccity="1"
+                <v-progress-linear :model-value="workTimeInfo.actTime" color="blue" :buffer-value="prog"
+                    buffer-color="blue-lighten-3" buffer-opacity="1" :max="base"
+                    :bg-color="isOver ? isOverPay ? 'red-darken-1' : 'yellow-darken-3' : 'grey'" bg-opaccity="1"
                     height="8">
                 </v-progress-linear>
-                <v-progress-linear v-if="workTimeInfo.start !== ''"
-                    :model-value="workTimeInfo.actTime" 
-                    color= "light-green"
-                    :buffer-value="workTimeInfo.actTime + commonWorkTime"
-                    buffer-color="light-green-lighten-3"
-                    buffer-opacity="1"
-                    :max="base"
-                    bg-color="grey"
-                    bg-opaccity="1"
-                    height="2" >
+                <v-progress-linear v-if="workTimeInfo.start !== ''" :model-value="workTimeInfo.actTime"
+                    color="light-green" :buffer-value="workTimeInfo.actTime + commonWorkTime"
+                    buffer-color="light-green-lighten-3" buffer-opacity="1" :max="base" bg-color="grey" bg-opaccity="1"
+                    height="2">
                 </v-progress-linear>
-                <v-progress-linear 
-                    :model-value="calProg" 
-                    color= "grey"
-                    :buffer-value="calProg + prePay"
-                    buffer-color="grey-lighten-2"
-                    buffer-opacity="1"
-                    :max="base"
-                    bg-color="grey"
-                    bg-opaccity="1"
-                    height="2" >
+                <v-progress-linear :model-value="calProg" color="grey" :buffer-value="calProg + prePay"
+                    buffer-color="grey-lighten-2" buffer-opacity="1" :max="base" bg-color="grey" bg-opaccity="1"
+                    height="2">
                 </v-progress-linear>
             </v-card>
 
@@ -390,7 +407,9 @@ onMounted(async () => {
                 </v-row>
                 <v-row>
                     <v-col cols="6">
-                        <v-text-field :label="`금일 근무시간 (${workTimeInfo.start?.slice(0, 2) + ':' + workTimeInfo.start?.slice(2)})`" v-model="todayWorkTime.hour"
+                        <v-text-field
+                            :label="`금일 근무시간 (${workTimeInfo.start?.slice(0, 2) + ':' + workTimeInfo.start?.slice(2)})`"
+                            v-model="todayWorkTime.hour"
                             :style="{ color: workTimeInfo.start === '' ? 'white' : 'black' }" variant="outlined"
                             type="number" readonly></v-text-field> </v-col>
                     <v-col cols="6">
@@ -408,6 +427,12 @@ onMounted(async () => {
                 style="position: fixed; bottom: 20px; right: 20px; display: flex; align-items: center; justify-content: center; width: auto; padding: 10px;">
                 <div class="text-h7" style="text-align: center;">
                     {{ overTimePay }}원
+                </div>
+            </v-card>
+            <v-card class="ma-2" v-if="isForcastOverPay" variant="flat" color="indigo-darken-3"
+                style="position: fixed; bottom: 20px; right: 20px; display: flex; align-items: center; justify-content: center; width: auto; padding: 10px;">
+                <div class="text-h7" style="text-align: center;">
+                   예상 : {{ forcastOverTimePay }}원
                 </div>
             </v-card>
         </v-main>
