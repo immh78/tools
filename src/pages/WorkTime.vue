@@ -383,11 +383,11 @@ onMounted(async () => {
                 <v-progress-linear v-if="workTimeInfo.start !== ''" :model-value="workTimeInfo.actTime"
                     color="light-green" :buffer-value="workTimeInfo.actTime + commonWorkTime"
                     buffer-color="light-green-lighten-3" buffer-opacity="1" :max="base" bg-color="grey" bg-opaccity="1"
-                    height="8">
+                    height="4">
                 </v-progress-linear>
                 <v-progress-linear :model-value="calProg" color="grey" :buffer-value="calProg + prePay"
                     buffer-color="grey-lighten-2" buffer-opacity="1" :max="base" bg-color="grey" bg-opaccity="1"
-                    height="8">
+                    height="4">
                 </v-progress-linear>
             </v-card>
 
