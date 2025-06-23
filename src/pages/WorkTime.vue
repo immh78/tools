@@ -301,7 +301,8 @@ async function getWorkingDaysInMonth(freeDays = []) {
     /* ── 4. 오늘 이후 근무 시간 합계 (규칙 적용) ── */
     let remainingWorkHours = 0;                        // ★
 
-    for (let d = todayDay + 1; d <= lastDay; d++) {    // ★ 내일~말일
+    
+    for (let d = todayDay + (start.value === "" ? 1 : 0); d <= lastDay; d++) {    // ★ 내일~말일
         const date = new Date(year, month, d);
         const weekday = date.getDay();                  // 0=일,6=토
         const dateStr = `${year}${String(month + 1).padStart(2, '0')}${String(d).padStart(2, '0')}`;
@@ -382,11 +383,11 @@ onMounted(async () => {
                 <v-progress-linear v-if="workTimeInfo.start !== ''" :model-value="workTimeInfo.actTime"
                     color="light-green" :buffer-value="workTimeInfo.actTime + commonWorkTime"
                     buffer-color="light-green-lighten-3" buffer-opacity="1" :max="base" bg-color="grey" bg-opaccity="1"
-                    height="2">
+                    height="4">
                 </v-progress-linear>
                 <v-progress-linear :model-value="calProg" color="grey" :buffer-value="calProg + prePay"
                     buffer-color="grey-lighten-2" buffer-opacity="1" :max="base" bg-color="grey" bg-opaccity="1"
-                    height="2">
+                    height="4">
                 </v-progress-linear>
             </v-card>
 
@@ -423,18 +424,12 @@ onMounted(async () => {
                 <v-btn class="ma-2" @click="openFinishTimePopup()"
                     :disabled="workTimeInfo.start === ''"><v-icon>mdi-home-export-outline</v-icon> 퇴근</v-btn>
             </div>
-            <v-card class="ma-2" v-if="isOverPay" variant="flat" color="indigo-darken-3"
+            <v-card class="ma-2" v-if="isOverPay || isForcastOverPay" variant="flat" color="indigo-darken-3"
                 style="position: fixed; bottom: 20px; right: 20px; display: flex; align-items: center; justify-content: center; width: auto; padding: 10px;">
                 <div class="text-h7" style="text-align: center;">
-                    {{ overTimePay }}원
+                    예상 : {{ forcastOverTimePay }}원 <span style="color:grey;">|</span> {{ overTimePay }}원
                 </div>
-            </v-card>
-            <v-card class="ma-2" v-if="isForcastOverPay" variant="flat" color="indigo-darken-3"
-                style="position: fixed; bottom: 20px; right: 20px; display: flex; align-items: center; justify-content: center; width: auto; padding: 10px;">
-                <div class="text-h7" style="text-align: center;">
-                   예상 : {{ forcastOverTimePay }}원
-                </div>
-            </v-card>
+            </v-card>            
         </v-main>
 
         <v-dialog v-model="isPopup" max-width="500">
