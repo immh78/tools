@@ -394,7 +394,7 @@ onMounted(async () => {
             <v-card class="mt-2 ml-2 mr-2" variant="flat">
                 <v-row>
                     <v-col cols="12">
-                        <v-text-field :label="'의무 근무시간 | 잔여 근무시간 :' + remainTime.hour + '시간 ' + remainTime.minute + '분'"
+                        <v-text-field :label="'의무 근무시간 | 잔여 근무시간 : ' + remainTime.hour + '시간 ' + remainTime.minute + '분'"
                             v-model="workTimeInfo.planTime" variant="outlined" type="number" class="mt-2" />
                     </v-col>
                 </v-row>
