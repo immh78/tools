@@ -22,6 +22,7 @@ const commonWorkTime = ref(0);
 const remainWorkTime = ref(0);
 const isForcastOverPay = ref(true);
 const forcastOverTimePay = ref(0);
+const forcastOverTime = ref(0);
 
 const base = ref(0);
 const prog = ref(0);
@@ -139,6 +140,7 @@ function refreshCalcTime() {
 
     if ( workTimeInfo.value.actTime + remainWorkTime.value - workTimeInfo.value.planTime > prePay ) {
         isForcastOverPay.value = true;
+        forcastOverTime.value = workTimeInfo.value.actTime + remainWorkTime.value - workTimeInfo.value.planTime - prePay;
         forcastOverTimePay.value = Math.round(workTimeInfo.value.salary / 240 * 1.5 * (workTimeInfo.value.actTime + remainWorkTime.value - workTimeInfo.value.planTime - prePay)).toLocaleString();
     }
 
@@ -427,7 +429,7 @@ onMounted(async () => {
             <v-card class="ma-2" v-if="isOverPay || isForcastOverPay" variant="flat" color="indigo-darken-3"
                 style="position: fixed; bottom: 20px; right: 20px; display: flex; align-items: center; justify-content: center; width: auto; padding: 10px;">
                 <div class="text-h7" style="text-align: center;">
-                    예상 : {{ forcastOverTimePay }}원 <span style="color:grey;">|</span> {{ overTimePay }}원
+                    예상 : {{ forcastOverTimePay }}원 ({{ Math.round(forcastOverTime * 10) / 10 }}시간) <span style="color:grey;">|</span> {{ overTimePay }}원
                 </div>
             </v-card>            
         </v-main>
