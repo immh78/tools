@@ -1,7 +1,6 @@
 // src/router/index.js 또는 main.js
 import { createRouter, createWebHashHistory } from 'vue-router';
 import { database, ref as firebaseRef, get, push } from "../config/firebase";
-import { isLoggedIn } from '../config/authGuard';
 import { useUserStore } from '../store/user';
 
 import Main from '../pages/Main.vue';
@@ -115,9 +114,10 @@ const router = createRouter({
 router.beforeEach(async (to, from, next) => {
   const userStore = useUserStore();
   const uid = userStore.user?.uid;
+  //console.log("router.beforeEach", uid);
 
   // 로그인 필요
-  if (to.meta.requiresAuth && !isLoggedIn()) {
+  if (to.meta.requiresAuth && !uid) {
     return next({ path: '/login', query: { redirect: to.fullPath } });
   }
 
@@ -182,7 +182,7 @@ router.afterEach((to) => {
   const userStore = useUserStore();
   const uid = userStore.user?.uid;
 
-  //console.log("router.afterEach #1");
+  //console.log("router.afterEach", uid);
   // meta.loggable === true인 페이지만 기록
   if (to.meta?.loggable && uid) {
     // '/'는 실질적으로 대시보드 같은 첫 화면이므로 필요하면 별도 처리
@@ -190,7 +190,5 @@ router.afterEach((to) => {
     logPageVisit(to);    
   }
 });
-
-
 
 export default router

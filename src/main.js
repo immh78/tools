@@ -1,7 +1,11 @@
 import { createApp, watch } from 'vue';
-//import './style.css'
 import App from './App.vue';
 import router from './router';
+
+//firebase
+import { auth } from './config/firebase'; // Firebase 초기화
+import { onAuthStateChanged } from 'firebase/auth';
+import { useUserStore } from './store/user';
 
 // Vuetify 관련 import
 import { createVuetify } from 'vuetify';
@@ -9,10 +13,11 @@ import * as components from "vuetify/components";
 import * as directives from "vuetify/directives";
 import "vuetify/styles";
 import '@mdi/font/css/materialdesignicons.css'; // MDI 아이콘 스타일 추가
-import { createPinia } from 'pinia';
-import persistedState from 'pinia-plugin-persistedstate';
 import * as labs from 'vuetify/labs/components'
 
+//pinia
+import { createPinia } from 'pinia';
+import persistedState from 'pinia-plugin-persistedstate';
 
 
 // Vuetify 인스턴스 생성
@@ -64,4 +69,26 @@ router.isReady().then(() => {
     )
 })
 
-createApp(App).use(vuetify).use(router).use(pinia).mount('#app');
+const app = createApp(App);
+
+app.use(pinia);
+app.use(vuetify);
+app.use(router);
+
+onAuthStateChanged(auth, (user) => {
+    //console.log("onAuthStateChanged", user);
+
+    const userStore = useUserStore();
+    if (user) {
+        userStore.setUser({
+            email: auth.currentUser.email,
+            uid: auth.currentUser.uid
+        }); // 로그인 정보 저장
+    } else {
+        userStore.clearUser();
+    }   
+    
+});
+app.mount('#app');
+
+

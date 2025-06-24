@@ -5,12 +5,10 @@ import FingerprintJS from '@fingerprintjs/fingerprintjs';
 import { AppBarTitle } from '../composables/getRouteInfo';
 import { auth } from '../config/firebase';
 import { signOut } from 'firebase/auth';
-import { useCookies } from '@vueuse/integrations/useCookies';
 import { useUserStore } from '../store/user';
 
 const visitorId = ref('');
 const router = useRouter();
-const cookies = useCookies();
 const userStore = useUserStore();
 
 
@@ -23,7 +21,6 @@ function navigateTo(path) {
 
 async function logout() {
   await signOut(auth);
-  cookies.remove('authToken');
   userStore.clearUser();
   router.push('/login');
 };
