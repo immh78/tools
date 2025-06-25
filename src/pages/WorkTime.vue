@@ -138,7 +138,7 @@ function refreshCalcTime() {
         }
     }
 
-    if ( workTimeInfo.value.actTime + remainWorkTime.value - workTimeInfo.value.planTime > prePay ) {
+    if (workTimeInfo.value.actTime + remainWorkTime.value - workTimeInfo.value.planTime > prePay) {
         isForcastOverPay.value = true;
         forcastOverTime.value = workTimeInfo.value.actTime + remainWorkTime.value - workTimeInfo.value.planTime - prePay;
         forcastOverTimePay.value = Math.round(workTimeInfo.value.salary / 240 * 1.5 * (workTimeInfo.value.actTime + remainWorkTime.value - workTimeInfo.value.planTime - prePay)).toLocaleString();
@@ -303,7 +303,7 @@ async function getWorkingDaysInMonth(freeDays = []) {
     /* ── 4. 오늘 이후 근무 시간 합계 (규칙 적용) ── */
     let remainingWorkHours = 0;                        // ★
 
-    
+
     for (let d = todayDay + (start.value === "" ? 1 : 0); d <= lastDay; d++) {    // ★ 내일~말일
         const date = new Date(year, month, d);
         const weekday = date.getDay();                  // 0=일,6=토
@@ -396,7 +396,8 @@ onMounted(async () => {
             <v-card class="mt-2 ml-2 mr-2" variant="flat">
                 <v-row>
                     <v-col cols="12">
-                        <v-text-field :label="'의무 근무시간 | 잔여 근무시간 : ' + remainTime.hour + '시간 ' + remainTime.minute + '분'"
+                        <v-text-field
+                            :label="'의무 근무시간 | 잔여 근무시간 : ' + remainTime.hour + '시간 ' + remainTime.minute + '분'"
                             v-model="workTimeInfo.planTime" variant="outlined" type="number" class="mt-2" />
                     </v-col>
                 </v-row>
@@ -429,9 +430,10 @@ onMounted(async () => {
             <v-card class="ma-2" v-if="isOverPay || isForcastOverPay" variant="flat" color="indigo-darken-3"
                 style="position: fixed; bottom: 20px; right: 20px; display: flex; align-items: center; justify-content: center; width: auto; padding: 10px;">
                 <div class="text-h7" style="text-align: center;">
-                    예상 : {{ forcastOverTimePay }}원 ({{ Math.round(forcastOverTime * 10) / 10 }}시간) <span style="color:grey;">|</span> {{ overTimePay }}원
+                    예상 : {{ forcastOverTimePay }}원 ({{ Math.round(forcastOverTime * 10) / 10 }}시간) <span
+                        style="color:grey;">|</span> {{ overTimePay }}원
                 </div>
-            </v-card>            
+            </v-card>
         </v-main>
 
         <v-dialog v-model="isPopup" max-width="500">
@@ -459,7 +461,7 @@ onMounted(async () => {
         </v-dialog>
     </v-app>
 
-    <v-snackbar v-model="isSnackbar">저장 완료!</v-snackbar>
+    <v-snackbar v-model="isSnackbar" :timeout="1000" color="primary" variant="tonal">저장 완료!</v-snackbar>
 </template>
 
 <style scoped></style>
