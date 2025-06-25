@@ -14,7 +14,7 @@ const overTimePay = ref(0);
 const todayWorkTime = ref({}); // 금일 근무시간
 const actTime = ref({}); // 누적 근무시간
 const remainTime = ref({ hour: '-', minute: '-' }); // 잔여 근무시간
-const isSnackbar = ref(false);
+const isSnackbar = ref(true);
 const lastRefreshTime = ref("");
 const freeDays = ref([]);
 const prePay = 16.5;
@@ -422,11 +422,21 @@ onMounted(async () => {
                             type="number" readonly></v-text-field> </v-col>
                 </v-row>
             </v-card>
-            <div class="mt-4" style="display: flex; justify-content: center; align-items: center;">
-                <v-btn class="ma-2" @click="saveStartTime()"><v-icon>mdi-home-import-outline</v-icon> 출근</v-btn>
-                <v-btn class="ma-2" @click="openFinishTimePopup()"
-                    :disabled="workTimeInfo.start === ''"><v-icon>mdi-home-export-outline</v-icon> 퇴근</v-btn>
+            <div class="mt-4 d-flex flex-column align-center">
+                <div>
+                    <v-btn class="ma-2" @click="saveStartTime()">
+                        <v-icon>mdi-home-import-outline</v-icon> 출근
+                    </v-btn>
+                    <v-btn class="ma-2" @click="openFinishTimePopup()" :disabled="workTimeInfo.start === ''">
+                        <v-icon>mdi-home-export-outline</v-icon> 퇴근
+                    </v-btn>
+                </div>
+                <v-snackbar v-model="isSnackbar" :timeout="2000" color="primary" variant="tonal" location="top center"
+                style="position: absolute; top: 420px; left: 50%; transform: translateX(-50%);">
+                저장 완료!
+                </v-snackbar>
             </div>
+
             <v-card class="ma-2" v-if="isOverPay || isForcastOverPay" variant="flat" color="indigo-darken-3"
                 style="position: fixed; bottom: 20px; right: 20px; display: flex; align-items: center; justify-content: center; width: auto; padding: 10px;">
                 <div class="text-h7" style="text-align: center;">
@@ -461,7 +471,7 @@ onMounted(async () => {
         </v-dialog>
     </v-app>
 
-    <v-snackbar v-model="isSnackbar" :timeout="1000" color="primary" variant="tonal">저장 완료!</v-snackbar>
+
 </template>
 
 <style scoped></style>
