@@ -370,8 +370,8 @@ onMounted(async () => {
                 <v-img gradient="to top right, rgba(19,84,122,.8), rgba(128,208,199,.8)"></v-img>
             </template>
             <template v-slot:append>
+                <v-btn icon="mdi-calendar-month" @click="isCalPopup = true"></v-btn>
                 <v-btn icon="mdi-content-save" @click="saveWorkInfo()"></v-btn>
-                <v-btn icon="mdi-cog" @click="isCalPopup = true"></v-btn>
             </template>
             <AppBarTitle :onIconClick="refreshCalcTime" :refreshIcon="refreshIcon" />
         </v-app-bar>
@@ -462,13 +462,12 @@ onMounted(async () => {
                 </v-card-actions>
             </v-card>
         </v-dialog>
-        <v-dialog v-model="isCalPopup" max-width="500">
-            <v-card title="연차휴가일 선택">
-                <v-date-picker v-model="freeDays" color='red-lighten-3' multiple></v-date-picker>
-                <v-card-actions>
-                    <v-spacer></v-spacer>
-                    <v-btn text="취소" @click="isCalPopup = false"></v-btn>
-                    <v-btn text="저장" @click="saveFreeDays()"></v-btn>
+        <v-dialog v-model="isCalPopup" max-width="320">
+            <v-card>
+                <v-date-picker title="연차휴가일 선택" v-model="freeDays" color="red-lighten-3" multiple></v-date-picker>
+                <v-card-actions class="justify-center">
+                    <v-btn text @click="isCalPopup = false">닫기</v-btn>
+                    <v-btn text @click="saveFreeDays()">저장</v-btn>
                 </v-card-actions>
             </v-card>
         </v-dialog>
