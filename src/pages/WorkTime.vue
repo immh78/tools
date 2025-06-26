@@ -138,10 +138,18 @@ function refreshCalcTime() {
         }
     }
 
-    if (workTimeInfo.value.actTime + remainWorkTime.value - workTimeInfo.value.planTime > prePay) {
+    let addWorkTime = 0;
+    if (getTime(todayWorkTime.value) > commonWorkTime.value) {
+        addWorkTime = getTime(todayWorkTime.value) - commonWorkTime.value;
+    }
+
+    const forcastOverTimeCalc = workTimeInfo.value.actTime + remainWorkTime.value + addWorkTime - workTimeInfo.value.planTime - prePay;
+
+    if (forcastOverTimeCalc > 0) {
         isForcastOverPay.value = true;
-        forcastOverTime.value = workTimeInfo.value.actTime + remainWorkTime.value - workTimeInfo.value.planTime - prePay;
-        forcastOverTimePay.value = Math.round(workTimeInfo.value.salary / 240 * 1.5 * (workTimeInfo.value.actTime + remainWorkTime.value - workTimeInfo.value.planTime - prePay)).toLocaleString();
+
+        forcastOverTime.value = forcastOverTimeCalc;
+        forcastOverTimePay.value = Math.round(workTimeInfo.value.salary / 240 * 1.5 * forcastOverTimeCalc).toLocaleString();
     }
 
     remainTime.value = getHourMinute(workTimeInfo.value.planTime - workTimeInfo.value.actTime - getTime(todayWorkTime.value));
@@ -200,19 +208,14 @@ async function saveWorkInfo() {
     getWorkTimeInfo();
 }
 
-function saveStartTime() {
+function openStartTimePopup() {
     if (workTimeInfo.value.start === "") {
-        const now = getNow();
-        const data = { "start": now };
-
-        saveData(data);
-        getWorkTimeInfo();
-    } else {
-        //console.log("start", workTimeInfo.value.start);
-        popupTime.value = workTimeInfo.value.start.slice(0, 2) + ":" + workTimeInfo.value.start.slice(2);
-        popupKind.value = "START";
-        isPopup.value = true;
+        workTimeInfo.value.start = getNow();
     }
+
+    popupTime.value = workTimeInfo.value.start.slice(0, 2) + ":" + workTimeInfo.value.start.slice(2);
+    popupKind.value = "START";
+    isPopup.value = true;
 }
 
 function openFinishTimePopup() {
@@ -424,7 +427,7 @@ onMounted(async () => {
             </v-card>
             <div class="mt-4 d-flex flex-column align-center">
                 <div>
-                    <v-btn class="ma-2" @click="saveStartTime()">
+                    <v-btn class="ma-2" @click="openStartTimePopup()">
                         <v-icon>mdi-home-import-outline</v-icon> 출근
                     </v-btn>
                     <v-btn class="ma-2" @click="openFinishTimePopup()" :disabled="workTimeInfo.start === ''">
@@ -432,8 +435,8 @@ onMounted(async () => {
                     </v-btn>
                 </div>
                 <v-snackbar v-model="isSnackbar" :timeout="2000" color="primary" variant="tonal" location="top center"
-                style="position: absolute; top: 420px; left: 50%; transform: translateX(-50%);">
-                저장 완료!
+                    style="position: absolute; top: 420px; left: 50%; transform: translateX(-50%);">
+                    저장 완료!
                 </v-snackbar>
             </div>
 
