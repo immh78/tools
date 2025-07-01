@@ -68,7 +68,11 @@ async function resetPassword() {
 }
 
 function goToRegister() {
-  router.push('/register'); // 회원가입 페이지 경로
+  const redirectTo = route.query.redirect;
+  router.push({
+    path: '/register',
+    query: redirectTo ? { redirect: redirectTo } : {}
+  });
 };
 </script>
 

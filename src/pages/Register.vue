@@ -12,6 +12,7 @@ const showPassword = ref(false);
 const loading = ref(false);
 const errorMessage = ref('');
 const router = useRouter();
+const route = useRoute();
 
 const register = async () => {
     try {
@@ -23,7 +24,14 @@ const register = async () => {
 
         saveUser(user.uid);
         alert(`환영합니다, ${user.email} 님!`);
-        router.push('/login');
+        
+        const redirectTo = route.query.redirect;
+        router.push({
+            path: '/login',
+            query: redirectTo ? { redirect: redirectTo } : {}
+        });
+
+
     } catch (error) {
         console.error(error.code, error.message);
         switch (error.code) {
