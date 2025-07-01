@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue';
-import { signInWithEmailAndPassword,sendPasswordResetEmail } from 'firebase/auth';
+import { signInWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
 import { auth } from '../config/firebase';
 import { useRouter, useRoute } from 'vue-router';
 
@@ -15,9 +15,15 @@ async function login() {
   try {
     await signInWithEmailAndPassword(auth, email.value, password.value);
 
-    // 리디렉트 경로 있으면 해당 페이지로, 없으면 홈으로
-    const redirectTo = route.query.redirect || '/';
-    router.push(redirectTo);
+    const redirectTo = route.query.redirect;
+
+    if (/^https?:\/\//.test(redirectTo)) {
+      // 외부 URL (다른 프로젝트 전체 주소)로 이동
+      window.location.href = redirectTo;
+    } else {
+      // 내부 라우팅
+      router.push(redirectTo || '/');
+    }
 
   } catch (error) {
     console.error('로그인 오류:', error.code);
