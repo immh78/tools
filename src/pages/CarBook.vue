@@ -142,7 +142,7 @@ function sortData(data) {
         tempData.push({ ...data[key], 'key': Number(key) });
     })
     //정렬
-    return [...tempData].sort((a, b) => parseDate(b.date) - parseDate(a.date));
+    return [...tempData].sort((a, b) => b.mileage - a.mileage);
 }
 
 function threeMonthsAgo(yyyymmdd) {
