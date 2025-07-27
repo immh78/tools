@@ -48,6 +48,7 @@ router.isReady().then(() => {
                 'regular-task',
                 'offering',
                 'scoring',
+                'tax',
                 'test'
             ];
 

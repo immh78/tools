@@ -19,6 +19,7 @@ import Register from '../pages/Register.vue';
 import AccessDenied from '../pages/AccessDenied.vue';
 import PermissionEditor from '../pages/PermissionEditor.vue';
 import DbBrowser from '../pages/DbBrowser.vue';
+import Tax from '../pages/Tax.vue';
 
 const routes = [
   {
@@ -59,6 +60,10 @@ const routes = [
   },
   {
     path: '/db-browser', component: DbBrowser, comment: 'DB 브라우저', icon: 'mdi-database-search',
+    meta: { requiresAuth: true, restricted: true, loggable: true }
+  },
+  {
+    path: '/db-browser', component: Tax, comment: '세금 납부 이력', icon: 'mdi-payments',
     meta: { requiresAuth: true, restricted: true, loggable: true }
   },
   {

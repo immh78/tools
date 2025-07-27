@@ -1,0 +1,21 @@
+{
+    "name": "세금 납부 이력",
+    "short_name": "세금 납부 이력",
+    "start_url": "/tools/#/tax",
+    "display": "standalone",
+    "theme_color": "#000000",    
+    "background_color": "#ffffff",
+    "icons": [
+      {
+        "src": "/tools/tax.png",
+        "sizes": "192x192",
+        "type": "image/png"
+      },
+      {
+        "src": "/tools/tax.png",
+        "sizes": "512x512",
+        "type": "image/png"
+      }
+    ]
+  }
+  
