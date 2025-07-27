@@ -288,7 +288,8 @@ onMounted(async () => {
                                     <span>{{ formatDate(value.date, ".") }}</span>
                                 </v-col>
                                 <v-col cols="5">
-                                    <span>{{ value.destination }}</span>
+                                    <span>{{ value.destination }}</span><br/>
+                                    <span style="font-size: 11px; color:darkgray">{{ value.item }}</span>
                                 </v-col>
                                 <v-col cols="3">
                                     <span>{{ value.amount?.toLocaleString() || 0 }}</span>
@@ -297,7 +298,7 @@ onMounted(async () => {
                         </div>
                     </v-container>
                     <v-divider class="mx-4 border-dashed" />
-                    <v-card-text class="text-end"> {{ notSettledAmount }}
+                    <v-card-text class="text-end" style="font-size: 16px"> {{ notSettledAmount }}
                     </v-card-text>
                 </div>
                 <v-card-actions>
