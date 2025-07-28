@@ -1,12 +1,16 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import { database, ref as firebaseRef, get, update, remove } from "../config/firebase";
+import { database, ref as firebaseRef, get, set, remove } from "../config/firebase";
 import { AppBarTitle, usePageMeta } from '../composables/getRouteInfo';
 
 const tax = ref({});
 const month = ref([]);
 const payment = ref([]);
 const isOpenPopup = ref(false);
+const isMonthPopup = ref(false);
+const isNotice = ref(false);
+const notice = ref('');
+const newMonth = ref('');
 
 const headers = [
     { title: "지역", value: "target" },
@@ -18,18 +22,9 @@ const headers = [
 const { icon } = usePageMeta();
 const defaultIcon = ref(icon.value);
 const refreshIcon = ref('');
-// const year = ref(Number(getToday().slice(0, 4))); // 현재 연도로 초기화
-// const taxList = ref([]);
-const taxItem = ref({
-    target: "",
-    resTaxAmount: 0,
-    propTaxAmount: 0,
-    date: ""
-});
+const taxItem = ref({});
 
 const carouselIndex = ref(0); // 캐러셀 인덱스
-
-const istaxAdd = ref(false);
 
 function setLoadingIcon() {
     refreshIcon.value = 'mdi-refresh';
@@ -37,6 +32,29 @@ function setLoadingIcon() {
 
 function resetIcon() {
     refreshIcon.value = defaultIcon.value; // 복원
+}
+
+function openAddMonth() {
+    newMonth.value = getToday().slice(0, 6); // 현재 연월로 초기화
+    isMonthPopup.value = true;
+}
+
+async function addMonth() {
+    if (month.value.includes(newMonth.value)) {
+        notice.value = `${newMonth.value}는 이미 존재합니다.`;
+        isNotice.value = true; // 팝업 닫기
+        return;
+    }
+
+    tax.value.payment[newMonth.value] = [];
+    await selectPayment();
+    carouselIndex.value = month.value.length - 1;
+
+    console.log("* tax", tax.value);
+    console.log("* month", month.value);
+    console.log("* payment", payment.value);
+
+    isMonthPopup.value = false;
 }
 
 async function selectData() {
@@ -52,10 +70,15 @@ async function selectData() {
             console.error("Error fetching data:", err);
         });
 
+    await selectPayment();
+    resetIcon();
+}
+
+async function selectPayment() {
     month.value = Object.keys(tax.value.payment).sort();
 
-    for (const month in tax.value.payment) {
-        const monthData = tax.value.payment[month];
+    month.value.forEach(mm => {
+        const monthData = tax.value.payment[mm];
 
         const rows = tax.value.target.map(target => {
             const targetEntries = monthData.filter(entry => entry.target === target);
@@ -70,15 +93,12 @@ async function selectData() {
             };
         });
 
-        payment.value[month] = rows;
-    }
+        payment.value[mm] = rows;
+    });
 
     console.log("* tax", tax.value);
     console.log("* month", month.value);
     console.log("* payment", payment.value);
-    // console.log("* taxList", taxList.value);
-
-    resetIcon();
 }
 
 function getToday() {
@@ -92,15 +112,7 @@ function getToday() {
     // 일도 두 자리수 맞춤
     const day = String(today.getDate()).padStart(2, '0');
 
-    return `${y}-${month}-${day}`;
-}
-
-function formatDate(dateStr) {
-    if (!dateStr || dateStr.length !== 8) return dateStr; // 방어적 처리
-    const year = dateStr.slice(0, 4);
-    const month = dateStr.slice(4, 6);
-    const day = dateStr.slice(6, 8);
-    return `${year}-${month}-${day}`;
+    return `${y}${month}${day}`;
 }
 
 function openTaxPopup(mm, item) {
@@ -109,29 +121,36 @@ function openTaxPopup(mm, item) {
 
     taxItem.value = {
         ...item,
-        month:mm
+        month: mm
     };
     isOpenPopup.value = true;
 }
 
-function savetax() {
+function saveTax(category) {
 
-    const year = Object.keys(tax.value)[carouselIndex.value];
+    const idx = tax.value.payment[taxItem.value.month].findIndex(item => item.target === taxItem.value.target && item.category === (category === 'prop' ? '재산세' : '주민세'));
 
-    const data = {
-        [taxItem.value.key]: {
-            date: taxItem.value.date.replace(/-/g, ''), // YYYYMMDD 형식으로 변환
-            category: taxItem.value.category,
-            remark: taxItem.value.remark,
-            amount: Number(taxItem.value.amount),
-        }
-    };
+    tax.value.payment[taxItem.value.month].splice(idx, 1);
+
+    if (taxItem.value[category + 'TaxAmount'] > 0) {
+        const inputData = {
+            target: taxItem.value.target,
+            category: category === 'prop' ? '재산세' : '주민세',
+            amount: Number(taxItem.value[category + 'TaxAmount']),
+            date: getToday()
+        };
+
+        tax.value.payment[taxItem.value.month].push(inputData);
+    }
+
+    console.log("* tax", tax.value);
+    console.log("* tax.payment", tax.value.payment[taxItem.value.month]);
 
     // Firebase에 저장
-    const dbRef = firebaseRef(database, "tax/" + year);
-    update(dbRef, data)
+    const dbRef = firebaseRef(database, "tax/payment/" + taxItem.value.month);
+    set(dbRef, tax.value.payment[taxItem.value.month])
         .then(() => {
-            console.log("헌금 정보가 성공적으로 저장되었습니다.");
+            console.log("저장되었습니다.");
             isOpenPopup.value = false;
             selectData(); // 데이터 새로고침
         })
@@ -162,11 +181,6 @@ async function deletetax(target) {
     isOpenPopup.value = false;
 
     selectData();
-}
-
-
-function sumtax(year) {
-    return tax.value[year].reduce((sum, item) => sum + item.amount, 0);
 }
 
 onMounted(async () => {
@@ -211,9 +225,9 @@ onMounted(async () => {
                         <tbody>
                             <tr v-for="item in payment[mm]" :key="item.target">
                                 <td><v-btn @click="openTaxPopup(mm, item)">{{ item.target }}</v-btn></td>
-                                <td v-if="item.propTaxAmount > 0">{{ item.propTaxAmount }}</td>
-                                <td v-else colspan="2">미납부</td>
-                                <td v-if="item.propTaxAmount > 0">{{ item.resTaxAmount }}</td>
+                                <td v-if="item.propTaxAmount && item.propTaxAmount > 0">{{ item.propTaxAmount.toLocaleString('ko-KR') }}</td>
+                                <td v-else>미납부</td>
+                                <td v-if="item.resTaxAmount && item.resTaxAmount > 0">{{ item.resTaxAmount.toLocaleString('ko-KR') }}</td>
                             </tr>
                         </tbody>
                     </v-table>
@@ -221,26 +235,37 @@ onMounted(async () => {
             </v-carousel>
         </v-main>
 
-        <v-dialog v-model="isOpenPopup" max-width="380px">
+        <v-dialog v-model="isOpenPopup" max-width="500px">
             <v-card>
                 <v-card-title>{{ taxItem.target }}</v-card-title>
-                <v-table>
-                    <tbody>
-                        <tr>
-                            <td><v-text-field v-model="taxItem.propTaxAmount" label="재산세" type="number" clearable /></td>
-                            <td><v-btn @click="savetax()" icon="mdi-content-save"></v-btn></td>
-                        </tr>
-                        <tr>
-                            <td><v-text-field v-model="taxItem.resTaxAmount" label="주민세" type="number" clearable /></td>
-                            <td><v-btn @click="savetax()" icon="mdi-content-save"></v-btn></td>
-                        </tr>
-                    </tbody>
-                </v-table>
+                <tbody class="ma-4">
+                    <tr>
+                        <td><v-text-field v-model="taxItem.propTaxAmount" label="재산세" type="number" clearable variant="outlined"/>
+                        </td>
+                        <td class="d-flex align-center justify-center"><v-btn @click="saveTax('prop')" icon="mdi-content-save" variant="text"/></td>
+                    </tr>
+                    <tr>
+                        <td><v-text-field v-model="taxItem.resTaxAmount" label="주민세" type="number" clearable variant="outlined"/></td>
+                        <td class="d-flex align-center justify-center"><v-btn @click="saveTax('res')" icon="mdi-content-save" variant="text"/></td>
+                    </tr>
+                </tbody>
                 <v-card-actions>
-                   <v-btn @click="isOpenPopup = false" icon="mdi-close-thick"></v-btn>
+                    <v-btn @click="isOpenPopup = false" icon="mdi-close-thick"></v-btn>
                 </v-card-actions>
             </v-card>
         </v-dialog>
+
+        <v-dialog v-model="isMonthPopup" max-width="380px">
+            <v-card>
+                <v-card-title>추가 월(yyyymm)</v-card-title>
+                <v-text-field v-model="newMonth" label="월" type="text" clearable />
+                <v-card-actions>
+                    <v-btn @click="addMonth()" icon="mdi-check-bold"></v-btn>
+                    <v-btn @click="isMonthPopup = false" icon="mdi-close-thick"></v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+        <v-snackbar v-model="isNotice">{{ notice }}</v-snackbar>
     </v-app>
 
 </template>
