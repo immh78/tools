@@ -63,7 +63,7 @@ const routes = [
     meta: { requiresAuth: true, restricted: true, loggable: true }
   },
   {
-    path: '/db-browser', component: Tax, comment: '세금 납부 이력', icon: 'mdi-payments',
+    path: '/tax', component: Tax, comment: '세금 납부 이력', icon: 'mdi-cash-multiple',
     meta: { requiresAuth: true, restricted: true, loggable: true }
   },
   {

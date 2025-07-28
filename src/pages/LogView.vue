@@ -12,12 +12,12 @@ const tableData  = ref([]);   // 화면에 그릴 집계 결과
 const error      = ref(null);
 const adminUid   = ref('');
 
-const headers = ref([
+const headers = [
   { title: 'Page',  align: 'start',  key: 'page',   value: 'page'   },
   { title: 'User',  align: 'start',  key: 'user',   value: 'user'   },
   { title: 'Count', align: 'end',    key: 'count',  value: 'count'  },
   { title: 'Date',  align: 'center', key: 'latest', value: 'latest'}
-]);
+];
 
 /* AppBar 아이콘 처리 */
 const { icon }  = usePageMeta();
