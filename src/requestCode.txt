@@ -6,7 +6,14 @@ tax = {
                 "category": "재산세",
                 "date": 20250711,
                 "target": "청주"
+            },
+            {
+                "amount": 200,
+                "category": "주민세",
+                "date": 20250711,
+                "target": "청주"
             }
+
         ],
         "202507": [
             {
@@ -35,7 +42,8 @@ payment 변수를 구성하려고 한다.
 payment 속성에는 amount, category, date, target이 있으며 
 tax.target 변수가 모두 포함되어야 한다.
 만약 tax.target에는 있는데 tax.payment가 없다면 target category를 "미납부"로 입력한다.
-payment는 tax.payment와 구조가 같다. 년월 key값 하위로 구성된다.
+payment는 년월 key값 하위로 구성된다.
+payment의 속성은 target, resTaxAmount, propTaxAmount이며 resTexAmount는 주민세, propTaxAmount는 재산세이다.
 
 
 vue.js로 개발한다.

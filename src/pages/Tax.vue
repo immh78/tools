@@ -10,8 +10,8 @@ const isOpenPopup = ref(false);
 
 const headers = [
     { title: "지역", value: "target" },
-    { title: "구분", value: "category" },
-    { title: "금액", value: "amount" }
+    { title: "재산세", value: "propTaxAmount" },
+    { title: "주민세", value: "resTaxAmount" }
 ]
 
 // AppBarTitle 컴포넌트에서 사용하는 아이콘
@@ -21,11 +21,10 @@ const refreshIcon = ref('');
 // const year = ref(Number(getToday().slice(0, 4))); // 현재 연도로 초기화
 // const taxList = ref([]);
 const taxItem = ref({
-    date: "",
-    category: "",
-    remark: "",
-    amount: 0,
-    key: 0
+    target: "",
+    resTaxAmount: 0,
+    propTaxAmount: 0,
+    date: ""
 });
 
 const carouselIndex = ref(0); // 캐러셀 인덱스
@@ -54,20 +53,24 @@ async function selectData() {
         });
 
     month.value = Object.keys(tax.value.payment).sort();
+
     for (const month in tax.value.payment) {
-        const monthPayments = tax.value.payment[month];
-        const filled = tax.value.target.map(target => {
-            const record = monthPayments.find(p => p.target === target);
-            return record
-                ? { ...record }
-                : {
-                    amount: null,
-                    category: "미납부",
-                    date: null,
-                    target
-                };
+        const monthData = tax.value.payment[month];
+
+        const rows = tax.value.target.map(target => {
+            const targetEntries = monthData.filter(entry => entry.target === target);
+
+            const resTax = targetEntries.find(e => e.category === "주민세");
+            const propTax = targetEntries.find(e => e.category === "재산세");
+
+            return {
+                target,
+                resTaxAmount: resTax ? resTax.amount : null,
+                propTaxAmount: propTax ? propTax.amount : null
+            };
         });
-        payment.value[month] = filled;
+
+        payment.value[month] = rows;
     }
 
     console.log("* tax", tax.value);
@@ -100,45 +103,14 @@ function formatDate(dateStr) {
     return `${year}-${month}-${day}`;
 }
 
-function openTaxPopup(year, item) {
+function openTaxPopup(mm, item) {
 
-    console.log("openTaxPopup", year, item);
+    console.log("openTaxPopup", mm, item);
 
-    if (item) {
-        taxItem.value = {
-            ...item,
-            date: formatDate(item.date)
-        };
-
-        istaxAdd.value = false;
-    } else {
-
-        let category = "";
-        let amount = 0;
-        let remark = ""
-        let key = 0;
-
-        if (tax.value[year].length > 0) {
-            const lastItem = tax.value[year][tax.value[year].length - 1];
-            category = lastItem.category;
-            amount = lastItem.amount;
-            key = Math.max(...tax.value[year].map(item => Number(item.key))) + 1;
-
-            if (category === '십일조') {
-                remark = Number(getToday().slice(5, 7)) + "월";
-            }
-        }
-
-        taxItem.value = {
-            date: getToday(),
-            category: category,
-            remark: remark,
-            amount: amount,
-            key: key
-        };
-
-        istaxAdd.value = true;
-    }
+    taxItem.value = {
+        ...item,
+        month:mm
+    };
     isOpenPopup.value = true;
 }
 
@@ -213,34 +185,59 @@ onMounted(async () => {
                 <v-img gradient="to top right, rgba(19,84,122,.8), rgba(128,208,199,.8)"></v-img>
             </template>
             <AppBarTitle :onIconClick="selectData" :refreshIcon="refreshIcon" />
+            <template v-slot:append>
+                <v-btn icon="mdi-plus-circle" @click="openAddMonth()"></v-btn>
+            </template>
         </v-app-bar>
         <v-main>
             <v-carousel v-model="carouselIndex" :continuous="false" :show-arrows="true" hide-delimiter-background
                 height="801">
                 <v-carousel-item v-for="(mm, i) in month" :key="i">
                     <h3 class="ml-4 mt-2">{{ mm }}</h3>
-
-                    <v-data-table :headers="headers" :items="payment[mm]" class="elevation-1" no-data-text="조회중입니다."
-                        hide-default-footer items-per-page="-1" :show-items-per-page="false">
-                        <template #item.target="{ item }">
-                            <v-btn @click="openTaxPopup(mm, item)">{{ item.target }}</v-btn>
-                        </template>
-                    </v-data-table>
-
+                    <v-table>
+                        <thead>
+                            <tr>
+                                <th class="text-left">
+                                    지역
+                                </th>
+                                <th class="text-left">
+                                    재산세
+                                </th>
+                                <th class="text-left">
+                                    주민세
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="item in payment[mm]" :key="item.target">
+                                <td><v-btn @click="openTaxPopup(mm, item)">{{ item.target }}</v-btn></td>
+                                <td v-if="item.propTaxAmount > 0">{{ item.propTaxAmount }}</td>
+                                <td v-else colspan="2">미납부</td>
+                                <td v-if="item.propTaxAmount > 0">{{ item.resTaxAmount }}</td>
+                            </tr>
+                        </tbody>
+                    </v-table>
                 </v-carousel-item>
             </v-carousel>
         </v-main>
 
         <v-dialog v-model="isOpenPopup" max-width="380px">
             <v-card>
-                <v-card-title>세금 납부</v-card-title>
-                <v-text-field label="납부일자" v-model="taxItem.date" type="date" />
-                <v-text-field v-model="taxItem.category" label="구분" clearable />
-                <v-text-field v-model="taxItem.amount" label="금액" type="number" clearable />
+                <v-card-title>{{ taxItem.target }}</v-card-title>
+                <v-table>
+                    <tbody>
+                        <tr>
+                            <td><v-text-field v-model="taxItem.propTaxAmount" label="재산세" type="number" clearable /></td>
+                            <td><v-btn @click="savetax()" icon="mdi-content-save"></v-btn></td>
+                        </tr>
+                        <tr>
+                            <td><v-text-field v-model="taxItem.resTaxAmount" label="주민세" type="number" clearable /></td>
+                            <td><v-btn @click="savetax()" icon="mdi-content-save"></v-btn></td>
+                        </tr>
+                    </tbody>
+                </v-table>
                 <v-card-actions>
-                    <v-btn @click="savetax()" icon="mdi-check-bold"></v-btn>
-                    <v-btn @click="deletetax(taxItem.key)" :disabled="istaxAdd" icon="mdi-delete"></v-btn>
-                    <v-btn @click="isOpenPopup = false" icon="mdi-close-thick"></v-btn>
+                   <v-btn @click="isOpenPopup = false" icon="mdi-close-thick"></v-btn>
                 </v-card-actions>
             </v-card>
         </v-dialog>
