@@ -129,11 +129,11 @@ function openTaxPopup(mm, item) {
 function saveTax(category) {
 
     const idx = tax.value.payment[taxItem.value.month].findIndex(item => item.target === taxItem.value.target && item.category === (category === 'prop' ? '재산세' : '주민세'));
-    
-     console.log("idx", idx);
 
-    if (idx >= 0 ) {
-         tax.value.payment[taxItem.value.month].splice(idx, 1);
+    console.log("idx", idx);
+
+    if (idx >= 0) {
+        tax.value.payment[taxItem.value.month].splice(idx, 1);
     }
 
     console.log("month", taxItem.value.month);
@@ -215,7 +215,11 @@ onMounted(async () => {
             <v-carousel v-model="carouselIndex" :continuous="false" :show-arrows="true" hide-delimiter-background
                 height="801">
                 <v-carousel-item v-for="(mm, i) in month" :key="i">
-                    <h3 class="ml-4 mt-2">{{ mm }}</h3>
+                    <v-container class="d-flex justify-center mb-4">
+                        <v-sheet width="120px" rounded="lg" color="light-green-lighten-3">
+                            <h3 class="ma-2 text-center">{{ mm }}</h3>
+                        </v-sheet>
+                    </v-container>
                     <v-table>
                         <thead>
                             <tr>
@@ -232,10 +236,14 @@ onMounted(async () => {
                         </thead>
                         <tbody>
                             <tr v-for="item in payment[mm]" :key="item.target">
-                                <td><v-btn @click="openTaxPopup(mm, item)" :variant="item.propTaxAmount > 0 || item.resTaxAmount > 0 ? 'flat':'tonal'" color="primary">{{ item.target }}</v-btn></td>
-                                <td v-if="item.propTaxAmount && item.propTaxAmount > 0">{{ item.propTaxAmount.toLocaleString('ko-KR') }}</td>
-                                <td v-else></td>                                
-                                <td v-if="item.resTaxAmount && item.resTaxAmount > 0">{{ item.resTaxAmount.toLocaleString('ko-KR') }}</td>
+                                <td><v-btn @click="openTaxPopup(mm, item)"
+                                        :variant="item.propTaxAmount > 0 || item.resTaxAmount > 0 ? 'flat' : 'tonal'"
+                                        color="primary">{{ item.target }}</v-btn></td>
+                                <td v-if="item.propTaxAmount && item.propTaxAmount > 0">{{
+                                    item.propTaxAmount.toLocaleString('ko-KR') }}</td>
+                                <td v-else></td>
+                                <td v-if="item.resTaxAmount && item.resTaxAmount > 0">{{
+                                    item.resTaxAmount.toLocaleString('ko-KR') }}</td>
                                 <td v-else></td>
                             </tr>
                         </tbody>
@@ -249,13 +257,17 @@ onMounted(async () => {
                 <v-card-title>{{ taxItem.target }}</v-card-title>
                 <tbody class="ma-4">
                     <tr>
-                        <td><v-text-field v-model="taxItem.propTaxAmount" label="재산세" type="number" clearable variant="outlined"/>
+                        <td><v-text-field v-model="taxItem.propTaxAmount" label="재산세" type="number" clearable
+                                variant="outlined" />
                         </td>
-                        <td class="d-flex align-center justify-center"><v-btn @click="saveTax('prop')" icon="mdi-content-save" variant="text"/></td>
+                        <td class="d-flex align-center justify-center"><v-btn @click="saveTax('prop')"
+                                icon="mdi-content-save" variant="text" /></td>
                     </tr>
                     <tr>
-                        <td><v-text-field v-model="taxItem.resTaxAmount" label="주민세" type="number" clearable variant="outlined"/></td>
-                        <td class="d-flex align-center justify-center"><v-btn @click="saveTax('res')" icon="mdi-content-save" variant="text"/></td>
+                        <td><v-text-field v-model="taxItem.resTaxAmount" label="주민세" type="number" clearable
+                                variant="outlined" /></td>
+                        <td class="d-flex align-center justify-center"><v-btn @click="saveTax('res')"
+                                icon="mdi-content-save" variant="text" /></td>
                     </tr>
                 </tbody>
                 <v-card-actions>
@@ -267,7 +279,7 @@ onMounted(async () => {
         <v-dialog v-model="isMonthPopup" max-width="380px">
             <v-card>
                 <v-card-title>추가 월(yyyymm)</v-card-title>
-                <v-text-field class="ma-4" v-model="newMonth" label="월" type="text" clearable  variant="outlined"/>
+                <v-text-field class="ma-4" v-model="newMonth" label="월" type="text" clearable variant="outlined" />
                 <v-card-actions>
                     <v-btn @click="addMonth()" icon="mdi-check-bold"></v-btn>
                     <v-btn @click="isMonthPopup = false" icon="mdi-close-thick"></v-btn>
