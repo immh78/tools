@@ -412,20 +412,42 @@ onMounted(async () => {
                         <v-text-field label="분" v-model="actTime.minute" type="number" variant="outlined" />
                     </v-col>
                 </v-row>
+                <v-row>
+                    <v-col cols="6">
+                        <v-text-field
+                            :label="`금일 근무시간 (${workTimeInfo.start?.slice(0, 2) + ':' + workTimeInfo.start?.slice(2)})`"
+                            v-model="todayWorkTime.hour"
+                            :style="{ color: workTimeInfo.start === '' ? 'white' : 'black' }" variant="outlined"
+                            type="number" readonly></v-text-field> </v-col>
+                    <v-col cols="6">
+                        <v-text-field label="분" v-model="todayWorkTime.minute"
+                            :style="{ color: workTimeInfo.start === '' ? 'white' : 'black' }" variant="outlined"
+                            type="number" readonly></v-text-field> </v-col>
+                </v-row>
             </v-card>
+            <div class="mt-4 d-flex flex-column align-center">
+                <div>
+                    <v-btn class="ma-2" @click="openStartTimePopup()">
+                        <v-icon>mdi-home-import-outline</v-icon> 출근
+                    </v-btn>
+                    <v-btn class="ma-2" @click="openFinishTimePopup()" :disabled="workTimeInfo.start === ''">
+                        <v-icon>mdi-home-export-outline</v-icon> 퇴근
+                    </v-btn>
+                </div>
+                <v-snackbar v-model="isSnackbar" :timeout="2000" color="primary" variant="tonal" location="top center"
+                    style="position: absolute; top: 420px; left: 50%; transform: translateX(-50%);">
+                    저장 완료!
+                </v-snackbar>
+            </div>
 
             <v-card class="ma-2" v-if="isOverPay || isForcastOverPay" variant="flat" color="indigo-darken-3"
-                style="align-items: center; justify-content: center; width: auto; padding: 10px;">
+                style="position: fixed; bottom: 20px; right: 20px; display: flex; align-items: center; justify-content: center; width: auto; padding: 10px;">
                 <div class="text-h7" style="text-align: center;">
                     예상 : {{ forcastOverTimePay }}원 ({{ Math.round(forcastOverTime * 10) / 10 }}시간) <span
                         style="color:grey;">|</span> {{ overTimePay }}원
                 </div>
             </v-card>
-
-            <v-snackbar v-model="isSnackbar" :timeout="2000" color="primary" variant="tonal" location="top center"
-                style="position: absolute; top: 420px; left: 50%; transform: translateX(-50%);">
-                저장 완료!
-            </v-snackbar>        </v-main>
+        </v-main>
 
         <v-dialog v-model="isPopup" max-width="500">
             <v-card :title="popupKind === 'START' ? '출입시간' : '퇴근시간'">
