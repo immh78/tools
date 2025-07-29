@@ -129,8 +129,16 @@ function openTaxPopup(mm, item) {
 function saveTax(category) {
 
     const idx = tax.value.payment[taxItem.value.month].findIndex(item => item.target === taxItem.value.target && item.category === (category === 'prop' ? '재산세' : '주민세'));
+    
+     console.log("idx", idx);
 
-    tax.value.payment[taxItem.value.month].splice(idx, 1);
+    if (idx >= 0 ) {
+         tax.value.payment[taxItem.value.month].splice(idx, 1);
+    }
+
+    console.log("month", taxItem.value.month);
+    console.log("tax.value.payment", tax.value.payment);
+    console.log("* tax.payment(1)", tax.value.payment[taxItem.value.month]);
 
     if (taxItem.value[category + 'TaxAmount'] > 0) {
         const inputData = {
@@ -144,7 +152,7 @@ function saveTax(category) {
     }
 
     console.log("* tax", tax.value);
-    console.log("* tax.payment", tax.value.payment[taxItem.value.month]);
+    console.log("* tax.payment", taxItem.value.month, tax.value.payment[taxItem.value.month]);
 
     // Firebase에 저장
     const dbRef = firebaseRef(database, "tax/payment/" + taxItem.value.month);
@@ -224,10 +232,11 @@ onMounted(async () => {
                         </thead>
                         <tbody>
                             <tr v-for="item in payment[mm]" :key="item.target">
-                                <td><v-btn @click="openTaxPopup(mm, item)">{{ item.target }}</v-btn></td>
+                                <td><v-btn @click="openTaxPopup(mm, item)" :variant="item.propTaxAmount > 0 || item.resTaxAmount > 0 ? 'flat':'tonal'" color="primary">{{ item.target }}</v-btn></td>
                                 <td v-if="item.propTaxAmount && item.propTaxAmount > 0">{{ item.propTaxAmount.toLocaleString('ko-KR') }}</td>
-                                <td v-else>미납부</td>
+                                <td v-else></td>                                
                                 <td v-if="item.resTaxAmount && item.resTaxAmount > 0">{{ item.resTaxAmount.toLocaleString('ko-KR') }}</td>
+                                <td v-else></td>
                             </tr>
                         </tbody>
                     </v-table>
@@ -258,7 +267,7 @@ onMounted(async () => {
         <v-dialog v-model="isMonthPopup" max-width="380px">
             <v-card>
                 <v-card-title>추가 월(yyyymm)</v-card-title>
-                <v-text-field v-model="newMonth" label="월" type="text" clearable />
+                <v-text-field class="ma-4" v-model="newMonth" label="월" type="text" clearable  variant="outlined"/>
                 <v-card-actions>
                     <v-btn @click="addMonth()" icon="mdi-check-bold"></v-btn>
                     <v-btn @click="isMonthPopup = false" icon="mdi-close-thick"></v-btn>
