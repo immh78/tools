@@ -422,10 +422,10 @@ onMounted(async () => {
                 </div>
             </v-card>
 
-            <v-snackbar v-model="isSnackbar" :timeout="2000" color="primary" variant="tonal" location="top center"
-                style="position: absolute; top: 420px; left: 50%; transform: translateX(-50%);">
+            <v-snackbar v-model="isSnackbar" :timeout="2000" color="primary" variant="tonal">
                 저장 완료!
-            </v-snackbar>        </v-main>
+            </v-snackbar>        
+        </v-main>
 
         <v-dialog v-model="isPopup" max-width="500">
             <v-card :title="popupKind === 'START' ? '출입시간' : '퇴근시간'">
