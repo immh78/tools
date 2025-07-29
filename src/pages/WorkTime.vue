@@ -307,7 +307,7 @@ async function getWorkingDaysInMonth(freeDays = []) {
     let remainingWorkHours = 0;                        // ★
 
 
-    for (let d = todayDay + (start.value === "" ? 1 : 0); d <= lastDay; d++) {    // ★ 내일~말일
+    for (let d = todayDay; d <= lastDay; d++) {    // ★ 내일~말일
         const date = new Date(year, month, d);
         const weekday = date.getDay();                  // 0=일,6=토
         const dateStr = `${year}${String(month + 1).padStart(2, '0')}${String(d).padStart(2, '0')}`;
