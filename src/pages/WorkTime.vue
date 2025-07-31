@@ -476,7 +476,7 @@ onMounted(async () => {
                 <v-col cols="6" class="pa-0">
                     <v-card class="ma-2" variant="flat" color="indigo-lighten-2"
                         style="align-items: center; justify-content: center; width: auto; padding: 10px;">
-                        <div style="position: absolute; top: 4px; left: 8px; font-size: 9px;color: indio-darken-3;">
+                        <div style="position: absolute; top: 4px; left: 8px; font-size: 9px;">
                             예상 </div>
                         <div class="text-h7" style="text-align: center;">
                             {{ forcastOverTimePay }}원 ({{ Math.round(forcastOverTime * 10) / 10 }}시간)
