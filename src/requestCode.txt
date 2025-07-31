@@ -1,3 +1,47 @@
+overTimePay = [
+    [
+        "202506",
+        160000
+    ],
+    [
+        "202507",
+        561472
+    ]
+]
+
+첫번째 컬럼값으로 내림차순 정렬
+
+overTimePay = {
+    "202506": 160000,
+    "202507": 561472
+}
+
+overTimePay로 v-timeline을 월별로 출력되도록 하려 한다.
+overTimePay를 Array로 변경.
+년월을 "2025년 6월: 포멧으로 변경
+초과근무수당을 1000단위로 ,표시
+
+
+<v-timeline side="end">
+                <v-timeline-item
+                v-for="item in items"
+                :key="item.id"
+                :dot-color="item.color"
+                size="small"
+                >
+                <v-alert
+                    :color="item.color"
+                    :icon="item.icon"
+                    :value="true"
+                >
+                    Lorem ipsum dolor sit amet, no nam oblique veritus. Commune scaevola imperdiet nec ut, sed euismod convenire principes at. Est et nobis iisque percipit, an vim zril disputando voluptatibus, vix an salutandi sententiae.
+                </v-alert>
+                </v-timeline-item>
+            </v-timeline>
+
+
+
+
 tax = {
     "payment": {
         "202404": [

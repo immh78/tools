@@ -11,6 +11,7 @@ const isOver = ref(false);
 const isOverPay = ref(false);
 const isCalPopup = ref(false);
 const overTimePay = ref(0);
+const overTimePayList = ref([]);
 const todayWorkTime = ref({}); // 금일 근무시간
 const actTime = ref({}); // 누적 근무시간
 const remainTime = ref({ hour: '-', minute: '-' }); // 잔여 근무시간
@@ -23,6 +24,11 @@ const remainWorkTime = ref(0);
 const isForcastOverPay = ref(true);
 const forcastOverTimePay = ref(0);
 const forcastOverTime = ref(0);
+const isSaveOverPayPopup = ref(false);
+const overPay = ref({
+    month: "",
+    overTimePay: 0
+});
 
 const base = ref(0);
 const prog = ref(0);
@@ -59,6 +65,21 @@ async function getWorkTimeInfo() {
         .catch(err => {
             console.error("Error fetching data:", err);
         });
+
+    console.log("overtimepay", Object.entries(workTimeInfo.value.overTimePay));
+
+    
+    Object.entries(workTimeInfo.value.overTimePay).sort((a, b) => {return b[0].localeCompare(a[0])}).map(([ym, value]) => {
+        const year = ym.slice(0, 4);
+        const month = String(parseInt(ym.slice(4), 10)); // "06" -> 6
+        overTimePayList.value.push({
+            month: `${year}년 ${month}월`,
+            amount: value.toLocaleString() // "160000" -> "160,000"
+        });
+    });
+
+    console.log("overTimePayList", overTimePayList.value)
+    
 
 
     base.value = workTimeInfo.value.planTime + prePay;
@@ -223,6 +244,42 @@ function openFinishTimePopup() {
     popupTime.value = getNow().slice(0, 2) + ":" + getNow().slice(2);
     isPopup.value = true;
 }
+function getMonth() {
+    const today = new Date();
+
+    const y = today.getFullYear();
+
+    // 월은 0부터 시작하므로 1을 더함, padStart로 두 자리수 맞춤
+    const month = String(today.getMonth()).padStart(2, '0');
+
+    // 일도 두 자리수 맞춤
+    //const day = String(today.getDate()).padStart(2, '0');
+
+    return `${y}${month}`;
+}
+
+function onclick_saveOverPay() {
+    overPay.value.month = getMonth();
+    overPay.value.overTimePay = Number(overTimePay.value.replace(/,/g, '')); // 쉼표 제거 후 숫자로 변환
+    isSaveOverPayPopup.value = true;
+}
+
+async function saveOverTimePay() {
+    const data = {
+        [overPay.value.month]: Number(overPay.value.overTimePay)
+    }
+
+    try {
+        const dbRef = firebaseRef(database, "work-time/overTimePay");
+        await update(dbRef, data); // 데이터를 저장
+    } catch (err) {
+        console.error("Error saving data:", err);
+    }
+
+    isSaveOverPayPopup.value = false;
+    isSnackbar.value = true;
+}
+
 
 function saveStartTimeSelect() {
     const data = { "start": popupTime.value.slice(0, 2) + popupTime.value.slice(3) };
@@ -413,18 +470,37 @@ onMounted(async () => {
                     </v-col>
                 </v-row>
             </v-card>
+            <v-row class="ma-2">
+                <td>
+                    <v-card class="ma-2" v-if="isOverPay || isForcastOverPay" variant="flat" color="indigo-darken-3"
+                        style="align-items: center; justify-content: center; width: auto; padding: 10px;">
+                        <div class="text-h7" style="text-align: center;">
+                            예상 : {{ forcastOverTimePay }}원 ({{ Math.round(forcastOverTime * 10) / 10 }}시간) <span
+                                style="color:grey;">|</span> {{ overTimePay }}원
+                        </div>
+                    </v-card>
+                </td>
+                <td>
+                    <v-btn variant="text" @click="onclick_saveOverPay()"><v-icon
+                            color="indigo-darken-3">mdi-arrow-down-bold</v-icon></v-btn>
+                </td>
+            </v-row>
 
-            <v-card class="ma-2" v-if="isOverPay || isForcastOverPay" variant="flat" color="indigo-darken-3"
-                style="align-items: center; justify-content: center; width: auto; padding: 10px;">
-                <div class="text-h7" style="text-align: center;">
-                    예상 : {{ forcastOverTimePay }}원 ({{ Math.round(forcastOverTime * 10) / 10 }}시간) <span
-                        style="color:grey;">|</span> {{ overTimePay }}원
-                </div>
-            </v-card>
+            <v-timeline>
+                <v-timeline-item v-for="(item, index) in overTimePayList" :key="index" dot-color="green"
+                    icon="mdi-cash">
+                    <template #opposite>
+                        <strong>{{ item.month }}</strong>
+                    </template>
+                    <div>
+                        {{ item.amount }} 원
+                    </div>
+                </v-timeline-item>
+            </v-timeline>
 
             <v-snackbar v-model="isSnackbar" :timeout="2000" color="primary" variant="tonal">
                 저장 완료!
-            </v-snackbar>        
+            </v-snackbar>
         </v-main>
 
         <v-dialog v-model="isPopup" max-width="500">
@@ -449,9 +525,22 @@ onMounted(async () => {
                 </v-card-actions>
             </v-card>
         </v-dialog>
+        <v-dialog v-model="isSaveOverPayPopup" max-width="320">
+            <v-card class="pa-4">
+                <v-card-title>초과근무수당 등록</v-card-title>
+                <v-text-field label="월" v-model="overPay.month" type="text" variant="outlined"></v-text-field>
+                <v-text-field label="초과근무수당" v-model="overPay.overTimePay" type="number"
+                    variant="outlined"></v-text-field>
+                <v-card-actions class="justify-center">
+                    <v-btn text @click="isSaveOverPayPopup = false">닫기</v-btn>
+                    <v-btn text @click="saveOverTimePay()">저장</v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
     </v-app>
 
 
 </template>
 
-<style scoped></style>
+<style scoped>
+</style>
