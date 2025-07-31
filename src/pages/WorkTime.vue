@@ -278,6 +278,9 @@ async function saveOverTimePay() {
 
     isSaveOverPayPopup.value = false;
     isSnackbar.value = true;
+    
+    actTime.value.hour = 0;
+    actTime.value.minute = 0;
 }
 
 
