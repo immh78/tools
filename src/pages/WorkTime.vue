@@ -66,9 +66,10 @@ async function getWorkTimeInfo() {
             console.error("Error fetching data:", err);
         });
 
-    console.log("overtimepay", Object.entries(workTimeInfo.value.overTimePay));
+    //console.log("overtimepay", Object.entries(workTimeInfo.value.overTimePay));
 
-    
+    overTimePayList.value = [];
+
     Object.entries(workTimeInfo.value.overTimePay).sort((a, b) => {return b[0].localeCompare(a[0])}).map(([ym, value]) => {
         const year = ym.slice(0, 4);
         const month = String(parseInt(ym.slice(4), 10)); // "06" -> 6
@@ -78,9 +79,7 @@ async function getWorkTimeInfo() {
         });
     });
 
-    console.log("overTimePayList", overTimePayList.value)
-    
-
+    //console.log("overTimePayList", overTimePayList.value)
 
     base.value = workTimeInfo.value.planTime + prePay;
     start.value = workTimeInfo.value.start;
