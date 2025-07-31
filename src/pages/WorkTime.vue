@@ -70,7 +70,7 @@ async function getWorkTimeInfo() {
 
     overTimePayList.value = [];
 
-    Object.entries(workTimeInfo.value.overTimePay).sort((a, b) => {return b[0].localeCompare(a[0])}).map(([ym, value]) => {
+    Object.entries(workTimeInfo.value.overTimePay).sort((a, b) => { return b[0].localeCompare(a[0]) }).map(([ym, value]) => {
         const year = ym.slice(0, 4);
         const month = String(parseInt(ym.slice(4), 10)); // "06" -> 6
         overTimePayList.value.push({
@@ -277,7 +277,7 @@ async function saveOverTimePay() {
 
     isSaveOverPayPopup.value = false;
     isSnackbar.value = true;
-    
+
     actTime.value.hour = 0;
     actTime.value.minute = 0;
 }
@@ -473,12 +473,21 @@ onMounted(async () => {
                 </v-row>
             </v-card>
             <v-row class="ma-2">
-                <v-col cols="10">
-                    <v-card class="ma-2" v-if="isOverPay || isForcastOverPay" variant="flat" color="indigo-darken-3"
+                <v-col cols="6" class="pa-0">
+                    <v-card class="ma-2" variant="flat" color="indigo-lighten-2"
+                        style="align-items: center; justify-content: center; width: auto; padding: 10px;">
+                        <div style="position: absolute; top: 4px; left: 8px; font-size: 9px;color: indio-darken-3;">
+                            예상 </div>
+                        <div class="text-h7" style="text-align: center;">
+                            {{ forcastOverTimePay }}원 ({{ Math.round(forcastOverTime * 10) / 10 }}시간)
+                        </div>
+                    </v-card>
+                </v-col>
+                <v-col cols="4" class="pa-0">
+                    <v-card class="ma-2" vvariant="flat" color="indigo-darken-3"
                         style="align-items: center; justify-content: center; width: auto; padding: 10px;">
                         <div class="text-h7" style="text-align: center;">
-                            예상 : {{ forcastOverTimePay }}원 ({{ Math.round(forcastOverTime * 10) / 10 }}시간) <span
-                                style="color:grey;">|</span> {{ overTimePay }}원
+                            {{ overTimePay }}원
                         </div>
                     </v-card>
                 </v-col>
@@ -544,5 +553,4 @@ onMounted(async () => {
 
 </template>
 
-<style scoped>
-</style>
+<style scoped></style>
