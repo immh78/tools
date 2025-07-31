@@ -260,7 +260,7 @@ function getMonth() {
 
 function onclick_saveOverPay() {
     overPay.value.month = getMonth();
-    overPay.value.overTimePay = Number(overTimePay.value.replace(/,/g, '')); // 쉼표 제거 후 숫자로 변환
+    overPay.value.overTimePay = overTimePay.value ? Number(overTimePay.value.replace(/,/g, '')) : 0; // 쉼표 제거 후 숫자로 변환
     isSaveOverPayPopup.value = true;
 }
 
@@ -471,7 +471,7 @@ onMounted(async () => {
                 </v-row>
             </v-card>
             <v-row class="ma-2">
-                <td>
+                <v-col cols="10">
                     <v-card class="ma-2" v-if="isOverPay || isForcastOverPay" variant="flat" color="indigo-darken-3"
                         style="align-items: center; justify-content: center; width: auto; padding: 10px;">
                         <div class="text-h7" style="text-align: center;">
@@ -479,11 +479,11 @@ onMounted(async () => {
                                 style="color:grey;">|</span> {{ overTimePay }}원
                         </div>
                     </v-card>
-                </td>
-                <td>
+                </v-col>
+                <v-col cols="2" class="d-flex align-center justify-end">
                     <v-btn variant="text" @click="onclick_saveOverPay()"><v-icon
                             color="indigo-darken-3">mdi-arrow-down-bold</v-icon></v-btn>
-                </td>
+                </v-col>
             </v-row>
 
             <v-timeline>
