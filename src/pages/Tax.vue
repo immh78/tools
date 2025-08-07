@@ -57,6 +57,15 @@ async function addMonth() {
     isMonthPopup.value = false;
 }
 
+function formatDate(dateStr) {
+  if (!dateStr || dateStr.length !== 8) return dateStr;
+  const year = dateStr.substring(0, 4);
+  const month = parseInt(dateStr.substring(4, 6));
+  const day = parseInt(dateStr.substring(6, 8));
+  return `${year}년 ${month}월 ${day}일`;
+}
+
+
 async function selectData() {
     setLoadingIcon();
     const dbRef = firebaseRef(database, "tax");
@@ -246,7 +255,7 @@ onMounted(async () => {
                                         <template v-slot:activator="{ props }">
                                             <span v-bind="props">{{ item.propTaxAmount.toLocaleString('ko-KR') }}</span>
                                         </template>
-                                        <span>납부일: {{ item.propTaxDate }}</span>
+                                        <span>납부일: {{ formatDate(item.propTaxDate) }}</span>
                                     </v-tooltip>
                                 </td>
                                 <td v-else></td>
@@ -255,7 +264,7 @@ onMounted(async () => {
                                         <template v-slot:activator="{ props }">
                                             <span v-bind="props">{{ item.resTaxAmount.toLocaleString('ko-KR') }}</span>
                                         </template>
-                                        <span>납부일: {{ item.resTaxDate }}</span>
+                                        <span>납부일: {{ formatDate(item.resTaxDate) }}</span>
                                     </v-tooltip>
                                 </td>
                                 <td v-else></td>
