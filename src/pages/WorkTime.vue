@@ -315,24 +315,24 @@ async function getWorkingDaysInMonth(freeDays = []) {
     const apiKey = 'TJA71zif4CfRseoCQiA085iUVt%2BzzJGBzyyRB76Tc6aTqpCwyVqhB1AZwXaPg7NIx0Su8MNPf%2BtN%2BoadNkd6Gg%3D%3D';
     const apiUrl = `https://apis.data.go.kr/B090041/openapi/service/SpcdeInfoService/getRestDeInfo?solYear=${year}&solMonth=${String(month + 1).padStart(2, '0')}&ServiceKey=${apiKey}&_type=json`;
 
-    const response = await fetch(apiUrl);
-    const data = await response.json();
+    // const response = await fetch(apiUrl);
+    // const data = await response.json();
 
     // 공공 API 휴일 목록
     const holidays = new Set();
-    if (data.response.body.items?.item) {
-        const items = Array.isArray(data.response.body.items.item)
-            ? data.response.body.items.item
-            : [data.response.body.items.item];
-        for (const item of items) {
-            holidays.add(item.locdate.toString()); // 예: '20250606'
-        }
-    }
+    // if (data.response.body.items?.item) {
+    //     const items = Array.isArray(data.response.body.items.item)
+    //         ? data.response.body.items.item
+    //         : [data.response.body.items.item];
+    //     for (const item of items) {
+    //         holidays.add(item.locdate.toString()); // 예: '20250606'
+    //     }
+    // }
 
-    // 사용자 지정 휴일 추가
-    for (const day of freeDays) {
-        holidays.add(day);
-    }
+    // // 사용자 지정 휴일 추가
+    // for (const day of freeDays) {
+    //     holidays.add(day);
+    // }
 
     let fullMonthWorkdays = 0;
     let untilTodayWorkdays = 0;
