@@ -89,7 +89,9 @@ async function selectPayment() {
             return {
                 target,
                 resTaxAmount: resTax ? resTax.amount : null,
-                propTaxAmount: propTax ? propTax.amount : null
+                resTaxDate: resTax ? resTax.date : null,
+                propTaxAmount: propTax ? propTax.amount : null,
+                propTaxDate: propTax ? propTax.date : null
             };
         });
 
@@ -239,11 +241,23 @@ onMounted(async () => {
                                 <td><v-btn @click="openTaxPopup(mm, item)"
                                         :variant="item.propTaxAmount > 0 || item.resTaxAmount > 0 ? 'flat' : 'tonal'"
                                         color="primary">{{ item.target }}</v-btn></td>
-                                <td v-if="item.propTaxAmount && item.propTaxAmount > 0">{{
-                                    item.propTaxAmount.toLocaleString('ko-KR') }}</td>
+                                <td v-if="item.propTaxAmount && item.propTaxAmount > 0">
+                                    <v-tooltip :open-on-hover="false" open-on-click location="bottom">
+                                        <template v-slot:activator="{ props }">
+                                            <span v-bind="props">{{ item.propTaxAmount.toLocaleString('ko-KR') }}</span>
+                                        </template>
+                                        <span>납부일: {{ item.propTaxDate }}</span>
+                                    </v-tooltip>
+                                </td>
                                 <td v-else></td>
-                                <td v-if="item.resTaxAmount && item.resTaxAmount > 0">{{
-                                    item.resTaxAmount.toLocaleString('ko-KR') }}</td>
+                                <td v-if="item.resTaxAmount && item.resTaxAmount > 0">
+                                    <v-tooltip :open-on-hover="false" open-on-click location="bottom">
+                                        <template v-slot:activator="{ props }">
+                                            <span v-bind="props">{{ item.resTaxAmount.toLocaleString('ko-KR') }}</span>
+                                        </template>
+                                        <span>납부일: {{ item.resTaxDate }}</span>
+                                    </v-tooltip>
+                                </td>
                                 <td v-else></td>
                             </tr>
                         </tbody>
