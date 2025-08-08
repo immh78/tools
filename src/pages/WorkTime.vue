@@ -25,6 +25,7 @@ const isForcastOverPay = ref(true);
 const forcastOverTimePay = ref(0);
 const forcastOverTime = ref(0);
 const isSaveOverPayPopup = ref(false);
+const isHistoryPopup = ref(false);
 const overPay = ref({
     month: "",
     overTimePay: 0
@@ -429,6 +430,7 @@ onMounted(async () => {
                 <v-img gradient="to top right, rgba(19,84,122,.8), rgba(128,208,199,.8)"></v-img>
             </template>
             <template v-slot:append>
+                <v-btn icon="mdi-cash-clock" @click="isHistoryPopup = true"></v-btn>
                 <v-btn icon="mdi-calendar-month" @click="isCalPopup = true"></v-btn>
                 <v-btn icon="mdi-content-save" @click="saveWorkInfo()"></v-btn>
             </template>
@@ -496,19 +498,6 @@ onMounted(async () => {
                             color="indigo-darken-3">mdi-arrow-down-bold</v-icon></v-btn>
                 </v-col>
             </v-row>
-
-            <v-timeline>
-                <v-timeline-item v-for="(item, index) in overTimePayList" :key="index" dot-color="green"
-                    icon="mdi-cash">
-                    <template #opposite>
-                        <strong>{{ item.month }}</strong>
-                    </template>
-                    <div>
-                        {{ item.amount }} 원
-                    </div>
-                </v-timeline-item>
-            </v-timeline>
-
             <v-snackbar v-model="isSnackbar" :timeout="2000" color="primary" variant="tonal">
                 저장 완료!
             </v-snackbar>
@@ -545,6 +534,24 @@ onMounted(async () => {
                 <v-card-actions class="justify-center">
                     <v-btn text @click="isSaveOverPayPopup = false">닫기</v-btn>
                     <v-btn text @click="saveOverTimePay()">저장</v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+        <v-dialog v-model="isHistoryPopup" max-width="320">
+            <v-card>
+                <v-timeline>
+                    <v-timeline-item v-for="(item, index) in overTimePayList" :key="index" dot-color="green"
+                        icon="mdi-cash">
+                        <template #opposite>
+                            <strong>{{ item.month }}</strong>
+                        </template>
+                        <div>
+                            {{ item.amount }} 원
+                        </div>
+                    </v-timeline-item>
+                </v-timeline>
+                <v-card-actions class="justify-center">
+                    <v-btn text @click="isHistoryPopup = false">닫기</v-btn>                   
                 </v-card-actions>
             </v-card>
         </v-dialog>
