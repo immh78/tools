@@ -31,6 +31,8 @@ const overPay = ref({
     overTimePay: 0
 });
 
+
+
 const base = ref(0);
 const prog = ref(0);
 const calProg = ref(0);
@@ -102,7 +104,7 @@ async function getWorkTimeInfo() {
 
     const workingDays = await getWorkingDaysInMonth(tempFreeDays);
     calProg.value = workingDays.untilTodayWorkdays * 8;
-    commonWorkTime.value = workingDays.commonWorkTime;
+    //commonWorkTime.value = workingDays.commonWorkTime;
     remainWorkTime.value = workingDays.remainingWorkHours;
 
 
@@ -141,7 +143,7 @@ function refreshCalcTime() {
     }
 
     // workTimeInfo.value.actTime = 162;
-    prog.value = workTimeInfo.value.actTime + getTime(todayWorkTime.value);
+    prog.value = workTimeInfo.value.actTime + commonWorkTime.value; //getTime(todayWorkTime.value);
     //console.log(prog.value);
 
     //console.log("prog", prog.value, "base", base.value, "act", workTimeInfo.value.actTime)
@@ -354,12 +356,11 @@ async function getWorkingDaysInMonth(freeDays = []) {
     // ── 2. 오늘의 근무 시간 판단 ──
     const todayStr = `${year}${String(month + 1).padStart(2, '0')}${String(todayDay).padStart(2, '0')}`;
 
-    let commonWorkTime = 0;
     if (!holidays.has(todayStr)) {
         if (weekday >= 1 && weekday <= 4)        // 월(1)~목(4)
-            commonWorkTime = 9.5;
+            commonWorkTime.value = 9.5;
         else if (weekday === 5)                  // 금(5)
-            commonWorkTime = 5;
+            commonWorkTime.value = 5;
         // 토(6), 일(0)은 그대로 0
     }
 
