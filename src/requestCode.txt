@@ -1,3 +1,540 @@
+category가 "기름"인 데이터로 line chart를 그리려고 한다.
+chart는 chart.js v4.5를 이용한다.
+횡축은 date이고 종축은 unitCost이다.
+
+list = [
+    {
+        "category": "기름",
+        "cost": 58480,
+        "date": "20250810",
+        "liter": 40,
+        "mileage": 314020,
+        "remark": "",
+        "unitCost": 1462,
+        "key": 61
+    },
+    {
+        "category": "기름",
+        "cost": 80000,
+        "date": "20250803",
+        "liter": 55,
+        "mileage": 312849,
+        "remark": "",
+        "unitCost": 1455,
+        "key": 60
+    },
+    {
+        "category": "기름",
+        "cost": 15000,
+        "date": "20250801",
+        "liter": 10,
+        "mileage": 312647,
+        "remark": "",
+        "unitCost": 1500,
+        "key": 59
+    },
+    {
+        "category": "머플러,중통,PM센서",
+        "cost": 500000,
+        "date": "20250730",
+        "liter": 0,
+        "mileage": 312625,
+        "remark": "한국자동차정비",
+        "key": 58
+    },
+    {
+        "category": "기름",
+        "cost": 73100,
+        "date": "20250727",
+        "liter": 50,
+        "mileage": 312313,
+        "remark": "",
+        "unitCost": 1462,
+        "key": 57
+    },
+    {
+        "category": "브레이크 어셈블리-프론트 좌측",
+        "cost": 156200,
+        "date": "20250721",
+        "liter": 0,
+        "mileage": 311996,
+        "remark": "",
+        "key": 55
+    },
+    {
+        "category": "브레이크 오일",
+        "cost": 47780,
+        "date": "20250721",
+        "liter": 0,
+        "mileage": 311996,
+        "remark": "",
+        "key": 56
+    },
+    {
+        "category": "기름",
+        "cost": 73450,
+        "date": "20250720",
+        "liter": 50,
+        "mileage": 311679,
+        "remark": "",
+        "unitCost": 1469,
+        "key": 54
+    },
+    {
+        "category": "기름",
+        "cost": 36725,
+        "date": "20250713",
+        "liter": 25,
+        "mileage": 310916,
+        "remark": "",
+        "unitCost": 1469,
+        "key": 53
+    },
+    {
+        "category": "기름",
+        "cost": 10000,
+        "date": "20250711",
+        "liter": 7,
+        "mileage": 310322,
+        "remark": "",
+        "unitCost": 1429,
+        "key": 52
+    },
+    {
+        "category": "기름",
+        "cost": 66105,
+        "date": "20250705",
+        "liter": 45,
+        "mileage": 309952,
+        "remark": "",
+        "unitCost": 1469,
+        "key": 51
+    },
+    {
+        "category": "엔진오일",
+        "cost": 80000,
+        "date": "20250705",
+        "liter": 0,
+        "mileage": 309930,
+        "remark": "T스테이션 수동점",
+        "key": 50
+    },
+    {
+        "category": "기름",
+        "cost": 25000,
+        "date": "20250704",
+        "liter": 17,
+        "mileage": 309648,
+        "remark": "",
+        "unitCost": 1471,
+        "key": 49
+    },
+    {
+        "category": "기름",
+        "cost": 55000,
+        "date": "20250627",
+        "liter": 37,
+        "mileage": 309029,
+        "remark": "통영",
+        "unitCost": 1486,
+        "key": 48
+    },
+    {
+        "category": "기름",
+        "cost": 40000,
+        "date": "20250620",
+        "liter": 27,
+        "mileage": 308445,
+        "remark": "통영",
+        "unitCost": 1481,
+        "key": 47
+    },
+    {
+        "category": "기름",
+        "cost": 65827,
+        "date": "20250615",
+        "liter": 46,
+        "mileage": 308158,
+        "remark": "증평",
+        "unitCost": 1431,
+        "key": 46
+    },
+    {
+        "category": "주행거리",
+        "cost": -1,
+        "date": "20250614",
+        "mileage": 308106,
+        "remark": "",
+        "key": 45
+    },
+    {
+        "category": "기름",
+        "cost": 37816,
+        "date": "20250608",
+        "liter": 26,
+        "mileage": 307530,
+        "remark": "증평",
+        "unitCost": 1454,
+        "key": 44
+    },
+    {
+        "category": "주행거리",
+        "cost": -1,
+        "date": "20250606",
+        "mileage": 307115,
+        "remark": "",
+        "key": 43
+    },
+    {
+        "category": "타이어 앞, 휠얼라이먼트",
+        "cost": 150000,
+        "date": "20250308",
+        "mileage": 297896,
+        "remark": "T스테이션 수동점",
+        "key": 41
+    },
+    {
+        "category": "타이어 앞, 휠얼라이먼트",
+        "cost": 30000,
+        "date": "20250308",
+        "mileage": 297896,
+        "remark": "T스테이션 수동점",
+        "key": 42
+    },
+    {
+        "category": "엔진오일",
+        "cost": 90000,
+        "date": "20250201",
+        "mileage": 294380,
+        "remark": "T스테이션 수동점",
+        "key": 40
+    },
+    {
+        "category": "엔진오일",
+        "cost": 90000,
+        "date": "20240920",
+        "mileage": 278599,
+        "remark": "T스테이션 수동점",
+        "key": 39
+    },
+    {
+        "category": "엔진오일",
+        "cost": 75940,
+        "date": "20240503",
+        "mileage": 263578,
+        "remark": "2만원 보험사 쿠폰",
+        "key": 38
+    },
+    {
+        "category": "엔진오일",
+        "cost": 71940,
+        "date": "20231222",
+        "mileage": 248122,
+        "remark": "2만원 보험사 쿠폰",
+        "key": 37
+    },
+    {
+        "category": "엔진오일",
+        "cost": 22000,
+        "date": "20230801",
+        "mileage": 232421,
+        "remark": "7만쿠폰 사용",
+        "key": 36
+    },
+    {
+        "category": "에어컨필터",
+        "cost": 30000,
+        "date": "20230507",
+        "mileage": 224078,
+        "remark": "",
+        "key": 35
+    },
+    {
+        "category": "엔진오일",
+        "cost": 61660,
+        "date": "20230223",
+        "mileage": 216987,
+        "remark": "25000 클럼SM 쿠폰사용",
+        "key": 34
+    },
+    {
+        "category": "엔진오일",
+        "cost": 25790,
+        "date": "20221003",
+        "mileage": 201793,
+        "remark": "클럽SM쿠폰 사용",
+        "key": 33
+    },
+    {
+        "category": "뒤브레이크디스크/패드",
+        "cost": 244200,
+        "date": "20220609",
+        "mileage": 190032,
+        "remark": "",
+        "key": 30
+    },
+    {
+        "category": "미션오일",
+        "cost": 199200,
+        "date": "20220609",
+        "mileage": 190032,
+        "remark": "",
+        "key": 31
+    },
+    {
+        "category": "브레이크오일",
+        "cost": 69300,
+        "date": "20220609",
+        "mileage": 190032,
+        "remark": "",
+        "key": 32
+    },
+    {
+        "category": "엔진오일",
+        "cost": 57390,
+        "date": "20220408",
+        "mileage": 187500,
+        "remark": "쿠폰 25000만원 사용",
+        "key": 29
+    },
+    {
+        "category": "엔진오일",
+        "cost": 57390,
+        "date": "20211217",
+        "mileage": 176200,
+        "remark": "쿠폰 25000만원 사용",
+        "key": 28
+    },
+    {
+        "category": "타이어 위치 교환",
+        "cost": -1,
+        "date": "20210912",
+        "mileage": 165891,
+        "remark": "",
+        "key": 27
+    },
+    {
+        "category": "엔진오일",
+        "cost": 57390,
+        "date": "20210903",
+        "mileage": 165221,
+        "remark": "쿠폰 25000만원 사용",
+        "key": 26
+    },
+    {
+        "category": "엔진오일",
+        "cost": 57390,
+        "date": "20210518",
+        "mileage": 154239,
+        "remark": "쿠폰 25000만원 사용",
+        "key": 24
+    },
+    {
+        "category": "타이어 앞뒤",
+        "cost": 741000,
+        "date": "20210518",
+        "mileage": 154239,
+        "remark": "3+1",
+        "key": 25
+    },
+    {
+        "category": "엔진오일",
+        "cost": 49536,
+        "date": "20201224",
+        "mileage": 142156,
+        "remark": "",
+        "key": 23
+    },
+    {
+        "category": "엔진오일",
+        "cost": 60040,
+        "date": "20200905",
+        "mileage": 131500,
+        "remark": "",
+        "key": 22
+    },
+    {
+        "category": "엔진오일",
+        "cost": 60040,
+        "date": "20200522",
+        "mileage": 120357,
+        "remark": "",
+        "key": 21
+    },
+    {
+        "category": "흡기메니폴드 클리닝",
+        "cost": 248000,
+        "date": "20200330",
+        "mileage": 114301,
+        "remark": "",
+        "key": 15
+    },
+    {
+        "category": "EGR 쿨러 클리닝",
+        "cost": 36900,
+        "date": "20200330",
+        "mileage": 114301,
+        "remark": "",
+        "key": 16
+    },
+    {
+        "category": "연료필터 ASSY",
+        "cost": 232000,
+        "date": "20200330",
+        "mileage": 114301,
+        "remark": "",
+        "key": 17
+    },
+    {
+        "category": "드라이브벨트",
+        "cost": -1,
+        "date": "20200330",
+        "mileage": 114301,
+        "remark": "",
+        "key": 18
+    },
+    {
+        "category": "워터펌프",
+        "cost": -1,
+        "date": "20200330",
+        "mileage": 114301,
+        "remark": "",
+        "key": 19
+    },
+    {
+        "category": "인젝터 클리닝",
+        "cost": -1,
+        "date": "20200330",
+        "mileage": 114301,
+        "remark": "",
+        "key": 20
+    },
+    {
+        "category": "엔진오일",
+        "cost": 79380,
+        "date": "20200123",
+        "mileage": 109600,
+        "remark": "",
+        "key": 11
+    },
+    {
+        "category": "브레이크 패드 앞",
+        "cost": 89250,
+        "date": "20200123",
+        "mileage": 109600,
+        "remark": "",
+        "key": 12
+    },
+    {
+        "category": "브레이크오일",
+        "cost": 63100,
+        "date": "20200123",
+        "mileage": 109600,
+        "remark": "",
+        "key": 13
+    },
+    {
+        "category": "미션오일",
+        "cost": 163260,
+        "date": "20200123",
+        "mileage": 109600,
+        "remark": "",
+        "key": 14
+    },
+    {
+        "category": "엔진오일",
+        "cost": 59210,
+        "date": "20191018",
+        "mileage": 99372,
+        "remark": "",
+        "key": 10
+    },
+    {
+        "category": "타이어 위치 교환",
+        "cost": -1,
+        "date": "20190911",
+        "mileage": 95000,
+        "remark": "",
+        "key": 9
+    },
+    {
+        "category": "에어컨 필터",
+        "cost": -1,
+        "date": "20190608",
+        "mileage": 84530,
+        "remark": "",
+        "key": 8
+    },
+    {
+        "category": "엔진오일",
+        "cost": 59210,
+        "date": "20190413",
+        "mileage": 78090,
+        "remark": "",
+        "key": 7
+    },
+    {
+        "category": "엔진오일",
+        "cost": 59210,
+        "date": "20181231",
+        "mileage": 67957,
+        "remark": "",
+        "key": 6
+    },
+    {
+        "category": "엔진오일",
+        "cost": 59000,
+        "date": "20181003",
+        "mileage": 57919,
+        "remark": "",
+        "key": 4
+    },
+    {
+        "category": "배터리",
+        "cost": 287000,
+        "date": "20181003",
+        "mileage": 57919,
+        "remark": "",
+        "key": 5
+    },
+    {
+        "category": "타이어 앞뒤",
+        "cost": 920000,
+        "date": "20180721",
+        "mileage": 51000,
+        "remark": "",
+        "key": 3
+    },
+    {
+        "category": "엔진오일",
+        "cost": -1,
+        "date": "20180621",
+        "mileage": 47800,
+        "remark": "",
+        "key": 1
+    },
+    {
+        "category": "앞 유리 선팅",
+        "cost": 80000,
+        "date": "20180624",
+        "mileage": 47800,
+        "remark": "",
+        "key": 2
+    },
+    {
+        "category": "차량구입",
+        "cost": -1,
+        "date": "20180427",
+        "mileage": 40632,
+        "remark": "",
+        "key": 0
+    }
+]
+
+
+
+
+
 overTimePay = [
     [
         "202506",

@@ -87,7 +87,7 @@ async function selectData() {
     listSORENTO.value = sortData(carBook.value.SORENTO);
     listSM6.value = sortData(carBook.value.SM6);
 
-    //console.log("listSORENTO", listSORENTO.value);
+    console.log("listSORENTO", listSORENTO.value);
     //console.log("listSM6", listSM6.value);
 
     let { forecateMileage, avgPerDay } = calcEstimatedMileage(listSORENTO.value);
@@ -247,7 +247,7 @@ watch(() => addData.value.category, (newVal) => {
         }
 
         addData.value.remark = findedItem ? findedItem.remark : '';
-        addData.value.cost = findedItem ? findedItem.cost : '';
+        addData.value.cost = findedItem ? findedItem.cost : '';        
     }
 });
 
@@ -309,7 +309,8 @@ function openDetailPopup(item) {
         "category": item.category,
         "mileage": item.mileage,
         "cost": item.cost,
-        "liter": item.liter,
+        "unitCost": item.unitCost || 0, // 기름 단가
+        "liter": item.liter,        
         "remark": item.remark,
         "key": item.key
     }
@@ -345,6 +346,7 @@ async function addFuel() {
     addData.value.key = -1;
     addData.value.cost = fuelAmount.value;
     addData.value.liter = carBook.value.fuel.liter;
+    addData.value.unitCost = carBook.value.fuel.unitCost;
     isFuelPopup.value = false;
 
     try {
@@ -378,7 +380,8 @@ async function addAction() {
         "category": addData.value.category || "주행거리",
         "remark": addData.value.remark || "",
         "liter": addData.value.liter || 0,
-        "mileage": Number(addData.value.mileage)
+        "mileage": Number(addData.value.mileage),
+        ...(addData.value.category === "기름" && { "unitCost": Number(addData.value.unitCost) })
     }
 
     const data = {
@@ -485,6 +488,8 @@ onMounted(async () => {
                 <v-text-field v-model="addData.mileage" label="주행거리" type="number" clearable />
                 <v-text-field v-if="addData.category === '기름'" v-model="addData.liter" label="주유량" type="number"
                     clearable />
+                <v-text-field v-if="addData.category === '기름'" v-model="addData.unitCost" label="단가" type="number"
+                    clearable />    
                 <v-text-field v-if="addData.category !== '주행거리'" v-model="addData.cost" label="비용" type="number" clearable />
                 <v-text-field v-model="addData.remark" label="비고" clearable />
 
