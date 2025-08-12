@@ -19,6 +19,8 @@ import * as labs from 'vuetify/labs/components'
 import { createPinia } from 'pinia';
 import persistedState from 'pinia-plugin-persistedstate';
 
+import ko from 'vuetify/lib/locale/ko';
+
 
 // Vuetify 인스턴스 생성
 const vuetify = createVuetify({
@@ -26,6 +28,10 @@ const vuetify = createVuetify({
         ...components, ...labs
     },
     directives,
+    locale: {
+        locale: 'ko',
+        messages: { ko },
+      },
 
 })
 const pinia = createPinia();
