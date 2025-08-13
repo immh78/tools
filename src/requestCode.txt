@@ -2,6 +2,10 @@ category가 "기름"인 데이터로 line chart를 그리려고 한다.
 chart는 chart.js v4.5를 이용한다.
 횡축은 date이고 종축은 unitCost이다.
 
+
+v-sparkline를 이용하여 category가 "기름"인 데이터에 대해 unitCost의 추이를 그래프로 출력
+
+
 const listSORENTO = ref([]);
 listSORENTO.value = [
     {

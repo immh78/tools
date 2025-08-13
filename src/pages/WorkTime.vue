@@ -333,19 +333,19 @@ async function getWorkingDaysInMonth(freeDays = []) {
     // }
 
     // // 사용자 지정 휴일 추가
-    // for (const day of freeDays) {
-    //     holidays.add(day);
-    // }
+    for (const day of freeDays) {
+         holidays.add(day);
+    }
 
     let fullMonthWorkdays = 0;
     let untilTodayWorkdays = 0;
 
     for (let day = 1; day <= lastDayOfMonth; day++) {
         const date = new Date(year, month, day);
-        const weekday = date.getDay(); // 0=일요일, ..., 6=토요일
+        const weekday2 = date.getDay(); // 0=일요일, ..., 6=토요일
         const dateStr = `${year}${String(month + 1).padStart(2, '0')}${String(day).padStart(2, '0')}`;
 
-        if (weekday >= 1 && weekday <= 5 && !holidays.has(dateStr)) {
+        if (weekday2 >= 1 && weekday2 <= 5 && !holidays.has(dateStr)) {
             fullMonthWorkdays++;
             if (day <= todayDay) {
                 untilTodayWorkdays++;
@@ -355,13 +355,25 @@ async function getWorkingDaysInMonth(freeDays = []) {
 
     // ── 2. 오늘의 근무 시간 판단 ──
     const todayStr = `${year}${String(month + 1).padStart(2, '0')}${String(todayDay).padStart(2, '0')}`;
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    const formatted =
+    tomorrow.getFullYear().toString() +
+    String(tomorrow.getMonth() + 1).padStart(2, '0') +
+    String(tomorrow.getDate()).padStart(2, '0');    
 
     if (!holidays.has(todayStr)) {
-        if (weekday >= 1 && weekday <= 4)        // 월(1)~목(4)
+        console.log("holidays.has(todayStr)", holidays.has(todayStr));
+
+        if (weekday >= 1 && weekday <= 4 && !holidays.has(formatted))        // 월(1)~목(4)
             commonWorkTime.value = 9.5;
         else if (weekday === 5)                  // 금(5)
-            commonWorkTime.value = 5;
+        console.log("holidays", holidays)
+        commonWorkTime.value = 5;
         // 토(6), 일(0)은 그대로 0
+    } else {
+        commonWorkTime.value = 0;
     }
 
     /* ── 4. 오늘 이후 근무 시간 합계 (규칙 적용) ── */
