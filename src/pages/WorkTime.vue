@@ -363,18 +363,21 @@ async function getWorkingDaysInMonth(freeDays = []) {
     String(tomorrow.getMonth() + 1).padStart(2, '0') +
     String(tomorrow.getDate()).padStart(2, '0');    
 
-    if (!holidays.has(todayStr)) {
-        console.log("holidays.has(todayStr)", holidays.has(todayStr));
-
-        if (weekday >= 1 && weekday <= 4 && !holidays.has(formatted))        // 월(1)~목(4)
-            commonWorkTime.value = 9.5;
-        else if (weekday === 5)                  // 금(5)
-        console.log("holidays", holidays)
-        commonWorkTime.value = 5;
-        // 토(6), 일(0)은 그대로 0
-    } else {
+    if (holidays.has(todayStr) || weekday == 6 || weekday == 0) { 
         commonWorkTime.value = 0;
+    } else {
+        //console.log("holidays.has(todayStr)", holidays.has(todayStr));
+        //console.log("check", (weekday >= 1 && weekday <= 4 && !holidays.has(formatted)));
+
+        if (weekday >= 1 && weekday <= 4 && !holidays.has(formatted)) {       // 월(1)~목(4)
+            commonWorkTime.value = 9.5;
+        } else {
+            //console.log("holidays", holidays)
+            commonWorkTime.value = 5;
+        }            
     }
+    //console.log("weekday", weekday);
+    //console.log("commonWorkTime.value", commonWorkTime.value);
 
     /* ── 4. 오늘 이후 근무 시간 합계 (규칙 적용) ── */
     let remainingWorkHours = 0;                        // ★
