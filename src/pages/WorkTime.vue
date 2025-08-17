@@ -119,6 +119,13 @@ function getHourMinute(time) {
     return { hour, minute };
 }
 
+function getHourMinuteString(hours) {
+  const h = Math.floor(hours); // 정수 부분 = 시간
+  const m = Math.round((hours - h) * 60); // 소수 부분을 분으로 변환
+
+  return `${h}시간 ${m}분`;
+}
+
 function getTime({ hour, minute }) {
     return Number(hour) + (Number(minute) / 60);
 }
@@ -477,7 +484,7 @@ onMounted(async () => {
                 <v-row>
                     <v-col cols="12">
                         <v-text-field
-                            :label="'의무 근무시간 | 잔여 근무시간 : ' + remainTime.hour + '시간 ' + remainTime.minute + '분'"
+                            :label="`의무 근무시간 | 잔여 근무시간 : ${remainTime.hour}시간 ${remainTime.minute}분 | 과부족시간 : ${getHourMinuteString(calProg - workTimeInfo.actTime)}`"
                             v-model="workTimeInfo.planTime" variant="outlined" type="number" class="mt-2" />
                     </v-col>
                 </v-row>
