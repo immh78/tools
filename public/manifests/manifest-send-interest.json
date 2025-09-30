@@ -1,0 +1,21 @@
+{
+    "name": "이자 공유",
+    "short_name": "이자 공유",
+    "start_url": "/tools/#/send-interest",
+    "display": "standalone",
+    "theme_color": "#000000",    
+    "background_color": "#ffffff",
+    "icons": [
+      {
+        "src": "/tools/tax.png",
+        "sizes": "192x192",
+        "type": "image/png"
+      },
+      {
+        "src": "/tools/tax.png",
+        "sizes": "512x512",
+        "type": "image/png"
+      }
+    ]
+  }
+  

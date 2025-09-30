@@ -52,10 +52,11 @@ router.isReady().then(() => {
                 'log-view',
                 'work-time',
                 'regular-task',
+                'send-interest',
                 'offering',
                 'scoring',
                 'tax',
-                'test'
+                'test',
             ];
 
             manifest.href = "";

@@ -13,6 +13,7 @@ import RegularTask from '../pages/RegularTask.vue';
 import CarBook from '../pages/CarBook.vue';
 import Test from '../pages/Test.vue';
 import Offering from '../pages/Offering.vue';
+import SendInterest from '../pages/SendInterest.vue';
 import Scoring from '../pages/Scoring.vue';
 import Login from '../pages/Login.vue';
 import Register from '../pages/Register.vue';
@@ -74,6 +75,10 @@ const routes = [
     path: '/login', component: Login, comment: '로그인', icon: 'mdi-login',
     meta: { requiresAuth: false, restricted: false, loggable: false }
 
+  },
+  {
+    path: '/send-interest', component: SendInterest, comment: '이자 공유', icon: 'mdi-percent-outline',
+    meta: { requiresAuth: true, restricted: true, loggable: true }
   },
   {
     path: '/register', component: Register, comment: '회원등록', icon: 'mdi-account-plus',
