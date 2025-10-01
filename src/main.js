@@ -61,7 +61,7 @@ router.isReady().then(() => {
 
             manifest.href = "";
 
-            for (const tool of tools) {
+            for (let tool of tools) {
                 if (newPath.includes(`/${tool}`)) {
                     manifest.href = `/tools/manifests/manifest-${tool}.json?v=` + Date.now();
                     break;
