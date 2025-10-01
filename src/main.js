@@ -46,13 +46,13 @@ router.isReady().then(() => {
             if (!manifest) return
 
             const tools = [
+                'send-interest',
                 'travel-logs',
                 'car-book',
                 'tlj-sms',
                 'log-view',
                 'work-time',
                 'regular-task',
-                'send-interest',
                 'offering',
                 'scoring',
                 'tax',
