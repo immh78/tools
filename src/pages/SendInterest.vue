@@ -7,7 +7,11 @@ import { AppBarTitle, usePageMeta } from '../composables/getRouteInfo';
 const { icon } = usePageMeta();
 const defaultIcon = ref(icon.value);
 const refreshIcon = ref('');
-
+const principal = ref(0); // 원금
+const interest = ref(0); // 이자
+const principalAfterAdjustment = ref(0); // 조정 후 원금
+const interestAfterAdjustment = ref(0); // 조정 후 이자
+const additionalAmount = ref(0); // 상환시 이자
 
 function setLoadingIcon() {
     refreshIcon.value = 'mdi-refresh';
@@ -17,15 +21,43 @@ function resetIcon() {
     refreshIcon.value = defaultIcon.value; // 복원
 }
 
-const principal = 30000000; // 원금
-const interest = ref(0); // 이자
-const principalAfterAdjustment = 10000000; // 조정 후 원금
-const interestAfterAdjustment = ref(0); // 조정 후 이자
-const additionalAmount = 13040; // 상환시 이자
+async function selectData() {
+    setLoadingIcon();
+    const dbRef = firebaseRef(database, "send-interest");
+    await get(dbRef)
+        .then(snapshot => {
+            if (snapshot.exists()) {
+                principal.value = snapshot.val().principal;
+                principalAfterAdjustment.value = snapshot.val().principalAfterAdjustment;
+                interestAfterAdjustment.value = snapshot.val().interestAfterAdjustment;
+                additionalAmount.value = snapshot.val().additionalAmount;
+            }
+        })
+        .catch(err => {
+            //console.error("Error fetching data:", err);
+        });
+    resetIcon();
+}
+
+async function saveInterest() {
+    const dbRef = firebaseRef(database, "send-interest");
+    await update(dbRef, {
+        interestAfterAdjustment: interestAfterAdjustment.value
+    })
+        .then(() => {
+            // Data saved successfully!
+        })
+        .catch((error) => {
+            // The write failed...
+            console.error("Error saving data:", error);
+        });
+}
+
+
 
 watch(interestAfterAdjustment, (newInterest) => {
-    if (newInterest && principalAfterAdjustment && principal) {
-        interest.value = (principal * newInterest ) / principalAfterAdjustment + additionalAmount;
+    if (newInterest && principalAfterAdjustment.value && principal.value) {
+        interest.value = (principal.value * newInterest ) / principalAfterAdjustment.value + additionalAmount.value;
     } else {
         interest.value = 0;
     }
@@ -59,6 +91,7 @@ async function onClickShare() {
 
 
 onMounted(async () => {
+    selectData()
 });
 
 </script>
@@ -73,25 +106,36 @@ onMounted(async () => {
             <AppBarTitle :onIconClick="selectData" :refreshIcon="refreshIcon" />
             <template v-slot:append>
                 <v-btn icon="mdi-share-variant" @click="onClickShare()"></v-btn>
+                <v-btn icon="mdi-content-save" @click="saveInterest()"></v-btn>
             </template>
         </v-app-bar>
         <v-main>
-            <v-row>
-                <v-col>
-                    <v-text-field label="원금" v-model="principal" type="number" clearable />
+            <v-row class="mt-4 mx-1">
+                <v-col cols="6">
+                    <v-text-field label="원금" v-model="principal" type="number" variant="outlined" readonly/>
                 </v-col>
-                <v-text-field label="원금 이자" v-model="interest" type="number" clearable />
+                <v-col cols="6">
+                    <v-text-field label="원금 이자" v-model="interest" type="number" variant="outlined" readonly/>
+                </v-col>
             </v-row>
-            <v-row>
-                <v-col>
-                    <v-text-field label="조정후 원금" v-model="principalAfterAdjustment" type="number" clearable />
+            <v-row class="mx-1">
+                <v-col cols="6">
+                    <v-text-field label="조정후 원금" v-model="principalAfterAdjustment" type="number" variant="outlined" readonly/>
                 </v-col>
-                <v-col>
-                    <v-text-field label="조정후 이자" v-model="interestAfterAdjustment" type="number" clearable />
+                <v-col cols="6">
+                    <v-text-field label="조정후 이자" v-model="interestAfterAdjustment" type="number" clearable variant="outlined"/>
                 </v-col>
+            </v-row>
+            <v-row class="mx-1">
+                <v-col cols="6">
+                    <v-text-field label="상환 이자" v-model="additionalAmount" type="number" variant="outlined" readonly/>            
+                </v-col>
+                <v-col cols="6">
+                </v-col>
+
             </v-row>
             
-            <v-text-field label="상환 이자" v-model="additionalAmount" type="number" clearable />            
+            
 
         </v-main>
 
