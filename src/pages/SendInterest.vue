@@ -9,6 +9,7 @@ const defaultIcon = ref(icon.value);
 const refreshIcon = ref('');
 const principal = ref(0); // 원금
 const interest = ref(0); // 이자
+const rate = ref(0); // 이자율
 const principalAfterAdjustment = ref(0); // 조정 후 원금
 const interestAfterAdjustment = ref(0); // 조정 후 이자
 const additionalAmount = ref(0); // 상환시 이자
@@ -29,8 +30,7 @@ async function selectData() {
             if (snapshot.exists()) {
                 principal.value = snapshot.val().principal;
                 principalAfterAdjustment.value = snapshot.val().principalAfterAdjustment;
-                interestAfterAdjustment.value = snapshot.val().interestAfterAdjustment;
-                additionalAmount.value = snapshot.val().additionalAmount;
+                rate.value = snapshot.val().rate;
             }
         })
         .catch(err => {
@@ -42,7 +42,7 @@ async function selectData() {
 async function saveInterest() {
     const dbRef = firebaseRef(database, "send-interest");
     await update(dbRef, {
-        interestAfterAdjustment: interestAfterAdjustment.value
+        rate: rate.value
     })
         .then(() => {
             // Data saved successfully!
@@ -55,11 +55,23 @@ async function saveInterest() {
 
 
 
-watch(interestAfterAdjustment, (newInterest) => {
-    if (newInterest && principalAfterAdjustment.value && principal.value) {
-        interest.value = (principal.value * newInterest ) / principalAfterAdjustment.value + additionalAmount.value;
+watch(rate, (newRate) => {
+    if (newRate) {
+        if (principal.value > 0)
+            interest.value = Math.round(principal.value * (rate.value / 100) / 12 / 10) * 10;
+        else {
+            interest.value = 0;
+        }
+
+        if (principalAfterAdjustment.value > 0) {
+            interestAfterAdjustment.value = Math.round(principalAfterAdjustment.value * (rate.value / 100) / 12 / 10) * 10;
+        } else {
+            interestAfterAdjustment.value = 0;
+        }
     } else {
         interest.value = 0;
+        interestAfterAdjustment.value = 0;
+
     }
 });
 
@@ -123,12 +135,12 @@ onMounted(async () => {
                     <v-text-field label="조정후 원금" v-model="principalAfterAdjustment" type="number" variant="outlined" readonly/>
                 </v-col>
                 <v-col cols="6">
-                    <v-text-field label="조정후 이자" v-model="interestAfterAdjustment" type="number" clearable variant="outlined"/>
+                    <v-text-field label="조정후 이자" v-model="interestAfterAdjustment" type="number" readonly variant="outlined"/>
                 </v-col>
             </v-row>
             <v-row class="mx-1">
                 <v-col cols="6">
-                    <v-text-field label="상환 이자" v-model="additionalAmount" type="number" variant="outlined" readonly/>            
+                    <v-text-field label="이자율" v-model="rate" type="number" variant="outlined" clearable/>            
                 </v-col>
                 <v-col cols="6">
                 </v-col>
