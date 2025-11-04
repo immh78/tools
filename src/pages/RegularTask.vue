@@ -10,6 +10,9 @@ const selectTask = ref("");
 const date = ref("");
 const place = ref("");
 const cost = ref(0);
+const isHistoryPopup = ref(false);
+const historyData = ref([]);
+const historyTaskName = ref("");
 
 // AppBarTitle 컴포넌트에서 사용하는 아이콘
 const { icon } = usePageMeta();
@@ -136,6 +139,35 @@ function openPopup(param) {
     isOpenPopup.value = true;
 }
 
+function openHistoryPopup(key) {
+    historyTaskName.value = key;
+    
+    // 해당 항목의 이력 데이터 가져오기
+    if (regularTask.value.task && regularTask.value.task[key]) {
+        const entries = regularTask.value.task[key];
+        
+        // 날짜 순으로 정렬 (최신순)
+        historyData.value = entries
+            .map(entry => ({
+                ...entry,
+                formattedDate: formatDate(entry.date)
+            }))
+            .sort((a, b) => Number(b.date) - Number(a.date));
+    } else {
+        historyData.value = [];
+    }
+    
+    isHistoryPopup.value = true;
+}
+
+function formatDate(dateStr) {
+    if (!dateStr || dateStr.length !== 8) return dateStr;
+    const year = dateStr.slice(0, 4);
+    const month = dateStr.slice(4, 6);
+    const day = dateStr.slice(6, 8);
+    return `${year}.${month}.${day}`;
+}
+
 function getProgressTextColor(value) {
     // value: 퍼센트 (0~100)
     if (value <= 55) {
@@ -211,7 +243,7 @@ onMounted(async () => {
                             <h5 class="text-black mt-0 ml-2">{{ key }}</h5>
                         </v-col>
                         <v-col cols="6" class="text-right pr-3">
-                            <small style="color:grey;">{{ value.nextDate }}</small>
+                            <small style="color:grey; cursor: pointer;" @click.stop="openHistoryPopup(key)">{{ value.nextDate }}</small>
                         </v-col>
                     </v-row>
                     <v-row no-gutters>
@@ -242,6 +274,32 @@ onMounted(async () => {
                 <v-card-actions>
                     <v-btn @click="addAction()" icon="mdi-check-bold"></v-btn>
                     <v-btn @click="isOpenPopup = false" icon="mdi-close-thick"></v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+
+        <v-dialog v-model="isHistoryPopup" max-width="500px">
+            <v-card>
+                <v-card-title>{{ historyTaskName }} 이력</v-card-title>
+                <v-card-text>
+                    <v-list v-if="historyData.length > 0">
+                        <v-list-item v-for="(item, index) in historyData" :key="index" class="px-0">
+                            <v-list-item-title class="d-flex justify-space-between align-center">
+                                <span>{{ item.formattedDate }}</span>
+                                <div class="d-flex align-center">
+                                    <span v-if="item.place" class="mr-3" style="font-size: 12px; color: grey;">{{ item.place }}</span>
+                                    <span v-if="item.cost" style="font-size: 12px; color: grey;">{{ item.cost.toLocaleString() }}원</span>
+                                </div>
+                            </v-list-item-title>
+                        </v-list-item>
+                    </v-list>
+                    <div v-else class="text-center py-4" style="color: grey;">
+                        이력이 없습니다.
+                    </div>
+                </v-card-text>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn @click="isHistoryPopup = false" icon="mdi-close-thick"></v-btn>
                 </v-card-actions>
             </v-card>
         </v-dialog>
